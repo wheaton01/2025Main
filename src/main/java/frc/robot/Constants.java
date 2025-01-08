@@ -16,4 +16,16 @@ public final class Constants {
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
   }
+  public static class robotConstants{
+
+  }
+
+
+  public static class swerveConstants{
+
+    public static final double MAX_SPEED = 5.09;
+  }
+    
+    
+  
 }
