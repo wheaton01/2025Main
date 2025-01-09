@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems;
 
+import com.revrobotics.AbsoluteEncoder;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
@@ -12,9 +14,12 @@ import frc.robot.Constants.robotConstants;
 public class elevatorSub extends SubsystemBase {
   /** Creates a new elevatorSub. */
   SparkMax elevatorSpark1,elevatorSpark2;
+  AbsoluteEncoder elevatorEncoder;
   public elevatorSub() {
     elevatorSpark1 = new SparkMax(robotConstants.kelevatorSparkID1, MotorType.kBrushless);
     elevatorSpark2 = new SparkMax(robotConstants.kelevatorSparkID2, MotorType.kBrushless);
+
+    elevatorEncoder = elevatorSpark1.getAbsoluteEncoder();
 
   }
 
