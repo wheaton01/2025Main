@@ -17,6 +17,8 @@ public final class Constants {
     public static final int kDriverControllerPort = 0;
   }
   public static class robotConstants{
+    public static final int kelevatorSparkID1 = 0;//TODO : CORRECT CAN ID
+    public static final int kelevatorSparkID2 = 0;//TODO : CORRECT CAN ID
 
   }
 
