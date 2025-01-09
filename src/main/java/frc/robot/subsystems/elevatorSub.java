@@ -14,12 +14,13 @@ import frc.robot.Constants.robotConstants;
 public class elevatorSub extends SubsystemBase {
   /** Creates a new elevatorSub. */
   SparkMax elevatorSpark1,elevatorSpark2;
-  AbsoluteEncoder elevatorEncoder;
+  RelativeEncoder elevatorEncoder;
   public elevatorSub() {
     elevatorSpark1 = new SparkMax(robotConstants.kelevatorSparkID1, MotorType.kBrushless);
     elevatorSpark2 = new SparkMax(robotConstants.kelevatorSparkID2, MotorType.kBrushless);
 
-    elevatorEncoder = elevatorSpark1.getAbsoluteEncoder();
+    //i hope we are able to use a better solution, but a relative encoer in this situation isnt really the worst since we should be starting at a hard stop either way 
+    elevatorEncoder  =  elevatorSpark1.getEncoder();
 
   }
 
