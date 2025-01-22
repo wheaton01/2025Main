@@ -4,13 +4,13 @@
 
 package frc.robot.subsystems;
 
-import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.robotConstants;
+
 public class elevatorSub extends SubsystemBase {
   /** Creates a new elevatorSub. */
   SparkMax elevatorSpark1,elevatorSpark2;
@@ -28,4 +28,5 @@ public class elevatorSub extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
   }
+  
 }
