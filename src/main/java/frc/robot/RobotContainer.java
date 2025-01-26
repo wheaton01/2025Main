@@ -6,8 +6,10 @@ package frc.robot;
 
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Autos;
-import frc.robot.commands.ExampleCommand;
-import frc.robot.subsystems.ExampleSubsystem;
+import frc.robot.commands.climberCommands.setClimber;
+import frc.robot.commands.intakeCommands.setIntake;
+import frc.robot.subsystems.sClimber;
+import frc.robot.subsystems.sElevator;
 import frc.robot.subsystems.sEndAffector;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -16,8 +18,15 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class RobotContainer {
   sEndAffector sEndAffector;
+  sClimber sClimber;
+  sElevator sElevator;
 
-  private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
+  setIntake defaultIntake;
+  setClimber defaultClimber;
+  
+  
+
+  //private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
 
   // Initialize sEndAffector in the constructor
 
@@ -25,29 +34,47 @@ public class RobotContainer {
   private final CommandXboxController m_driverController =
       new CommandXboxController(OperatorConstants.kDriverControllerPort);
 
+  public final CommandXboxController m_operatorController =
+      new CommandXboxController(OperatorConstants.kOperatorControllerPort);
+
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-
-
-    // Initialize sEndAffector
+    // Initializing Subsystems
     sEndAffector = new sEndAffector();
+    sClimber = new sClimber();
+    sElevator = new sElevator();
 
-    // Configure the trigger bindings
-    configureBindings();
-  }
+    setupCommands();
+    
+        // Configure the trigger bindings
+        configureBindings();
+      }
+    
+    
+      private void setupCommands() {
+         defaultIntake = new setIntake(false, false, 0, sEndAffector);
+         defaultClimber =new setClimber(sClimber, false, false);
 
 
-  private void configureBindings() {
+         sEndAffector.setDefaultCommand(defaultIntake);
+         sClimber.setDefaultCommand(defaultClimber);
+         //sElevator.setDefaultCommand(defaultElevator);
+      }
+    
+    
+      private void configureBindings() {
 
     // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
     // cancelling on release.
     
     // m_driverController.b().whileTrue(m_exampleSubsystem.exampleMethodCommand());
   }
+  
 
 
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
-    return Autos.exampleAuto(m_exampleSubsystem);
+    //todo : this is all temporary
+    return Autos.getAutonomousCommand(sEndAffector);
   }
 }

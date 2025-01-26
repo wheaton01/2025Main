@@ -15,6 +15,7 @@ package frc.robot;
 public final class Constants {
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
+    public static final int kOperatorControllerPort = 1;
   }
   public static class robotConstants{
     public static final int kelevatorSparkID1 = 0;//TODO : CORRECT CAN ID
@@ -40,9 +41,22 @@ public final class Constants {
     }
 
       public static class elevatorConstants{
+
+        public static final double kFeedForward = 0.0;
+
         public static final double kP = 0.0;
         public static final double kI = 0.0;
         public static final double kD = 0.0;
+
+        public static final double kL4Height = 150.0;
+        public static final double kL3Height = 100.0; 
+        public static final double kL2Height = 50.0; 
+        public static final double kL1Height = 0.0;
+
+        public static final double kHomePose = 0.0;
+
+        public static final double kMaxHeight = 250.0;
+
       }
 
   }
