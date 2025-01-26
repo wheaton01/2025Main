@@ -21,14 +21,17 @@ public final class Constants {
     public static final int kelevatorSparkID2 = 0;//TODO : CORRECT CAN ID
     
     //End Affector Constants
-    public static final int kintakeSparkID = 0;//TODO : CORRECT CAN ID
-    public static final int kPlacesparkID = 0;//TODO : CORRECT CAN ID
+      public static final int kintakeSparkID = 0;//TODO : CORRECT CAN ID
+      public static final int kPlacesparkID = 0;//TODO : CORRECT CAN ID
 
-    public static final int kPneuExtendID = 0;//TODO : CORRECT PNEUMATIC ID
+      public static final int kPneuExtendID = 0;//TODO : CORRECT PNEUMATIC ID
 
 
-    public static int kIntakeSensorID = 0; //TODO : CORRECT ANALOG ID
-    public static int kPlaceSensorID  = 0;      //TODO : CORRECT ANALOG ID
+      public static int kIntakeSensorID = 0; //TODO : CORRECT ANALOG ID
+      public static int kPlaceSensorID  = 0;      //TODO : CORRECT ANALOG ID
+    
+    
+      public static int kintakeSensorThreshold;
 
   }
 

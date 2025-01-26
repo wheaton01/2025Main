@@ -4,12 +4,15 @@
 
 package frc.robot.subsystems;
 
-// import com.revrobotics.AnalogInput;
+import javax.crypto.SealedObject;
+
+import javax.crypto.SealedObject;
+
+import edu.wpi.first.wpilibj.AnalogInput;
 import com.revrobotics.jni.CANSparkJNI;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
-import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.PneumaticHub;
 import edu.wpi.first.wpilibj.PneumaticsBase;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
@@ -39,5 +42,22 @@ public class sEndAffector extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+  }
+
+  public void setIntake(double nspeed, boolean bextend, boolean buseSensor){
+    if(buseSensor){
+      if (aPlaceSensor.getValue()>Constants.robotConstants.kintakeSensorThreshold){
+        mIntake.set(0);
+      
+    }
+    if(!buseSensor){
+      mIntake.   set(nspeed);
+      mPlace.    set(nspeed);
+      sEAExtend. set(bextend);
+    }
+  }
+
+  public void setEAExtension(boolean bextend){
+    sEAExtend.set(bextend);
   }
 }
