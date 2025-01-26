@@ -29,9 +29,21 @@ public final class Constants {
 
       public static int kIntakeSensorID = 0; //TODO : CORRECT ANALOG ID
       public static int kPlaceSensorID  = 0;      //TODO : CORRECT ANALOG ID
-    
-    
+
+
       public static int kintakeSensorThreshold;
+
+
+    public static class climberConstants{
+      public static final int kClimberSolenoidID = 0;//TODO : CORRECT PNEUMATIC ID
+      public static final int kDeployClimberSolenoidID = 0;//TODO : CORRECT PNEUMATIC ID
+    }
+
+      public static class elevatorConstants{
+        public static final double kP = 0.0;
+        public static final double kI = 0.0;
+        public static final double kD = 0.0;
+      }
 
   }
 

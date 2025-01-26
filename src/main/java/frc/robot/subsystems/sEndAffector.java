@@ -36,8 +36,8 @@ public class sEndAffector extends SubsystemBase {
     sEAExtend = new Solenoid(PneumaticsModuleType.REVPH, Constants.robotConstants.kPneuExtendID);
 
     aIntakeSensor = new AnalogInput(Constants.robotConstants.kIntakeSensorID);
-    aPlaceSensor = new  AnalogInput(Constants.robotConstants.kPlaceSensorID); 
-  }
+      aPlaceSensor = new  AnalogInput(Constants.robotConstants.kPlaceSensorID); 
+    }
 
   @Override
   public void periodic() {
@@ -50,10 +50,10 @@ public class sEndAffector extends SubsystemBase {
         mIntake.set(0);
       
     }
-    if(!buseSensor){
-      mIntake.   set(nspeed);
-      mPlace.    set(nspeed);
-      sEAExtend. set(bextend);
+    } else {
+      mIntake.set(nspeed);
+      mPlace.set(nspeed);
+      sEAExtend.set(bextend);
     }
   }
 
@@ -61,3 +61,4 @@ public class sEndAffector extends SubsystemBase {
     sEAExtend.set(bextend);
   }
 }
+

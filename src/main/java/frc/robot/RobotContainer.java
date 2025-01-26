@@ -15,10 +15,11 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 
 public class RobotContainer {
+  sEndAffector sEndAffector;
 
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
 
-  this.sEndAffector = new sEndAffector();
+  // Initialize sEndAffector in the constructor
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_driverController =
@@ -26,7 +27,10 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-      sEndAffector sEndAffector;
+
+
+    // Initialize sEndAffector
+    sEndAffector = new sEndAffector();
 
     // Configure the trigger bindings
     configureBindings();
