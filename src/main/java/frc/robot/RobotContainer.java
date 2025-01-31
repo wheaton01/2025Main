@@ -41,8 +41,8 @@ public class RobotContainer {
   public RobotContainer() {
     // Initializing Subsystems
     sEndAffector = new sEndAffector();
-    sClimber = new sClimber();
-    sElevator = new sElevator();
+    sClimber =     new sClimber();
+    sElevator =    new sElevator();
 
     setupCommands();
     

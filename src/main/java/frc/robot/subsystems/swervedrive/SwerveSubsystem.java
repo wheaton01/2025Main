@@ -19,6 +19,7 @@ import com.pathplanner.lib.util.swerve.SwerveSetpoint;
 import com.pathplanner.lib.util.swerve.SwerveSetpointGenerator;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -330,7 +331,7 @@ public class SwerveSubsystem extends SubsystemBase
   {
 // Create the constraints to use while pathfinding
     PathConstraints constraints = new PathConstraints(
-        swerveDrive.getMaximumChassisVelocity(), 4.0,
+        swerveDrive.getMaximumChassisVelocity(), 6.0,
         swerveDrive.getMaximumChassisAngularVelocity(), Units.degreesToRadians(720));
 
 // Since AutoBuilder is configured, we can use it to build pathfinding commands
@@ -411,6 +412,7 @@ public class SwerveSubsystem extends SubsystemBase
             this, swerveDrive, 12),
         3.0, 5.0, 3.0);
   }
+
 
   /**
    * Command to characterize the robot angle motors using SysId
@@ -791,5 +793,21 @@ public class SwerveSubsystem extends SubsystemBase
   public SwerveDrive getSwerveDrive()
   {
     return swerveDrive;
+  }
+Pose2d currentPose;
+PIDController XdeltaPID = new PIDController(.051, 0, 0);
+PIDController YdeltaPID = new PIDController(.05, 0, 0);
+PIDController thetaPID = new PIDController(.05, 0, 0);
+
+  public void driveToPose(Pose2d pose, double speed)
+  {
+    currentPose = getPose();
+    Translation2d delta = pose.getTranslation().minus(currentPose.getTranslation());
+    double xSpeed = XdeltaPID.calculate(currentPose.getX(), pose.getX()) * speed;
+    double ySpeed = YdeltaPID.calculate(currentPose.getY(), pose.getY()) * speed;
+    double thetaSpeed = thetaPID.calculate(currentPose.getRotation().getRadians(), pose.getRotation().getRadians()) * speed;
+
+    ChassisSpeeds chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, thetaSpeed, currentPose.getRotation());
+    swerveDrive.drive(chassisSpeeds);
   }
 }
