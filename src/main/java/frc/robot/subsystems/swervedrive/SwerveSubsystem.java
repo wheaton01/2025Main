@@ -810,4 +810,33 @@ PIDController thetaPID = new PIDController(.05, 0, 0);
     ChassisSpeeds chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, thetaSpeed, currentPose.getRotation());
     swerveDrive.drive(chassisSpeeds);
   }
+  public void stop()
+  {
+    swerveDrive.drive(new ChassisSpeeds(0, 0, 0));
+  }
+
+  public Pose2d getNearestAllianceAprilTagPose(String direction) {
+    int[] blueTags = {1, 2, 3}; // Example tag IDs for blue alliance
+    int[] redTags = {4, 5, 6}; // Example tag IDs for red alliance
+
+    int[] allianceTags = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue ? blueTags : redTags;
+    Pose2d currentPose = getPose();
+    Pose2d nearestTagPose = null;
+    double nearestDistance = Double.MAX_VALUE;
+
+    for (int tagID : allianceTags) {
+        Optional<Pose3d> tagPose3d = aprilTagFieldLayout.getTagPose(tagID);
+        if (tagPose3d.isPresent()) {
+            Pose2d tagPose = tagPose3d.get().toPose2d();
+            double distance = currentPose.getTranslation().getDistance(tagPose.getTranslation());
+            if (distance < nearestDistance) {
+                nearestDistance = distance;
+                nearestTagPose = tagPose;
+            }
+        }
+    }
+
+    return nearestTagPose;
+}
+
 }
