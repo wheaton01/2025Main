@@ -58,6 +58,12 @@ public final class Constants {
         public static final double kMaxHeight = 250.0;
 
       }
+      public static class aprilTagConstants{
+
+        public static double klReefOffset= -5.0;
+        public static double krReefOffset= 5.0;
+
+      }
 
   }
 

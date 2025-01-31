@@ -67,7 +67,7 @@ public class SwerveSubsystem extends SubsystemBase
   /**
    * AprilTag field layout.
    */
-  private final AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2024Crescendo);
+  private final AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
   /**
    * Enable vision odometry updates while driving.
    */
@@ -237,76 +237,6 @@ public class SwerveSubsystem extends SubsystemBase
     //Preload PathPlanner Path finding
     // IF USING CUSTOM PATHFINDER ADD BEFORE THIS LINE
     PathfindingCommand.warmupCommand().schedule();
-  }
-
-  /**
-   * Get the distance to the speaker.
-   *
-   * @return Distance to speaker in meters.
-   */
-  public double getDistanceToSpeaker()
-  {
-    int allianceAprilTag = DriverStation.getAlliance().get() == Alliance.Blue ? 7 : 4;
-    // Taken from PhotonUtils.getDistanceToPose
-    Pose3d speakerAprilTagPose = aprilTagFieldLayout.getTagPose(allianceAprilTag).get();
-    return getPose().getTranslation().getDistance(speakerAprilTagPose.toPose2d().getTranslation());
-  }
-
-  /**
-   * Get the yaw to aim at the speaker.
-   *
-   * @return {@link Rotation2d} of which you need to achieve.
-   */
-  public Rotation2d getSpeakerYaw()
-  {
-    int allianceAprilTag = DriverStation.getAlliance().get() == Alliance.Blue ? 7 : 4;
-    // Taken from PhotonUtils.getYawToPose()
-    Pose3d        speakerAprilTagPose = aprilTagFieldLayout.getTagPose(allianceAprilTag).get();
-    Translation2d relativeTrl         = speakerAprilTagPose.toPose2d().relativeTo(getPose()).getTranslation();
-    return new Rotation2d(relativeTrl.getX(), relativeTrl.getY()).plus(swerveDrive.getOdometryHeading());
-  }
-
-  /**
-   * Aim the robot at the speaker.
-   *
-   * @param tolerance Tolerance in degrees.
-   * @return Command to turn the robot to the speaker.
-   */
-  public Command aimAtSpeaker(double tolerance)
-  {
-    SwerveController controller = swerveDrive.getSwerveController();
-    return run(
-        () -> {
-          ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(0, 0,
-                                                   controller.headingCalculate(getHeading().getRadians(),
-                                                                               getSpeakerYaw().getRadians()),
-                                                                       getHeading());
-          drive(speeds);
-        }).until(() -> Math.abs(getSpeakerYaw().minus(getHeading()).getDegrees()) < tolerance);
-  }
-
-  /**
-   * Aim the robot at the target returned by PhotonVision.
-   *
-   * @return A {@link Command} which will run the alignment.
-   */
-  public Command aimAtTarget(Cameras camera)
-  {
-
-    return run(() -> {
-      Optional<PhotonPipelineResult> resultO = camera.getBestResult();
-      if (resultO.isPresent())
-      {
-        var result = resultO.get();
-        if (result.hasTargets())
-        {
-          drive(getTargetSpeeds(0,
-                                0,
-                                Rotation2d.fromDegrees(result.getBestTarget()
-                                                             .getYaw()))); // Not sure if this will work, more math may be required.
-        }
-      }
-    });
   }
 
   /**
@@ -815,16 +745,17 @@ PIDController thetaPID = new PIDController(.05, 0, 0);
     swerveDrive.drive(new ChassisSpeeds(0, 0, 0));
   }
 
-  public Pose2d getNearestAllianceAprilTagPose(String direction) {
-    int[] blueTags = {1, 2, 3}; // Example tag IDs for blue alliance
-    int[] redTags = {4, 5, 6}; // Example tag IDs for red alliance
+  public Pose2d getNearestReefAprilTagPose(boolean offsetLeft) { 
+    int[] blueReefTags = {17, 18, 19, 20, 21, 22}; // Blue reef tags
+    int[] redReefTags = {6, 7, 8, 9, 10, 11};     // Red reef tags
 
-    int[] allianceTags = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue ? blueTags : redTags;
+    int[] reefTags = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue ? blueReefTags : redReefTags;
     Pose2d currentPose = getPose();
     Pose2d nearestTagPose = null;
     double nearestDistance = Double.MAX_VALUE;
+    double offsetDistance = 0.165; // 6.5 inches (half the distance between poles)
 
-    for (int tagID : allianceTags) {
+    for (int tagID : reefTags) {
         Optional<Pose3d> tagPose3d = aprilTagFieldLayout.getTagPose(tagID);
         if (tagPose3d.isPresent()) {
             Pose2d tagPose = tagPose3d.get().toPose2d();
@@ -836,7 +767,33 @@ PIDController thetaPID = new PIDController(.05, 0, 0);
         }
     }
 
-    return nearestTagPose;
+    if (nearestTagPose == null) {
+        return null; // No valid tag found
+    }
+
+    // Get the AprilTag's rotation (assumes tags face "forward" into the field)
+    Rotation2d tagRotation = nearestTagPose.getRotation();
+
+    // Compute perpendicular direction vector (90 degrees from tag's forward direction)
+    Translation2d perpendicularOffset = new Translation2d(
+        offsetDistance * Math.cos(tagRotation.getRadians() + Math.PI / 2),  // X shift
+        offsetDistance * Math.sin(tagRotation.getRadians() + Math.PI / 2)   // Y shift
+    );
+
+    // If offsetLeft is false, move to the right (negative offset)
+    if (!offsetLeft) {
+        perpendicularOffset = perpendicularOffset.unaryMinus();
+    }
+
+    // Apply the offset to get the final target pose
+    Pose2d adjustedPose = new Pose2d(
+        nearestTagPose.getTranslation().plus(perpendicularOffset), 
+        nearestTagPose.getRotation()
+    );
+
+    return adjustedPose;
 }
+
+
 
 }

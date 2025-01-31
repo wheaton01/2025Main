@@ -1,6 +1,8 @@
 package frc.robot.commands.SwerveCommands;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants.robotConstants;
+import frc.robot.Constants.robotConstants.aprilTagConstants;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -8,14 +10,20 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import java.util.function.DoubleSupplier;
 
 public class DriveToPoseCommand extends Command {
+  // Subsystem for controlling the swerve drive
   private final SwerveSubsystem swerveSubsystem;
+  
+  // Speed at which the robot should drive
   private final double speed;
+  
+  // Suppliers for offsets and trigger inputs (dynamically received from the controller)
   private final DoubleSupplier xOffsetSupplier;
   private final DoubleSupplier yOffsetSupplier;
   private final DoubleSupplier rotationOffsetSupplier;
   private final DoubleSupplier leftTriggerSupplier;
   private final DoubleSupplier rightTriggerSupplier;
 
+  // Constructor to initialize the command
   public DriveToPoseCommand(SwerveSubsystem swerveSubsystem, double speed, 
                             DoubleSupplier xOffsetSupplier, DoubleSupplier yOffsetSupplier, 
                             DoubleSupplier rotationOffsetSupplier, DoubleSupplier leftTriggerSupplier, 
@@ -27,60 +35,88 @@ public class DriveToPoseCommand extends Command {
     this.rotationOffsetSupplier = rotationOffsetSupplier;
     this.leftTriggerSupplier = leftTriggerSupplier;
     this.rightTriggerSupplier = rightTriggerSupplier;
+    
+    // Declare subsystem dependencies so that no other command interferes
     addRequirements(swerveSubsystem);
   }
 
   @Override
   public void initialize() {
-    // Initialization code if needed
+    // Runs once when the command starts. Currently does nothing but can be used for setup.
   }
 
   @Override
   public void execute() {
-    Pose2d targetPose = getNearestAprilTagPose();
+    // Get the closest AprilTag pose for the reef
+    Pose2d targetPose = getNearestReefTagPose();
+    
+    // If no valid tag is found, exit early to avoid errors
     if (targetPose == null) {
-      return; // If no valid tag, do nothing
+      return;
     }
-
+  
+    // Get predefined offsets from constants
+    double leftOffset  = aprilTagConstants.klReefOffset;
+    double rightOffset = aprilTagConstants.krReefOffset;
+  
+    // Get the dynamic offset values from the controller inputs
     double xOffset = xOffsetSupplier.getAsDouble();
     double yOffset = yOffsetSupplier.getAsDouble();
     double rotationOffset = rotationOffsetSupplier.getAsDouble();
-
+  
+    // Get the trigger values (scale between 0 and 1)
+    double leftTrigger = leftTriggerSupplier.getAsDouble();
+    double rightTrigger = rightTriggerSupplier.getAsDouble();
+  
+    // You can choose to take the average of both triggers or scale the speed based on whichever trigger is pressed more
+    double triggerScale = (leftTrigger + rightTrigger) / 2; // Scale the speed between 0 and 1
+  
+    // Adjust the speed based on the trigger value
+    double scaledSpeed = speed * triggerScale;
+  
+    // Create a new target pose with the adjusted offsets
     Pose2d adjustedPose = new Pose2d(
       targetPose.getX() + xOffset,
       targetPose.getY() + yOffset,
       targetPose.getRotation().plus(Rotation2d.fromDegrees(rotationOffset))
     );
-
-    swerveSubsystem.driveToPose(adjustedPose, speed);
+  
+    // Command the swerve drive system to move to the adjusted pose at the scaled speed
+    swerveSubsystem.driveToPose(adjustedPose, scaledSpeed);
   }
-
-  private Pose2d getNearestAprilTagPose() {
-    double leftTriggerValue = leftTriggerSupplier.getAsDouble();
-    double rightTriggerValue = rightTriggerSupplier.getAsDouble();
-
-    // Determine alliance side and get the nearest tag
-    if (leftTriggerValue > rightTriggerValue) {
-      return swerveSubsystem.getNearestAllianceAprilTagPose("left");
-    } else {
-      return swerveSubsystem.getNearestAllianceAprilTagPose("right");
-    }
+  
+  
+  /**
+   * Determines which reef AprilTag to use for navigation.
+   * Uses the controller triggers to determine if the robot should offset left or right.
+   */
+  private Pose2d getNearestReefTagPose() {
+      if (leftTriggerSupplier.getAsDouble() > rightTriggerSupplier.getAsDouble()) {
+          return swerveSubsystem.getNearestReefAprilTagPose(true); // Offset left
+      }
+      if (leftTriggerSupplier.getAsDouble() <= rightTriggerSupplier.getAsDouble()) {
+          return swerveSubsystem.getNearestReefAprilTagPose(false); // Offset right
+      }
+      
+      // Default case: Always offset right (consider making this return null if unintended behavior occurs)
+      return swerveSubsystem.getNearestReefAprilTagPose(false);
   }
 
   @Override
   public boolean isFinished() {
-    Pose2d currentPose = swerveSubsystem.getPose();
-    Pose2d targetPose = getNearestAprilTagPose();
-    
-    if (targetPose == null) {
-      return true; // Stop if no valid AprilTag is found
+    // Check if both triggers are back to zero
+    if (leftTriggerSupplier.getAsDouble() == 0 && rightTriggerSupplier.getAsDouble() == 0) {
+      return true; // Stop the command when both triggers are zero
     }
-
-    return currentPose.equals(targetPose);
+  
+    // Otherwise, keep the command running
+    return false;
   }
+  
 
   @Override
   public void end(boolean interrupted) {
+    // Stop the robot when the command ends or is interrupted
     if (interrupted) {
       swerveSubsystem.stop();
     }
