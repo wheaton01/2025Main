@@ -37,7 +37,7 @@ public class RobotContainer {
         sEndAffector = new sEndAffector();
         sClimber = new sClimber();
         sElevator = new sElevator();
-        swerveSubsystem = new SwerveSubsystem(new File("src\\swerve\\neo\\swervedrive.json"));
+        swerveSubsystem = new SwerveSubsystem(new File("src\swerve\\neo\\swervedrive.json"));
 
         setupCommands();
         configureBindings();
