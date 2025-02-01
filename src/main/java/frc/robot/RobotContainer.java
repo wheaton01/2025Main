@@ -13,6 +13,7 @@ import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 
 import java.io.File;
 
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -37,8 +38,7 @@ public class RobotContainer {
         sEndAffector = new sEndAffector();
         sClimber = new sClimber();
         sElevator = new sElevator();
-        swerveSubsystem = new SwerveSubsystem(new File("src\swerve\\neo\\swervedrive.json"));
-
+        swerveSubsystem = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve/neo/swervedrive.json"));
         setupCommands();
         configureBindings();
     }

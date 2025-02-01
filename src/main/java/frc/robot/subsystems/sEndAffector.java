@@ -70,5 +70,8 @@ public class sEndAffector extends SubsystemBase {
   public void setEAExtension(boolean bextend){
     sEAExtend.set(bextend);
   }
+  public boolean hasCoral(){
+    return aIntakeSensor.getValue()>Constants.robotConstants.kintakeSensorThreshold;
+  }
 }
 
