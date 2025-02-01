@@ -745,7 +745,7 @@ PIDController thetaPID = new PIDController(.05, 0, 0);
     swerveDrive.drive(new ChassisSpeeds(0, 0, 0));
   }
 
-  public Pose2d getNearestReefAprilTagPose(boolean offsetLeft) { 
+  public Pose2d getNearestReefAprilTagPose(String offsetDirection) { 
     int[] blueReefTags = {17, 18, 19, 20, 21, 22}; // Blue reef tags
     int[] redReefTags = {6, 7, 8, 9, 10, 11};     // Red reef tags
 
@@ -753,8 +753,7 @@ PIDController thetaPID = new PIDController(.05, 0, 0);
     Pose2d currentPose = getPose();
     Pose2d nearestTagPose = null;
     double nearestDistance = Double.MAX_VALUE;
-    double offsetDistance = 0.165; // 6.5 inches (half the distance between poles)
-
+    
     for (int tagID : reefTags) {
         Optional<Pose3d> tagPose3d = aprilTagFieldLayout.getTagPose(tagID);
         if (tagPose3d.isPresent()) {
@@ -774,25 +773,32 @@ PIDController thetaPID = new PIDController(.05, 0, 0);
     // Get the AprilTag's rotation (assumes tags face "forward" into the field)
     Rotation2d tagRotation = nearestTagPose.getRotation();
 
-    // Compute perpendicular direction vector (90 degrees from tag's forward direction)
-    Translation2d perpendicularOffset = new Translation2d(
-        offsetDistance * Math.cos(tagRotation.getRadians() + Math.PI / 2),  // X shift
-        offsetDistance * Math.sin(tagRotation.getRadians() + Math.PI / 2)   // Y shift
+    // Compute offsets
+    Translation2d sideOffset = new Translation2d(0, 0); // Left/Right Offset
+    Translation2d forwardOffset = new Translation2d( // Forward/Backward Offset
+        -swerveConstants.kforwardOffsetDistance * Math.cos(tagRotation.getRadians()),  
+        -swerveConstants.kforwardOffsetDistance * Math.sin(tagRotation.getRadians())
     );
 
-    // If offsetLeft is false, move to the right (negative offset)
-    if (!offsetLeft) {
-        perpendicularOffset = perpendicularOffset.unaryMinus();
+    if ("left".equalsIgnoreCase(offsetDirection)) {
+        sideOffset = new Translation2d(
+          swerveConstants.sideOffsetDistance * Math.cos(tagRotation.getRadians() + Math.PI / 2), 
+          swerveConstants.sideOffsetDistance * Math.sin(tagRotation.getRadians() + Math.PI / 2)
+        );
+    } else if ("right".equalsIgnoreCase(offsetDirection)) {
+        sideOffset = new Translation2d(
+            -swerveConstants.sideOffsetDistance * Math.cos(tagRotation.getRadians() + Math.PI / 2), 
+            -swerveConstants.sideOffsetDistance * Math.sin(tagRotation.getRadians() + Math.PI / 2)
+        );
     }
 
-    // Apply the offset to get the final target pose
-    Pose2d adjustedPose = new Pose2d(
-        nearestTagPose.getTranslation().plus(perpendicularOffset), 
+    // Apply the offsets to get the final target pose
+    return new Pose2d(
+        nearestTagPose.getTranslation().plus(sideOffset).plus(forwardOffset), 
         nearestTagPose.getRotation()
     );
-
-    return adjustedPose;
 }
+
 
 
 

@@ -92,14 +92,14 @@ public class DriveToPoseCommand extends Command {
    */
   private Pose2d getNearestReefTagPose() {
       if (leftTriggerSupplier.getAsDouble() > rightTriggerSupplier.getAsDouble()) {
-          return swerveSubsystem.getNearestReefAprilTagPose(true); // Offset left
+          return swerveSubsystem.getNearestReefAprilTagPose("left"); // Offset left
       }
       if (leftTriggerSupplier.getAsDouble() <= rightTriggerSupplier.getAsDouble()) {
-          return swerveSubsystem.getNearestReefAprilTagPose(false); // Offset right
+          return swerveSubsystem.getNearestReefAprilTagPose("right"); // Offset right
       }
       
-      // Default case: Always offset right (consider making this return null if unintended behavior occurs)
-      return swerveSubsystem.getNearestReefAprilTagPose(false);
+      // Default case: Center robot to tag. for algae!
+      return swerveSubsystem.getNearestReefAprilTagPose("center");
   }
 
   @Override

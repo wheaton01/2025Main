@@ -71,6 +71,9 @@ public final class Constants {
   public static class swerveConstants{
 
     public static final double MAX_SPEED = 5.09;
+    public static double kforwardOffsetDistance = .460;//TODO : This value is pulled from cad and may need to be corrected based on field meas. this is used for the drivetoPose command
+    public static double sideOffsetDistance     = .165;//TODO : Sets distance between the center of the robot and april tag
+    
   }
 
     
