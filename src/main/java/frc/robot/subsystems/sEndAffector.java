@@ -54,16 +54,34 @@ public class sEndAffector extends SubsystemBase {
     // This method will be called once per scheduler run
   }
 
-  public void setIntake(double nspeed, boolean bextend, boolean buseSensor){
+  public void setIntake(double nintakeSpeed,double nplaceSpeed, boolean bextend, boolean buseSensor){
     if(buseSensor){
       if (aPlaceSensor.getValue()>Constants.robotConstants.kintakeSensorThreshold){
         mIntake.set(0);
       
     }
     } else {
-      mIntake.set(nspeed);
-      mPlace.set(nspeed);
+      mIntake.set(nintakeSpeed);
+      mPlace.set(nplaceSpeed);
       sEAExtend.set(bextend);
+    }
+  }
+  public void setPlace(double nspeed){
+    mPlace.set(nspeed);
+  }
+  public void setIntake(double nspeed){
+    mIntake.set(nspeed);
+  }
+  public void setZero(){
+    mIntake.set(0);
+    mPlace.set(0);
+  }
+  public boolean getPlace(){
+    if (aPlaceSensor.getValue()>Constants.robotConstants.kintakeSensorThreshold){
+      return true;
+    } else {
+      return false;
+      
     }
   }
 

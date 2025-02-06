@@ -15,7 +15,7 @@ public final class Autos {
   //   return Commands.sequence(subsystem.exampleMethodCommand(), new ExampleCommand(subsystem));
   // }
   public static Command getAutonomousCommand(sEndAffector sEndAffector) {
-    return Commands.sequence(new setIntake(true, true, 0.5, sEndAffector), new setIntake(true, false, 0.5, sEndAffector));
+    return Commands.sequence(new setIntake(true, true, 0.5,0, sEndAffector), new setIntake(true, false, 0.5,0, sEndAffector));
   }
 
   private Autos() {

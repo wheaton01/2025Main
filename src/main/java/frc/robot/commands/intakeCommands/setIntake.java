@@ -12,13 +12,14 @@ public class setIntake extends Command {
   /** Creates a new setIntake. */
   boolean buseSensor;
   boolean bextend;
-  double nspeed;
+  double nintakeSpeed,nplaceSpeed;
   sEndAffector sEndAffector;
-  public setIntake(boolean buseSensor, boolean bextend, double nspeed, sEndAffector sEndAffector) {
+  public setIntake(boolean buseSensor, boolean bextend, double nintakeSpeed,double nplaceSpeed, sEndAffector sEndAffector) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.buseSensor = buseSensor;
     this.bextend = bextend;
-    this.nspeed = nspeed;
+    this.nintakeSpeed = nintakeSpeed;
+    this.nplaceSpeed = nplaceSpeed;
     this.sEndAffector = sEndAffector;
     
     addRequirements(sEndAffector);
@@ -27,7 +28,7 @@ public class setIntake extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    sEndAffector.setIntake(nspeed, bextend, buseSensor);
+    sEndAffector.setIntake(nintakeSpeed,nplaceSpeed, bextend, buseSensor);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -36,11 +37,19 @@ public class setIntake extends Command {
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    if(buseSensor){
+    sEndAffector.setIntake(0,0, false, false);
+    }
+  }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return true;
-  }
+    if (buseSensor){
+      return sEndAffector.getPlace();
+    }
+    return false;
+    
+}
 }
