@@ -69,7 +69,7 @@ public final class Constants {
         public static final double kIntakeSpeed = 0.7;
         public static final double kPlaceSpeed = 1.0;
         public static final double kIntakeSensorThreshold = 0.0;
-        public static final double intakeTime = .25;//TODO : This value is used in the intakeCoral command to determine how long the intake should run for after coral is sensed
+        public static final double kIntakeTime = .25;//TODO : This value is used in the intakeCoral command to determine how long the intake should run for after coral is sensed
       }
 
   }

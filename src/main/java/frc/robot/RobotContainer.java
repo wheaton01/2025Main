@@ -44,7 +44,7 @@ public class RobotContainer {
     }
 
     private void setupCommands() {
-        defaultIntake = new setIntake(false, false, 0, sEndAffector);
+        defaultIntake = new setIntake(false, false, 0,0, sEndAffector);
         defaultClimber = new setClimber(sClimber, false, false);
 
         sEndAffector.setDefaultCommand(defaultIntake);
