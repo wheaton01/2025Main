@@ -43,7 +43,8 @@ public class RobotContainer {
         sElevator = new sElevator();
         m_controllerHaptics = new sControllerHaptics(m_driverController, m_operatorController);
 
-        swerveSubsystem = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve/neo/swervedrive.json"));
+        swerveSubsystem = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
+        "swerve/neo"));
         setupCommands();
         configureBindings();
     }
