@@ -22,12 +22,14 @@ public class DriveToPoseCommand extends Command {
   private final DoubleSupplier rotationOffsetSupplier;
   private final DoubleSupplier leftTriggerSupplier;
   private final DoubleSupplier rightTriggerSupplier;
+  private boolean bInAuton = false;
+  public Pose2d adjustedPose;
 
   // Constructor to initialize the command
   public DriveToPoseCommand(SwerveSubsystem swerveSubsystem, double speed, 
                             DoubleSupplier xOffsetSupplier, DoubleSupplier yOffsetSupplier, 
                             DoubleSupplier rotationOffsetSupplier, DoubleSupplier leftTriggerSupplier, 
-                            DoubleSupplier rightTriggerSupplier) {
+                            DoubleSupplier rightTriggerSupplier, boolean bInAuton) {
     this.swerveSubsystem = swerveSubsystem;
     this.speed = speed;
     this.xOffsetSupplier = xOffsetSupplier;
@@ -75,11 +77,12 @@ public class DriveToPoseCommand extends Command {
     double scaledSpeed = speed * triggerScale;
   
     // Create a new target pose with the adjusted offsets
-    Pose2d adjustedPose = new Pose2d(
+    adjustedPose = new Pose2d(
       targetPose.getX() + xOffset,
       targetPose.getY() + yOffset,
       targetPose.getRotation().plus(Rotation2d.fromDegrees(rotationOffset))
     );
+    swerveSubsystem.setTargetPose(adjustedPose);
   
     // Command the swerve drive system to move to the adjusted pose at the scaled speed
     swerveSubsystem.driveToPose(adjustedPose, scaledSpeed);
@@ -105,10 +108,12 @@ public class DriveToPoseCommand extends Command {
   @Override
   public boolean isFinished() {
     // Check if both triggers are back to zero
-    if (leftTriggerSupplier.getAsDouble() == 0 && rightTriggerSupplier.getAsDouble() == 0) {
+    if (leftTriggerSupplier.getAsDouble() == 0 && rightTriggerSupplier.getAsDouble() == 0 && !bInAuton) {
       return true; // Stop the command when both triggers are zero
     }
-  
+    if (bInAuton){
+      return swerveSubsystem.isAtPose();
+    }
     // Otherwise, keep the command running
     return false;
   }

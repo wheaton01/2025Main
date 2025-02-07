@@ -7,11 +7,12 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 public class sControllerHaptics extends SubsystemBase {
-  XboxController driverXbox,opXbox;
+  CommandXboxController driverXbox,opXbox;
   /** Creates a new controllerHaptics. */
-  public sControllerHaptics(XboxController driverXbox, XboxController opXbox) {
+  public sControllerHaptics(CommandXboxController driverXbox, CommandXboxController opXbox) {
     this.driverXbox = driverXbox;
     this.opXbox = opXbox;
   }

@@ -7,6 +7,7 @@ import frc.robot.commands.climberCommands.setClimber;
 import frc.robot.commands.intakeCommands.setIntake;
 import frc.robot.commands.SwerveCommands.DriveToPoseCommand;
 import frc.robot.subsystems.sClimber;
+import frc.robot.subsystems.sControllerHaptics;
 import frc.robot.subsystems.sElevator;
 import frc.robot.subsystems.sEndAffector;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
@@ -27,6 +28,7 @@ public class RobotContainer {
 
     setIntake defaultIntake;
     setClimber defaultClimber;
+    sControllerHaptics m_controllerHaptics;
 
     private final CommandXboxController m_driverController =
         new CommandXboxController(OperatorConstants.kDriverControllerPort);
@@ -34,19 +36,25 @@ public class RobotContainer {
     public final CommandXboxController m_operatorController =
         new CommandXboxController(OperatorConstants.kOperatorControllerPort);
 
+
     public RobotContainer() {
         sEndAffector = new sEndAffector();
         sClimber = new sClimber();
         sElevator = new sElevator();
+        m_controllerHaptics = new sControllerHaptics(m_driverController, m_operatorController);
+
         swerveSubsystem = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve/neo/swervedrive.json"));
         setupCommands();
         configureBindings();
     }
 
     private void setupCommands() {
+        //Intake Commands
         defaultIntake = new setIntake(false, false, 0,0, sEndAffector);
         defaultClimber = new setClimber(sClimber, false, false);
 
+
+        //Setting Default Commands
         sEndAffector.setDefaultCommand(defaultIntake);
         sClimber.setDefaultCommand(defaultClimber);
     }
@@ -70,7 +78,8 @@ public class RobotContainer {
                 m_driverController::getLeftY, // yOffset
                 m_driverController::getRightX, // rotationOffset
                 m_driverController::getLeftTriggerAxis,
-                m_driverController::getRightTriggerAxis
+                m_driverController::getRightTriggerAxis,
+                false
             ));
 
         // Bind left trigger to drive to nearest AprilTag pose to the left
@@ -82,7 +91,8 @@ public class RobotContainer {
                 m_driverController::getLeftY, // yOffset
                 m_driverController::getRightX, // rotationOffset
                 m_driverController::getLeftTriggerAxis,
-                m_driverController::getRightTriggerAxis
+                m_driverController::getRightTriggerAxis,
+                false
             ));
     }
 

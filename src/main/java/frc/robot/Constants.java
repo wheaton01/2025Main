@@ -80,6 +80,9 @@ public final class Constants {
     public static final double MAX_SPEED = 5.09;
     public static double kforwardOffsetDistance = .460;//TODO : This value is pulled from cad and may need to be corrected based on field meas. this is used for the drivetoPose command
     public static double sideOffsetDistance     = .165;//TODO : Sets distance between the center of the robot and april tag
+
+    public static final double POSITION_TOLERANCE = 0.5;//TODO : this value is used in the swerveSubsystem to determine how close the robot is to the target pose
+    public static final double ROTATION_TOLERANCE = 0.5;
     
   }
 

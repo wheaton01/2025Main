@@ -809,6 +809,29 @@ PIDController thetaPID = new PIDController(.05, 0, 0);
         nearestTagPose.getRotation()
     );
 }
+private Pose2d targetPose = new Pose2d(); // Store the latest pose to drive to
+
+public void setTargetPose(Pose2d pose) {
+    this.targetPose = pose;
+}
+
+public Pose2d getTargetPose() {
+    return targetPose;
+}
+public boolean isAtPose() {
+  Pose2d currentPose = getPose(); // Get the robot's current position
+  Pose2d targetPose = getTargetPose(); // Get the stored target pose
+
+  double positionTolerance = swerveConstants.POSITION_TOLERANCE; // In meters
+  double rotationTolerance = swerveConstants.ROTATION_TOLERANCE; // In degrees
+
+  double xError = Math.abs(currentPose.getX() - targetPose.getX());
+  double yError = Math.abs(currentPose.getY() - targetPose.getY());
+  double rotationError = Math.abs(currentPose.getRotation().getDegrees() - targetPose.getRotation().getDegrees());
+
+  return (xError < positionTolerance && yError < positionTolerance && rotationError < rotationTolerance);
+}
+
 
 
 
