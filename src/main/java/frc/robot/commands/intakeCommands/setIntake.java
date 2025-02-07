@@ -28,7 +28,16 @@ public class setIntake extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    sEndAffector.setIntake(nintakeSpeed,nplaceSpeed, bextend, buseSensor);
+    if(buseSensor && !sEndAffector.getCoralSensor()){
+
+      sEndAffector.setIntake(nintakeSpeed,nplaceSpeed);
+    }
+    if(!buseSensor){
+    sEndAffector.setIntake(nintakeSpeed,nplaceSpeed);
+    }
+
+    sEndAffector.setExtend(bextend);
+
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -39,7 +48,7 @@ public class setIntake extends Command {
   @Override
   public void end(boolean interrupted) {
     if(buseSensor){
-    sEndAffector.setIntake(0,0, false, false);
+    sEndAffector.setZero();
     }
   }
 
@@ -47,7 +56,7 @@ public class setIntake extends Command {
   @Override
   public boolean isFinished() {
     if (buseSensor){
-      return sEndAffector.getPlace();
+      return sEndAffector.getCoralSensor();
     }
     return false;
     

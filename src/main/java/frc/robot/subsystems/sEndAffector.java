@@ -54,18 +54,11 @@ public class sEndAffector extends SubsystemBase {
     // This method will be called once per scheduler run
   }
 
-  public void setIntake(double nintakeSpeed,double nplaceSpeed, boolean bextend, boolean buseSensor){
-    if(buseSensor){
-      if (aPlaceSensor.getValue()>Constants.robotConstants.kintakeSensorThreshold){
-        mIntake.set(0);
-      
-    }
-    } else {
+  public void setIntake(double nintakeSpeed,double nplaceSpeed){
       mIntake.set(nintakeSpeed);
       mPlace.set(nplaceSpeed);
-      sEAExtend.set(bextend);
     }
-  }
+  
   public void setPlace(double nspeed){
     mPlace.set(nspeed);
   }
@@ -76,7 +69,7 @@ public class sEndAffector extends SubsystemBase {
     mIntake.set(0);
     mPlace.set(0);
   }
-  public boolean getPlace(){
+  public boolean getCoralSensor(){
     if (aPlaceSensor.getValue()>Constants.robotConstants.kintakeSensorThreshold){
       return true;
     } else {
@@ -85,7 +78,7 @@ public class sEndAffector extends SubsystemBase {
     }
   }
 
-  public void setEAExtension(boolean bextend){
+  public void setExtend(boolean bextend){
     sEAExtend.set(bextend);
   }
   public boolean hasCoral(){

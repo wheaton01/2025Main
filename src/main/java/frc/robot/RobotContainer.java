@@ -26,7 +26,7 @@ public class RobotContainer {
     sElevator sElevator;
     SwerveSubsystem swerveSubsystem;
 
-    setIntake defaultIntake;
+    setIntake defaultIntake, intakeBall;
     setClimber defaultClimber;
     sControllerHaptics m_controllerHaptics;
 
@@ -53,6 +53,9 @@ public class RobotContainer {
         //Intake Commands
         defaultIntake = new setIntake(false, false, 0,0, sEndAffector);
         defaultClimber = new setClimber(sClimber, false, false);
+        intakeBall = new setIntake(false, true, 0.0,-1.0, sEndAffector);
+
+
 
 
         //Setting Default Commands
