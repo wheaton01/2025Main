@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.robotConstants;
+import frc.robot.Constants.robotConstants.elevatorConstants;
 
 public class sElevator extends SubsystemBase {
   /** Creates a new sElevator. */
@@ -22,23 +23,27 @@ public class sElevator extends SubsystemBase {
   public sElevator() {
     mElevator1 = new SparkMax(robotConstants.kelevatorSparkID1, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless);
     mElevator2 = new SparkMax(robotConstants.kelevatorSparkID2, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless);
-    
     mElevatorPid = new PIDController(robotConstants.elevatorConstants.kP, 
                                      robotConstants.elevatorConstants.kI, 
                                      robotConstants.elevatorConstants.kD);
+
+    mElevatorPid.setTolerance(elevatorConstants.kTolerance);
   }
 
   @Override
   public void periodic() {
     SmartDashboard.putNumber("Elevator Position", mElevator1.getEncoder().getPosition());
     SmartDashboard.putNumber("Elevator Setpoint", mElevatorPid.getSetpoint());
-    mElevatorPid.calculate(mElevator1.getEncoder().getPosition()+robotConstants.elevatorConstants.kFeedForward);
+    PIDOutput=mElevatorPid.calculate(mElevator1.getEncoder().getPosition()+robotConstants.elevatorConstants.kFeedForward);
     
     
-    mElevator1.set(mElevatorPid.getSetpoint());
-    mElevator2.set(mElevatorPid.getSetpoint());
+    mElevator1.set(PIDOutput);
+    mElevator2.set(-PIDOutput);
   }
   public void setElevatorPose(double height){
     mElevatorPid.setSetpoint(height);
+  }
+  public boolean isAtSetpoint(){
+    return mElevatorPid.atSetpoint();
   }
 }

@@ -57,6 +57,8 @@ public final class Constants {
 
         public static final double kMaxHeight = 250.0;
 
+        public static final double kTolerance = 1.0;
+
       }
       public static class aprilTagConstants{
 
