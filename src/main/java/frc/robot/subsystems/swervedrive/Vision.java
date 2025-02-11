@@ -54,8 +54,9 @@ public class Vision
   /**
    * April Tag Field Layout of the year.
    */
-  private final AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2024Crescendo);  /**
-   * Ambiguity defined as a value between (0,1). Used in {@link Vision#filterPose}.
+  public static final AprilTagFieldLayout fieldLayout                     = AprilTagFieldLayout.loadField(
+      AprilTagFields.k2025Reefscape);
+        /* Ambiguity defined as a value between (0,1). Used in {@link Vision#filterPose}.
    */
   private final       double              maximumAmbiguity                = 0.25;
   /**
