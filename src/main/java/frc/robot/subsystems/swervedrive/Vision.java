@@ -23,6 +23,8 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import frc.robot.Robot;
+import frc.robot.subsystems.swervedrive.Vision.Cameras;
+
 import java.awt.Desktop;
 import java.util.ArrayList;
 import java.util.List;
@@ -52,9 +54,7 @@ public class Vision
   /**
    * April Tag Field Layout of the year.
    */
-  public static final AprilTagFieldLayout fieldLayout                     = AprilTagFieldLayout.loadField(
-      AprilTagFields.kDefaultField);
-  /**
+  private final AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2024Crescendo);  /**
    * Ambiguity defined as a value between (0,1). Used in {@link Vision#filterPose}.
    */
   private final       double              maximumAmbiguity                = 0.25;

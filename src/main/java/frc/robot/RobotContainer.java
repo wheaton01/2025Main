@@ -83,6 +83,7 @@ public class RobotContainer {
                 m_driverController::getRightX, // rotationOffset
                 m_driverController::getLeftTriggerAxis,
                 m_driverController::getRightTriggerAxis,
+                false,
                 false
             ));
 
@@ -96,6 +97,7 @@ public class RobotContainer {
                 m_driverController::getRightX, // rotationOffset
                 m_driverController::getLeftTriggerAxis,
                 m_driverController::getRightTriggerAxis,
+                false,
                 false
             ));
             // Bind B button to drive to nearest AprilTag pose at center
@@ -108,8 +110,22 @@ public class RobotContainer {
                             m_driverController::getRightX, // rotationOffset
                             m_driverController::getLeftTriggerAxis,
                             m_driverController::getRightTriggerAxis,
+                            false,
                             false // Set to false for non-autonomous mode, change as needed
                         ));
+            new Trigger(m_driverController.rightBumper())
+                        .whileTrue(new DriveToPoseCommand(
+                            swerveSubsystem,
+                            swerveConstants.MAX_SPEED,
+                            m_driverController::getLeftX, // xOffset
+                            m_driverController::getLeftY, // yOffset
+                            m_driverController::getRightX, // rotationOffset
+                            m_driverController::getLeftTriggerAxis,
+                            m_driverController::getRightTriggerAxis,
+                            true,
+                            false // Set to false for non-autonomous mode, change as needed
+                        ));
+                        
                     
 
     }

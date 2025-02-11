@@ -8,11 +8,28 @@ import java.util.List;
 public class MyAprilTagField {
     public static AprilTagFieldLayout generateFieldLayout() {
         return new AprilTagFieldLayout(List.of(
-            new AprilTag(1, new Pose3d(0.0, 5.5, 0.5, new Rotation3d(0, 0, 0))),
-            new AprilTag(2, new Pose3d(1.5, 5.5, 0.5, new Rotation3d(0, 0, 0))),
-            new AprilTag(3, new Pose3d(3.0, 5.5, 0.5, new Rotation3d(0, 0, 0))),
-            // Add the rest of your IDs here based on field coordinates
-            new AprilTag(22, new Pose3d(8.0, 2.5, 0.5, new Rotation3d(0, 0, 0)))
-        ), 8.21, 4.11); // Field size (adjust based on real dimensions)
+            new AprilTag(1, new Pose3d(657.37, 25.80, 58.50, new Rotation3d(0, 0, Math.toRadians(126)))),
+            new AprilTag(2, new Pose3d(657.37, 291.20, 58.50, new Rotation3d(0, 0, Math.toRadians(234)))),
+            new AprilTag(3, new Pose3d(455.15, 317.15, 51.25, new Rotation3d(0, 0, Math.toRadians(270)))),
+            new AprilTag(4, new Pose3d(365.20, 241.64, 73.54, new Rotation3d(0, 0, Math.toRadians(0)))),
+            new AprilTag(5, new Pose3d(365.20, 75.39, 73.54, new Rotation3d(0, 0, Math.toRadians(0)))),
+            new AprilTag(6, new Pose3d(530.49, 130.17, 12.13, new Rotation3d(0, 0, Math.toRadians(300)))),
+            new AprilTag(7, new Pose3d(546.87, 158.50, 12.13, new Rotation3d(0, 0, Math.toRadians(0)))),
+            new AprilTag(8, new Pose3d(530.49, 186.83, 12.13, new Rotation3d(0, 0, Math.toRadians(60)))),
+            new AprilTag(9, new Pose3d(497.77, 186.83, 12.13, new Rotation3d(0, 0, Math.toRadians(120)))),
+            new AprilTag(10, new Pose3d(481.39, 158.50, 12.13, new Rotation3d(0, 0, Math.toRadians(180)))),
+            new AprilTag(11, new Pose3d(497.77, 130.17, 12.13, new Rotation3d(0, 0, Math.toRadians(240)))),
+            new AprilTag(12, new Pose3d(33.51, 25.80, 58.50, new Rotation3d(0, 0, Math.toRadians(54)))),
+            new AprilTag(13, new Pose3d(33.51, 291.20, 58.50, new Rotation3d(0, 0, Math.toRadians(306)))),
+            new AprilTag(14, new Pose3d(325.68, 241.64, 73.54, new Rotation3d(0, 0, Math.toRadians(180)))),
+            new AprilTag(15, new Pose3d(325.68, 75.39, 73.54, new Rotation3d(0, 0, Math.toRadians(180)))),
+            new AprilTag(16, new Pose3d(235.73, -0.15, 51.25, new Rotation3d(0, 0, Math.toRadians(90)))),
+            new AprilTag(17, new Pose3d(160.39, 130.17, 12.13, new Rotation3d(0, 0, Math.toRadians(240)))),
+            new AprilTag(18, new Pose3d(144.00, 158.50, 12.13, new Rotation3d(0, 0, Math.toRadians(180)))),
+            new AprilTag(19, new Pose3d(160.39, 186.83, 12.13, new Rotation3d(0, 0, Math.toRadians(120)))),
+            new AprilTag(20, new Pose3d(193.10, 186.83, 12.13, new Rotation3d(0, 0, Math.toRadians(60)))),
+            new AprilTag(21, new Pose3d(209.49, 158.50, 12.13, new Rotation3d(0, 0, Math.toRadians(0)))),
+            new AprilTag(22, new Pose3d(193.10, 130.17, 12.13, new Rotation3d(0, 0, Math.toRadians(300))))
+        ), 8.21, 4.11); // Adjust the field dimensions as needed
     }
 }

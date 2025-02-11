@@ -831,6 +831,34 @@ public boolean isAtPose() {
 
   return (xError < positionTolerance && yError < positionTolerance && rotationError < rotationTolerance);
 }
+public Pose2d getNearestHumanPlayerTagPose() { 
+  // Define AprilTag IDs for the Human Player Stations
+  int[] blueHumanPlayerTags = {12, 13}; // Blue alliance human player station tags
+  int[] redHumanPlayerTags = {1, 2};    // Red alliance human player station tags
+
+  // Select the correct tag set based on the alliance color
+  int[] humanPlayerTags = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue ? blueHumanPlayerTags : redHumanPlayerTags;
+  
+  Pose2d currentPose = getPose();
+  Pose2d nearestTagPose = null;
+  double nearestDistance = Double.MAX_VALUE;
+  
+  // Find the closest human player station tag
+  for (int tagID : humanPlayerTags) {
+      Optional<Pose3d> tagPose3d = aprilTagFieldLayout.getTagPose(tagID);
+      if (tagPose3d.isPresent()) {
+          Pose2d tagPose = tagPose3d.get().toPose2d();
+          double distance = currentPose.getTranslation().getDistance(tagPose.getTranslation());
+          if (distance < nearestDistance) {
+              nearestDistance = distance;
+              nearestTagPose = tagPose;
+          }
+      }
+  }
+
+  return nearestTagPose; // Return the nearest tag pose, or null if no valid tag is found
+}
+
 
 
 

@@ -23,13 +23,14 @@ public class DriveToPoseCommand extends Command {
   private final DoubleSupplier leftTriggerSupplier;
   private final DoubleSupplier rightTriggerSupplier;
   private boolean bInAuton = false;
+  private boolean bhumanPlayerStation = false;
   public Pose2d adjustedPose;
 
   // Constructor to initialize the command
   public DriveToPoseCommand(SwerveSubsystem swerveSubsystem, double speed, 
                             DoubleSupplier xOffsetSupplier, DoubleSupplier yOffsetSupplier, 
                             DoubleSupplier rotationOffsetSupplier, DoubleSupplier leftTriggerSupplier, 
-                            DoubleSupplier rightTriggerSupplier, boolean bInAuton) {
+                            DoubleSupplier rightTriggerSupplier,boolean bhumanPlayerStation, boolean bInAuton) {
     this.swerveSubsystem = swerveSubsystem;
     this.speed = speed;
     this.xOffsetSupplier = xOffsetSupplier;
@@ -51,6 +52,9 @@ public class DriveToPoseCommand extends Command {
   public void execute() {
     // Get the closest AprilTag pose for the reef
     Pose2d targetPose = getNearestReefTagPose();
+    if (bhumanPlayerStation){
+      targetPose = getHPStation();
+    }
     
     // If no valid tag is found, exit early to avoid errors
     if (targetPose == null) {
@@ -104,6 +108,9 @@ public class DriveToPoseCommand extends Command {
       // Default case: Center robot to tag. for algae!
       return swerveSubsystem.getNearestReefAprilTagPose("center");
   }
+  private Pose2d getHPStation(){
+    return swerveSubsystem.getNearestHumanPlayerTagPose();
+  }
 
   @Override
   public boolean isFinished() {
@@ -122,6 +129,9 @@ public class DriveToPoseCommand extends Command {
   @Override
   public void end(boolean interrupted) {
     // Stop the robot when the command ends or is interrupted
+    if (bInAuton){
+      swerveSubsystem.stop();
+    }
     if (interrupted) {
       swerveSubsystem.stop();
     }
