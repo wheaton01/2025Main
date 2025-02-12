@@ -43,7 +43,7 @@ public class sEndAffector extends SubsystemBase {
     mIntake = new TalonFX(robotConstants.kintakeSparkID, rioBus);
     mPlace = new TalonFX(robotConstants.kPlacesparkID, rioBus);
     
-    sEAExtend = new Solenoid(PneumaticsModuleType.REVPH, Constants.robotConstants.kPneuExtendID);
+    sEAExtend = new Solenoid(PneumaticsModuleType.CTREPCM, Constants.robotConstants.kPneuExtendID);
 
     aIntakeSensor = new AnalogInput(Constants.robotConstants.kIntakeSensorID);
       aPlaceSensor = new  AnalogInput(Constants.robotConstants.kPlaceSensorID); 
