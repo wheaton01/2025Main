@@ -93,7 +93,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "setL3Pose"
+                  "name": "setL2Pose"
                 }
               },
               {
@@ -134,6 +134,101 @@
           "type": "wait",
           "data": {
             "waitTime": 0.25
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.125
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "P2toHF3"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "setAutoIntake"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "setL2Pose"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "HF3toP3"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "placeL4"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "autoDriveToPoseCommand"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "sequential",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "setHomePose"
+                }
+              },
+              {
+                "type": "parallel",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "setAutoIntake"
+                      }
+                    },
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "P3toHF4"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
           }
         }
       ]
