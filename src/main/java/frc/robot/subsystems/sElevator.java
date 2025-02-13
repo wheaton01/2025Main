@@ -1,49 +1,70 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot.subsystems;
 
-import com.revrobotics.spark.SparkMax;
-
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.robotConstants;
 import frc.robot.Constants.robotConstants.elevatorConstants;
+import com.revrobotics.spark.*;
+import edu.wpi.first.math.controller.PIDController;
 
 public class sElevator extends SubsystemBase {
-  /** Creates a new sElevator. */
-  SparkMax mElevator1, mElevator2;
-  PIDController mElevatorPid;
 
-  double PIDOutput;
+    private SparkMax mElevator1, mElevator2;
+    private PIDController mElevatorPid;
 
-  public sElevator() {
-    mElevator1 = new SparkMax(robotConstants.kelevatorSparkID1, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless);
-    mElevator2 = new SparkMax(robotConstants.kelevatorSparkID2, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless);
-    mElevatorPid = new PIDController(robotConstants.elevatorConstants.kP, 
-                                     robotConstants.elevatorConstants.kI, 
-                                     robotConstants.elevatorConstants.kD);
+    // Tuning mode boolean
+    private boolean tuningMode = false;
 
-    mElevatorPid.setTolerance(elevatorConstants.kTolerance);
-  }
+    // Constructor
+    public sElevator() {
+        mElevator1 = new SparkMax(robotConstants.kelevatorSparkID1, SparkMax.MotorType.kBrushless);
+        mElevator2 = new SparkMax(robotConstants.kelevatorSparkID2, SparkMax.MotorType.kBrushless);
 
-  @Override
-  public void periodic() {
-    SmartDashboard.putNumber("Elevator Position", mElevator1.getEncoder().getPosition());
-    SmartDashboard.putNumber("Elevator Setpoint", mElevatorPid.getSetpoint());
-    PIDOutput=mElevatorPid.calculate(mElevator1.getEncoder().getPosition()+robotConstants.elevatorConstants.kFeedForward);
-    
-    
-    mElevator1.set(PIDOutput);
-    mElevator2.set(-PIDOutput);
-  }
-  public void setElevatorPose(double height){
-    mElevatorPid.setSetpoint(height);
-  }
-  public boolean isAtSetpoint(){
-    return mElevatorPid.atSetpoint();
-  }
+        // Initialize the PID controller with default values
+        mElevatorPid = new PIDController(robotConstants.elevatorConstants.kP, 
+                                         robotConstants.elevatorConstants.kI, 
+                                         robotConstants.elevatorConstants.kD);
+
+        mElevatorPid.setTolerance(elevatorConstants.kTolerance);
+    }
+
+    @Override
+    public void periodic() {
+        // Tuning Mode: Check if we are in tuning mode
+        if (tuningMode) {
+            // Update PID constants from SmartDashboard if tuning mode is on
+            mElevatorPid.setP(SmartDashboard.getNumber("PID P", robotConstants.elevatorConstants.kP));
+            mElevatorPid.setI(SmartDashboard.getNumber("PID I", robotConstants.elevatorConstants.kI));
+            mElevatorPid.setD(SmartDashboard.getNumber("PID D", robotConstants.elevatorConstants.kD));
+        }
+
+        // Get the elevator position from the encoder
+        double position = mElevator1.getEncoder().getPosition();
+
+        // Update SmartDashboard with elevator position and setpoint
+        SmartDashboard.putNumber("Elevator Position", position);
+        SmartDashboard.putNumber("Elevator Setpoint", mElevatorPid.getSetpoint());
+
+        // Calculate PID output based on current position
+        double PIDOutput = mElevatorPid.calculate(position + robotConstants.elevatorConstants.kFeedForward);
+
+        // Control the motors based on the PID output
+        mElevator1.set(PIDOutput);
+        mElevator2.set(-PIDOutput);  // Opposing motor for synchronization
+    }
+
+    // Set the desired height (pose) for the elevator
+    public void setElevatorPose(double height) {
+        mElevatorPid.setSetpoint(height);
+    }
+
+    // Check if the elevator is at the setpoint
+    public boolean isAtSetpoint() {
+        return mElevatorPid.atSetpoint();
+    }
+
+    // Method to toggle tuning mode on/off
+    public void setTuningMode(boolean isEnabled) {
+        tuningMode = isEnabled;
+    }
 }
