@@ -36,6 +36,7 @@ public class RobotContainer {
     setClimber defaultClimber;
     sControllerHaptics m_controllerHaptics;
     setElevatorPose setL4Pose, setL3Pose, setL2Pose, setL1Pose, setHomePose;
+    DriveToPoseCommand autoDriveToPoseCommand;
 
     private final CommandXboxController m_driverController = new CommandXboxController(
             OperatorConstants.kDriverControllerPort);
@@ -71,6 +72,15 @@ public class RobotContainer {
         // Setting Default Commands
         sEndAffector.setDefaultCommand(defaultIntake);
         sClimber.setDefaultCommand(defaultClimber);
+
+        //swerve Commands
+        autoDriveToPoseCommand = new  DriveToPoseCommand(swerveSubsystem,swerveConstants.kalignSpeed,()->0.0,
+        ()->0.0, 
+        ()->0.0,
+        ()->0.0, 
+        ()->0.0,
+        false, 
+        true);
     }
 
     private void configureBindings() {
@@ -129,46 +139,45 @@ public class RobotContainer {
                         false // Set to false for non-autonomous mode, adjust as needed
                 ));
     }
-
     public void operatorControls() {
         // ------------------------- Preset Pose Commands ------------------------- //
         m_operatorController.a().onTrue(setL1Pose);
         m_operatorController.b().onTrue(setL3Pose);
         m_operatorController.x().onTrue(setL2Pose);
         m_operatorController.a().onTrue(setHomePose); // Note: A button duplicated
-
+    
         // ----------------------- Climber Safety Override ----------------------- //
         new Trigger(() -> m_operatorController.rightStick().getAsBoolean() &&
                 m_operatorController.leftStick().getAsBoolean())
                 .onTrue(new ParallelCommandGroup(
                         new setCHaptics(m_controllerHaptics, 0.8).withTimeout(1.2),
                         new InstantCommand(sClimber::disableSafety)));
-
+    
         // --------------------------- Intake Controls --------------------------- //
-
-        // **Left Bumper**: Deploy intake only (no motor action)
+    
+        // **Left Bumper**: Deploy intake only (no motor action) -> No haptic feedback when motors are off
         m_operatorController.leftBumper()
-                .onTrue(new setIntake(false, true, 0, 0, sEndAffector));
-
-        // **Left Trigger (≥ 0.2)**: Deploy & run **intake forward, place motor in
-        // reverse**
+                .onTrue(new setIntake(false, true, 0, 0, sEndAffector)); // No haptics here since motors are off
+    
+        // **Left Trigger (≥ 0.2)**: Deploy & run **intake forward, place motor in reverse**
         m_operatorController.leftTrigger(0.2)
-                .whileTrue(new setIntake(false, true, intakeConstants.kIntakeSpeed, -intakeConstants.kPlaceSpeed,
-                        sEndAffector));
-
-        // **Right Trigger (≥ 0.2)**: Deploy & run **both intake & place motors
-        // forward**
+                .whileTrue(new ParallelCommandGroup(
+                        new setIntake(false, true, intakeConstants.kIntakeSpeed, -intakeConstants.kPlaceSpeed, sEndAffector),
+                        new setCHaptics(m_controllerHaptics, 0.5))); // Haptic feedback when motors are on
+    
+        // **Right Trigger (≥ 0.2)**: Deploy & run **both intake & place motors forward**
         m_operatorController.rightTrigger(0.2)
-                .whileTrue(new setIntake(false, true, intakeConstants.kIntakeSpeed, intakeConstants.kPlaceSpeed,
-                        sEndAffector));
-
+                .whileTrue(new ParallelCommandGroup(
+                        new setIntake(false, true, intakeConstants.kIntakeSpeed, intakeConstants.kPlaceSpeed, sEndAffector),
+                        new setCHaptics(m_controllerHaptics, 0.7))); // Haptic feedback when motors are on
+    
         // **Right Bumper**: Auto-Intake Mode (Both Motors Forward)
         m_operatorController.rightBumper()
-                .whileTrue(new setIntake(true, true, intakeConstants.kIntakeSpeed, intakeConstants.kPlaceSpeed,
-                        sEndAffector));
-
-        // **Home Position (Idle Intake Mode)**: Runs intake at low speed until a note
-        // is detected
+                .whileTrue(new ParallelCommandGroup(
+                        new setIntake(true, true, intakeConstants.kIntakeSpeed, intakeConstants.kPlaceSpeed, sEndAffector),
+                        new setCHaptics(m_controllerHaptics, 0.8))); // Haptic feedback when motors are on
+    
+        // **Home Position (Idle Intake Mode)**: Runs intake at low speed until a note is detected
         new Trigger(() -> !m_operatorController.leftTrigger(0.2).getAsBoolean() &&
                 !m_operatorController.rightTrigger(0.2).getAsBoolean() &&
                 !m_operatorController.leftBumper().getAsBoolean() &&
@@ -176,6 +185,7 @@ public class RobotContainer {
                 .whileTrue(new setIntake(false, false, intakeConstants.kIdleIntakeSpeed, 0, sEndAffector)
                         .until(sEndAffector::getCoralSensor)); // Stops when note is detected
     }
+    
 
     public Command getAutonomousCommand() {
         return Autos.getAutonomousCommand(sEndAffector);
