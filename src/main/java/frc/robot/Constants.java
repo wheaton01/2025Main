@@ -67,7 +67,7 @@ public final class Constants {
 
       }
       public static class intakeConstants{
-        
+        public static final double kIdleIntakeSpeed = .5;
         public static final double kIntakeSpeed = 0.7;
         public static final double kPlaceSpeed = 1.0;
         public static final double kIntakeSensorThreshold = 0.0;
