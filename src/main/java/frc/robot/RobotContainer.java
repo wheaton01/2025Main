@@ -35,15 +35,13 @@ public class RobotContainer {
     setIntake defaultIntake, intakeBall;
     setClimber defaultClimber;
     sControllerHaptics m_controllerHaptics;
-    setElevatorPose setL4Pose, setL3Pose,setL2Pose,setL1Pose, setHomePose;
+    setElevatorPose setL4Pose, setL3Pose, setL2Pose, setL1Pose, setHomePose;
 
+    private final CommandXboxController m_driverController = new CommandXboxController(
+            OperatorConstants.kDriverControllerPort);
 
-    private final CommandXboxController m_driverController =
-        new CommandXboxController(OperatorConstants.kDriverControllerPort);
-
-    public final CommandXboxController m_operatorController =
-        new CommandXboxController(OperatorConstants.kOperatorControllerPort);
-
+    public final CommandXboxController m_operatorController = new CommandXboxController(
+            OperatorConstants.kOperatorControllerPort);
 
     public RobotContainer() {
         sEndAffector = new sEndAffector();
@@ -52,7 +50,7 @@ public class RobotContainer {
         m_controllerHaptics = new sControllerHaptics(m_driverController, m_operatorController);
 
         swerveSubsystem = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
-        "swerve/neo"));
+                "swerve/neo"));
         setupCommands();
         configureBindings();
     }
@@ -62,119 +60,123 @@ public class RobotContainer {
         defaultIntake = new setIntake(false, false, 0, 0, sEndAffector);
         defaultClimber = new setClimber(sClimber, false, false);
         intakeBall = new setIntake(false, true, 0.0, -1.0, sEndAffector);
-    
+
         // Elevator Commands
         setL4Pose = new setElevatorPose(sElevator, elevatorConstants.kL4Height);
         setL3Pose = new setElevatorPose(sElevator, elevatorConstants.kL3Height);
         setL2Pose = new setElevatorPose(sElevator, elevatorConstants.kL2Height);
         setL1Pose = new setElevatorPose(sElevator, elevatorConstants.kL1Height);
         setHomePose = new setElevatorPose(sElevator, elevatorConstants.kHomePose);
-    
+
         // Setting Default Commands
         sEndAffector.setDefaultCommand(defaultIntake);
         sClimber.setDefaultCommand(defaultClimber);
     }
-    
+
     private void configureBindings() {
         driverControls();
         operatorControls();
     }
-    
+
     public void driverControls() {
         // Set default drive command
         swerveSubsystem.setDefaultCommand(
-            swerveSubsystem.driveCommand(
-                m_driverController::getLeftX,
-                m_driverController::getLeftY,
-                m_driverController::getRightX
-            )
-        );
-    
+                swerveSubsystem.driveCommand(
+                        m_driverController::getLeftX,
+                        m_driverController::getLeftY,
+                        m_driverController::getRightX));
+
         // Create DriveToPoseCommand based on trigger inputs
         createDriveToPoseTrigger(m_driverController.getRightTriggerAxis(), true);
         createDriveToPoseTrigger(m_driverController.getLeftTriggerAxis(), false);
-        
+
         // Bind B button to drive to nearest AprilTag pose at center
         createDriveToPoseButtonTrigger(m_driverController.b(), false);
-        
+
         // Bind right bumper to drive to nearest AprilTag pose with a special mode
         createDriveToPoseButtonTrigger(m_driverController.rightBumper(), true);
     }
-    
-    // Helper method to create drive-to-pose triggers for the right and left triggers
+
+    // Helper method to create drive-to-pose triggers for the right and left
+    // triggers
     private void createDriveToPoseTrigger(double triggerValue, boolean isRightTrigger) {
         new Trigger(() -> triggerValue > 0.5)
-            .whileTrue(new DriveToPoseCommand(
-                swerveSubsystem,
-                swerveConstants.MAX_SPEED,
-                m_driverController::getLeftX, // xOffset
-                m_driverController::getLeftY, // yOffset
-                m_driverController::getRightX, // rotationOffset
-                m_driverController::getLeftTriggerAxis,
-                m_driverController::getRightTriggerAxis,
-                !isRightTrigger, // Adjust the mode based on which trigger is being used
-                false // Set to false for non-autonomous mode, adjust as needed
-            ));
+                .whileTrue(new DriveToPoseCommand(
+                        swerveSubsystem,
+                        swerveConstants.MAX_SPEED,
+                        m_driverController::getLeftX, // xOffset
+                        m_driverController::getLeftY, // yOffset
+                        m_driverController::getRightX, // rotationOffset
+                        m_driverController::getLeftTriggerAxis,
+                        m_driverController::getRightTriggerAxis,
+                        !isRightTrigger, // Adjust the mode based on which trigger is being used
+                        false // Set to false for non-autonomous mode, adjust as needed
+                ));
     }
-    
+
     // Helper method to bind a button to a DriveToPoseCommand
     private void createDriveToPoseButtonTrigger(Trigger buttonTrigger, boolean useSpecialMode) {
         new Trigger(buttonTrigger)
-            .whileTrue(new DriveToPoseCommand(
-                swerveSubsystem,
-                swerveConstants.MAX_SPEED,
-                m_driverController::getLeftX, // xOffset
-                m_driverController::getLeftY, // yOffset
-                m_driverController::getRightX, // rotationOffset
-                m_driverController::getLeftTriggerAxis,
-                m_driverController::getRightTriggerAxis,
-                useSpecialMode,
-                false // Set to false for non-autonomous mode, adjust as needed
-            ));
+                .whileTrue(new DriveToPoseCommand(
+                        swerveSubsystem,
+                        swerveConstants.MAX_SPEED,
+                        m_driverController::getLeftX, // xOffset
+                        m_driverController::getLeftY, // yOffset
+                        m_driverController::getRightX, // rotationOffset
+                        m_driverController::getLeftTriggerAxis,
+                        m_driverController::getRightTriggerAxis,
+                        useSpecialMode,
+                        false // Set to false for non-autonomous mode, adjust as needed
+                ));
     }
-    
+
     public void operatorControls() {
         // ------------------------- Preset Pose Commands ------------------------- //
         m_operatorController.a().onTrue(setL1Pose);
         m_operatorController.b().onTrue(setL3Pose);
         m_operatorController.x().onTrue(setL2Pose);
         m_operatorController.a().onTrue(setHomePose); // Note: A button duplicated
-    
+
         // ----------------------- Climber Safety Override ----------------------- //
         new Trigger(() -> m_operatorController.rightStick().getAsBoolean() &&
-                          m_operatorController.leftStick().getAsBoolean())
-            .onTrue(new ParallelCommandGroup(
-                new setCHaptics(m_controllerHaptics, 0.8).withTimeout(1.2),
-                new InstantCommand(sClimber::disableSafety)
-            ));
-    
+                m_operatorController.leftStick().getAsBoolean())
+                .onTrue(new ParallelCommandGroup(
+                        new setCHaptics(m_controllerHaptics, 0.8).withTimeout(1.2),
+                        new InstantCommand(sClimber::disableSafety)));
+
         // --------------------------- Intake Controls --------------------------- //
-        
+
         // **Left Bumper**: Deploy intake only (no motor action)
         m_operatorController.leftBumper()
-            .onTrue(new setIntake(false, true, 0, 0, sEndAffector));
-    
-        // **Left Trigger (≥ 0.2)**: Deploy & run **intake forward, place motor in reverse**
+                .onTrue(new setIntake(false, true, 0, 0, sEndAffector));
+
+        // **Left Trigger (≥ 0.2)**: Deploy & run **intake forward, place motor in
+        // reverse**
         m_operatorController.leftTrigger(0.2)
-            .whileTrue(new setIntake(false, true, intakeConstants.kIntakeSpeed, -intakeConstants.kPlaceSpeed, sEndAffector));
-    
-        // **Right Trigger (≥ 0.2)**: Deploy & run **both intake & place motors forward**
+                .whileTrue(new setIntake(false, true, intakeConstants.kIntakeSpeed, -intakeConstants.kPlaceSpeed,
+                        sEndAffector));
+
+        // **Right Trigger (≥ 0.2)**: Deploy & run **both intake & place motors
+        // forward**
         m_operatorController.rightTrigger(0.2)
-            .whileTrue(new setIntake(false, true, intakeConstants.kIntakeSpeed, intakeConstants.kPlaceSpeed, sEndAffector));
-    
+                .whileTrue(new setIntake(false, true, intakeConstants.kIntakeSpeed, intakeConstants.kPlaceSpeed,
+                        sEndAffector));
+
         // **Right Bumper**: Auto-Intake Mode (Both Motors Forward)
         m_operatorController.rightBumper()
-            .whileTrue(new setIntake(true, true, intakeConstants.kIntakeSpeed, intakeConstants.kPlaceSpeed, sEndAffector));
-    
-        // **Home Position (Idle Intake Mode)**: Runs intake at low speed until a note is detected
+                .whileTrue(new setIntake(true, true, intakeConstants.kIntakeSpeed, intakeConstants.kPlaceSpeed,
+                        sEndAffector));
+
+        // **Home Position (Idle Intake Mode)**: Runs intake at low speed until a note
+        // is detected
         new Trigger(() -> !m_operatorController.leftTrigger(0.2).getAsBoolean() &&
-                          !m_operatorController.rightTrigger(0.2).getAsBoolean() &&
-                          !m_operatorController.leftBumper().getAsBoolean() &&
-                          !m_operatorController.rightBumper().getAsBoolean())
-            .whileTrue(new setIntake(false, false, intakeConstants.kIdleIntakeSpeed, 0, sEndAffector)
-                .until(sEndAffector::getCoralSensor)); // Stops when note is detected
+                !m_operatorController.rightTrigger(0.2).getAsBoolean() &&
+                !m_operatorController.leftBumper().getAsBoolean() &&
+                !m_operatorController.rightBumper().getAsBoolean())
+                .whileTrue(new setIntake(false, false, intakeConstants.kIdleIntakeSpeed, 0, sEndAffector)
+                        .until(sEndAffector::getCoralSensor)); // Stops when note is detected
     }
-    
+
     public Command getAutonomousCommand() {
         return Autos.getAutonomousCommand(sEndAffector);
     }
