@@ -17,7 +17,9 @@ import frc.robot.subsystems.sEndAffector;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 
 import java.io.File;
+import java.util.function.DoubleSupplier;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -45,33 +47,33 @@ public class RobotContainer {
             OperatorConstants.kOperatorControllerPort);
 
     public RobotContainer() {
-        sEndAffector = new sEndAffector();
-        sClimber = new sClimber();
-        sElevator = new sElevator();
-        m_controllerHaptics = new sControllerHaptics(m_driverController, m_operatorController);
+        //sEndAffector = new sEndAffector();
+        //sClimber = new sClimber();
+        //sElevator = new sElevator();
+       // m_controllerHaptics = new sControllerHaptics(m_driverController, m_operatorController);
 
         swerveSubsystem = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
-                "swerve/neo"));
+                "neo"));
         setupCommands();
         configureBindings();
     }
 
     private void setupCommands() {
-        // Intake Commands
-        defaultIntake = new setIntake(false, false, 0, 0, sEndAffector);
-        defaultClimber = new setClimber(sClimber, false, false);
-        intakeBall = new setIntake(false, true, 0.0, -1.0, sEndAffector);
+        // // Intake Commands
+        // defaultIntake = new setIntake(false, false, 0, 0, sEndAffector);
+        // defaultClimber = new setClimber(sClimber, false, false);
+        // intakeBall = new setIntake(false, true, 0.0, -1.0, sEndAffector);
 
-        // Elevator Commands
-        setL4Pose = new setElevatorPose(sElevator, elevatorConstants.kL4Height);
-        setL3Pose = new setElevatorPose(sElevator, elevatorConstants.kL3Height);
-        setL2Pose = new setElevatorPose(sElevator, elevatorConstants.kL2Height);
-        setL1Pose = new setElevatorPose(sElevator, elevatorConstants.kL1Height);
-        setHomePose = new setElevatorPose(sElevator, elevatorConstants.kHomePose);
+        // // Elevator Commands
+        // setL4Pose = new setElevatorPose(sElevator, elevatorConstants.kL4Height);
+        // setL3Pose = new setElevatorPose(sElevator, elevatorConstants.kL3Height);
+        // setL2Pose = new setElevatorPose(sElevator, elevatorConstants.kL2Height);
+        // setL1Pose = new setElevatorPose(sElevator, elevatorConstants.kL1Height);
+        // setHomePose = new setElevatorPose(sElevator, elevatorConstants.kHomePose);
 
-        // Setting Default Commands
-        sEndAffector.setDefaultCommand(defaultIntake);
-        sClimber.setDefaultCommand(defaultClimber);
+        // // Setting Default Commands
+        // sEndAffector.setDefaultCommand(defaultIntake);
+        // sClimber.setDefaultCommand(defaultClimber);
 
         //swerve Commands
         autoDriveToPoseCommand = new  DriveToPoseCommand(swerveSubsystem,swerveConstants.kalignSpeed,()->0.0,
@@ -85,21 +87,27 @@ public class RobotContainer {
 
     private void configureBindings() {
         driverControls();
-        operatorControls();
+        //operatorControls();
     }
 
     public void driverControls() {
+        
         // Set default drive command
         swerveSubsystem.setDefaultCommand(
                 swerveSubsystem.driveCommand(
-                        m_driverController::getLeftX,
-                        m_driverController::getLeftY,
-                        m_driverController::getRightX));
+                        () -> MathUtil.applyDeadband(-m_driverController.getLeftY(), 0.1),
+                        () -> MathUtil.applyDeadband(m_driverController.getLeftX(), 0.1),
+                        () -> MathUtil.applyDeadband(m_driverController.getRightX(), 0.1)
+                )
+        );
+        
+        m_driverController.a().onTrue(new InstantCommand(swerveSubsystem::zeroGyro));
+        m_driverController.start().onTrue(new InstantCommand(swerveSubsystem::zeroGyroWithAlliance));
 
         // Create DriveToPoseCommand based on trigger inputs
-        createDriveToPoseTrigger(m_driverController.getRightTriggerAxis(), true);
-        createDriveToPoseTrigger(m_driverController.getLeftTriggerAxis(), false);
-
+        createDriveToPoseTrigger(m_driverController::getRightTriggerAxis, true);
+        createDriveToPoseTrigger(m_driverController::getLeftTriggerAxis, false);
+                
         // Bind B button to drive to nearest AprilTag pose at center
         createDriveToPoseButtonTrigger(m_driverController.b(), false);
 
@@ -108,37 +116,40 @@ public class RobotContainer {
     }
 
     // Helper method to create drive-to-pose triggers for the right and left
-    // triggers
-    private void createDriveToPoseTrigger(double triggerValue, boolean isRightTrigger) {
-        new Trigger(() -> triggerValue > 0.5)
-                .whileTrue(new DriveToPoseCommand(
-                        swerveSubsystem,
-                        swerveConstants.MAX_SPEED,
-                        m_driverController::getLeftX, // xOffset
-                        m_driverController::getLeftY, // yOffset
-                        m_driverController::getRightX, // rotationOffset
-                        m_driverController::getLeftTriggerAxis,
-                        m_driverController::getRightTriggerAxis,
-                        !isRightTrigger, // Adjust the mode based on which trigger is being used
-                        false // Set to false for non-autonomous mode, adjust as needed
-                ));
-    }
+    // triggersprivate void createDriveToPoseTrigger(DoubleSupplier triggerSupplier, boolean isRightTrigger) {
+private void createDriveToPoseTrigger(DoubleSupplier triggerSupplier, boolean isRightTrigger) {
+    
+        new Trigger(() -> triggerSupplier.getAsDouble() > 0.5)
+            .whileTrue(new DriveToPoseCommand(
+                    swerveSubsystem,
+                    swerveConstants.MAX_SPEED,
+                    m_driverController::getLeftX,
+                    m_driverController::getLeftY,
+                    m_driverController::getRightX,
+                    m_driverController::getLeftTriggerAxis,
+                    m_driverController::getRightTriggerAxis,
+                    !isRightTrigger,
+                    false
+            ));
+}
+
+
 
     // Helper method to bind a button to a DriveToPoseCommand
-    private void createDriveToPoseButtonTrigger(Trigger buttonTrigger, boolean useSpecialMode) {
-        new Trigger(buttonTrigger)
-                .whileTrue(new DriveToPoseCommand(
-                        swerveSubsystem,
-                        swerveConstants.MAX_SPEED,
-                        m_driverController::getLeftX, // xOffset
-                        m_driverController::getLeftY, // yOffset
-                        m_driverController::getRightX, // rotationOffset
-                        m_driverController::getLeftTriggerAxis,
-                        m_driverController::getRightTriggerAxis,
-                        useSpecialMode,
-                        false // Set to false for non-autonomous mode, adjust as needed
-                ));
+    private void createDriveToPoseButtonTrigger(Trigger button, boolean specialMode) {
+        button.whileTrue(new DriveToPoseCommand(
+                swerveSubsystem,
+                swerveConstants.MAX_SPEED,
+                m_driverController::getLeftX,
+                m_driverController::getLeftY,
+                m_driverController::getRightX,
+                m_driverController::getLeftTriggerAxis,
+                m_driverController::getRightTriggerAxis,
+                specialMode,
+                false
+        ));
     }
+    
     public void operatorControls() {
         // ------------------------- Preset Pose Commands ------------------------- //
         m_operatorController.a().onTrue(setL1Pose);

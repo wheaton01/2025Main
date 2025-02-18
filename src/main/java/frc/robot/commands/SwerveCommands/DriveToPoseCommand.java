@@ -6,6 +6,7 @@ import frc.robot.Constants.robotConstants.aprilTagConstants;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import java.util.function.DoubleSupplier;
 
@@ -45,6 +46,7 @@ public class DriveToPoseCommand extends Command {
 
   @Override
   public void initialize() {
+    SmartDashboard.putString(getSubsystem(), "Now Driving To nearest pose");
     // Runs once when the command starts. Currently does nothing but can be used for setup.
   }
 
@@ -52,6 +54,7 @@ public class DriveToPoseCommand extends Command {
   public void execute() {
     // Get the closest AprilTag pose for the reef
     Pose2d targetPose = getNearestReefTagPose();
+    SmartDashboard.putString("DistToReefTag",targetPose.getX()+" " +targetPose.getY());
     if (bhumanPlayerStation){
       targetPose = getHPStation();
     }
@@ -75,11 +78,9 @@ public class DriveToPoseCommand extends Command {
     double rightTrigger = rightTriggerSupplier.getAsDouble();
   
     // You can choose to take the average of both triggers or scale the speed based on whichever trigger is pressed more
-    double triggerScale = (leftTrigger + rightTrigger) / 2; // Scale the speed between 0 and 1
-  
-    // Adjust the speed based on the trigger value
-    double scaledSpeed = speed * triggerScale;
-  
+    double triggerScale = Math.max(leftTrigger, rightTrigger); // Use the highest trigger value
+    double scaledSpeed = triggerScale; // Scale the speed accordingly
+    
     // Create a new target pose with the adjusted offsets
     adjustedPose = new Pose2d(
       targetPose.getX() + xOffset,
@@ -107,6 +108,7 @@ public class DriveToPoseCommand extends Command {
       
       // Default case: Center robot to tag. for algae!
       return swerveSubsystem.getNearestReefAprilTagPose("center");
+
   }
   private Pose2d getHPStation(){
     return swerveSubsystem.getNearestHumanPlayerTagPose();
