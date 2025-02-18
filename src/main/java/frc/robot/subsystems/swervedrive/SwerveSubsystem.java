@@ -83,8 +83,17 @@ public class SwerveSubsystem extends SubsystemBase
    *
    * @param directory Directory of swerve drive config files.
    */
+  Pose2d currentPose;
+PIDController XdeltaPID = new PIDController(1.2, 0, 0.01);
+PIDController YdeltaPID = new PIDController(1.2, 0, 0.01);
+PIDController thetaPID = new PIDController(0.8, 0, 0.005);
+
   public SwerveSubsystem(File directory)
   {
+    XdeltaPID.setTolerance(.2);
+    YdeltaPID.setTolerance(.2);
+    thetaPID.setTolerance(2);
+
     // Configure the Telemetry before creating the SwerveDrive to avoid unnecessary objects being created.
     SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
     try
@@ -735,10 +744,8 @@ public class SwerveSubsystem extends SubsystemBase
     return swerveDrive;
   }
   
-Pose2d currentPose;
-PIDController XdeltaPID = new PIDController(.051, 0, 0);
-PIDController YdeltaPID = new PIDController(.05, 0, 0);
-PIDController thetaPID = new PIDController(.05, 0, 0);
+
+
 
   public void driveToPose(Pose2d pose, double speed)
   {
