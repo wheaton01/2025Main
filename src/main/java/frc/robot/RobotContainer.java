@@ -151,7 +151,7 @@ public class RobotContainer {
                 m_operatorController.leftStick().getAsBoolean())
                 .onTrue(new ParallelCommandGroup(
                         new setCHaptics(m_controllerHaptics, 0.8).withTimeout(1.2),
-                        new InstantCommand(sClimber::disableSafety)));
+                        new InstantCommand(sClimber::disableSafety)).withTimeout(.8));
     
         // --------------------------- Intake Controls --------------------------- //
     
@@ -177,13 +177,13 @@ public class RobotContainer {
                         new setIntake(true, true, intakeConstants.kIntakeSpeed, intakeConstants.kPlaceSpeed, sEndAffector),
                         new setCHaptics(m_controllerHaptics, 0.8))); // Haptic feedback when motors are on
     
-        // **Home Position (Idle Intake Mode)**: Runs intake at low speed until a note is detected
+        // **Home Position (Idle Intake Mode)**: Runs intake at low speed until a Coral is detected
         new Trigger(() -> !m_operatorController.leftTrigger(0.2).getAsBoolean() &&
                 !m_operatorController.rightTrigger(0.2).getAsBoolean() &&
                 !m_operatorController.leftBumper().getAsBoolean() &&
                 !m_operatorController.rightBumper().getAsBoolean())
                 .whileTrue(new setIntake(false, false, intakeConstants.kIdleIntakeSpeed, 0, sEndAffector)
-                        .until(sEndAffector::getCoralSensor)); // Stops when note is detected
+                        .until(sEndAffector::getCoralSensor)); // Stops when Coral is detected
     }
     
 

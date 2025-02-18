@@ -18,12 +18,12 @@ public final class Constants {
     public static final int kOperatorControllerPort = 1;
   }
   public static class robotConstants{
-    public static final int kelevatorSparkID1 = 0;//TODO : CORRECT CAN ID
-    public static final int kelevatorSparkID2 = 0;//TODO : CORRECT CAN ID
+    public static final int kelevatorSparkID1 = 10;//TODO : CORRECT CAN ID
+    public static final int kelevatorSparkID2 = 11;//TODO : CORRECT CAN ID
     
     //End Affector Constants
-      public static final int kintakeSparkID = 0;//TODO : CORRECT CAN ID
-      public static final int kPlacesparkID = 0;//TODO : CORRECT CAN ID
+      public static final int kintakeSparkID = 12;//TODO : CORRECT CAN ID
+      public static final int kPlacesparkID = 13;//TODO : CORRECT CAN ID
 
       public static final int kPneuExtendID = 0;//TODO : CORRECT PNEUMATIC ID
 

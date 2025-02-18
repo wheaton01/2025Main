@@ -9,9 +9,8 @@ import edu.wpi.first.math.controller.PIDController;
 
 public class sElevator extends SubsystemBase {
 
-    private SparkMax mElevator1, mElevator2;
     private PIDController mElevatorPid;
-
+    private SparkMax mElevator1, mElevator2;
     // Tuning mode boolean
     private boolean tuningMode = false;
 

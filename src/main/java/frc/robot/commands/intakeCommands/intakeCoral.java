@@ -22,7 +22,7 @@ public class intakeCoral extends SequentialCommandGroup {
     addCommands(new setIntake(true, false, intakeConstants.kIntakeSpeed,0.0, m_endAffector),
                 new ParallelCommandGroup(
                     new setIntake(false,false, intakeConstants.kIntakeSpeed*.5,intakeConstants.kPlaceSpeed*.5, m_endAffector),
-                    new InstantCommand(()->m_controllerHaptics.setHaptics(1.0))
+                    new InstantCommand(()->m_controllerHaptics.setHaptics(.6))
                     ).withTimeout(intakeConstants.kIntakeTime),
                 new setIntake(false,false, 0.0,0.0, m_endAffector),
                 new InstantCommand(()->m_controllerHaptics.setHaptics(0.0)));
