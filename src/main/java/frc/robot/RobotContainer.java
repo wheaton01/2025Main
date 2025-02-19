@@ -123,8 +123,8 @@ private void createDriveToPoseTrigger(DoubleSupplier triggerSupplier, boolean is
             .whileTrue(new DriveToPoseCommand(
                     swerveSubsystem,
                     swerveConstants.MAX_SPEED,
-                    m_driverController::getLeftX,
                     m_driverController::getLeftY,
+                    m_driverController::getLeftX,
                     m_driverController::getRightX,
                     m_driverController::getLeftTriggerAxis,
                     m_driverController::getRightTriggerAxis,
@@ -140,8 +140,8 @@ private void createDriveToPoseTrigger(DoubleSupplier triggerSupplier, boolean is
         button.whileTrue(new DriveToPoseCommand(
                 swerveSubsystem,
                 swerveConstants.MAX_SPEED,
-                m_driverController::getLeftX,
                 m_driverController::getLeftY,
+                m_driverController::getLeftX,
                 m_driverController::getRightX,
                 m_driverController::getLeftTriggerAxis,
                 m_driverController::getRightTriggerAxis,

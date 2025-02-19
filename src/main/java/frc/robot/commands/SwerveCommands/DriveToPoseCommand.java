@@ -30,8 +30,9 @@ public class DriveToPoseCommand extends Command {
   // Constructor to initialize the command
   public DriveToPoseCommand(SwerveSubsystem swerveSubsystem, double speed, 
                             DoubleSupplier xOffsetSupplier, DoubleSupplier yOffsetSupplier, 
-                            DoubleSupplier rotationOffsetSupplier, DoubleSupplier leftTriggerSupplier, 
-                            DoubleSupplier rightTriggerSupplier,boolean bhumanPlayerStation, boolean bInAuton) {
+                            DoubleSupplier rotationOffsetSupplier, 
+                            DoubleSupplier rightTriggerSupplier,
+                             DoubleSupplier leftTriggerSupplier,boolean bhumanPlayerStation, boolean bInAuton) {
     this.swerveSubsystem = swerveSubsystem;
     this.speed = speed;
     this.xOffsetSupplier = xOffsetSupplier;
