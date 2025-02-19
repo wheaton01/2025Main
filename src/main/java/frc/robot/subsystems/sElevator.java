@@ -23,7 +23,6 @@ public class sElevator extends SubsystemBase {
     public sElevator() {
         mElevator1 = new SparkMax(robotConstants.kelevatorSparkID1, SparkMax.MotorType.kBrushless);
         mElevator2 = new SparkMax(robotConstants.kelevatorSparkID2, SparkMax.MotorType.kBrushless);
-
         //encoder init
         mElevatorEncoder = new Encoder(elevatorConstants.kEncoderA, elevatorConstants.kEncoderB);
         mElevatorEncoder.setDistancePerPulse(elevatorConstants.kEncoderDistancePerPulse);
@@ -42,6 +41,7 @@ public class sElevator extends SubsystemBase {
     @Override
     public void periodic() {
         SmartDashboard.putNumber("Current Elevator Pose",mElevatorEncoder.getDistance());
+        SmartDashboard.putNumber("Current Elevator Velocity",mElevator1.get());
         // Tuning Mode: Check if we are in tuning mode
         if (tuningMode) {
             // Update PID constants from SmartDashboard if tuning mode is on
@@ -65,8 +65,8 @@ public class sElevator extends SubsystemBase {
         double PIDOutput = mElevatorPid.calculate(position + robotConstants.elevatorConstants.kFeedForward+ nTuningFF);
 
         // Control the motors based on the PID output
-        mElevator1.set(PIDOutput);
-        mElevator2.set(-PIDOutput);  // Opposing motor for synchronization
+        // mElevator1.set(PIDOutput);
+        // mElevator2.set(-PIDOutput);  // Opposing motor for synchronization
     }
 
     // Set the desired height (pose) for the elevator
@@ -82,5 +82,9 @@ public class sElevator extends SubsystemBase {
     // Method to toggle tuning mode on/off
     public void setTuningMode(boolean isEnabled) {
         tuningMode = isEnabled;
+    }
+    public void setManualMotors(double speed) {
+        mElevator1.set(speed);
+        mElevator2.set(-speed);  // Opposing motor for synchronization
     }
 }

@@ -7,6 +7,7 @@ import frc.robot.Constants.robotConstants.intakeConstants;
 import frc.robot.commands.Autos;
 import frc.robot.commands.setCHaptics;
 import frc.robot.commands.climberCommands.setClimber;
+import frc.robot.commands.elevatorCommands.SetManualElevator;
 import frc.robot.commands.elevatorCommands.setElevatorPose;
 import frc.robot.commands.intakeCommands.intakeCoral;
 import frc.robot.commands.intakeCommands.setIntake;
@@ -73,7 +74,10 @@ public class RobotContainer {
     }
 
     private void setupCommands() {
-        // Intake Commands
+        sElevator.setDefaultCommand(new SetManualElevator(
+                sElevator,
+                () -> 1.0 * MathUtil.applyDeadband(m_operatorController.getLeftY(), 0.2) 
+            ));        // Intake Commands
        // defaultIntake = new setIntake(false, false, 0, 0, sEndAffector);
         defaultClimber = new setClimber(sClimber, false, false);
         //intakeBall = new setIntake(false, true, 0.0, -1.0, sEndAffector);
