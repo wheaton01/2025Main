@@ -167,7 +167,7 @@ private void createDriveToPoseTrigger(DoubleSupplier triggerSupplier, boolean is
         // --------------------------- Intake Controls --------------------------- //
     
         // **Left Bumper**: Deploy intake only (no motor action) -> No haptic feedback when motors are off
-        m_operatorController.leftBumper()
+        m_driverController.leftBumper()
                 .onTrue(new setIntake(false, true, 0, 0, sEndAffector)); // No haptics here since motors are off
     
         // **Left Trigger (≥ 0.2)**: Deploy & run **intake forward, place motor in reverse**
@@ -177,7 +177,7 @@ private void createDriveToPoseTrigger(DoubleSupplier triggerSupplier, boolean is
                         new setCHaptics(m_controllerHaptics, 0.5))); // Haptic feedback when motors are on
     
         // **Right Trigger (≥ 0.2)**: Deploy & run **both intake & place motors forward**
-        m_operatorController.rightTrigger(0.2)
+        m_driverController.rightBumper()
                 .whileTrue(new ParallelCommandGroup(
                         new setIntake(false, true, intakeConstants.kIntakeSpeed, intakeConstants.kPlaceSpeed, sEndAffector),
                         new setCHaptics(m_controllerHaptics, 0.7))); // Haptic feedback when motors are on
@@ -188,13 +188,13 @@ private void createDriveToPoseTrigger(DoubleSupplier triggerSupplier, boolean is
                         new setIntake(true, true, intakeConstants.kIntakeSpeed, intakeConstants.kPlaceSpeed, sEndAffector),
                         new setCHaptics(m_controllerHaptics, 0.8))); // Haptic feedback when motors are on
     
-        // **Home Position (Idle Intake Mode)**: Runs intake at low speed until a Coral is detected
+        // **Home Position (Idle Intake Mode)**: Runs intake at low speed until a note is detected
         new Trigger(() -> !m_operatorController.leftTrigger(0.2).getAsBoolean() &&
                 !m_operatorController.rightTrigger(0.2).getAsBoolean() &&
                 !m_operatorController.leftBumper().getAsBoolean() &&
                 !m_operatorController.rightBumper().getAsBoolean())
                 .whileTrue(new setIntake(false, false, intakeConstants.kIdleIntakeSpeed, 0, sEndAffector)
-                        .until(sEndAffector::getCoralSensor)); // Stops when Coral is detected
+                        .until(sEndAffector::getCoralSensor)); // Stops when note is detected
     }
     
 
