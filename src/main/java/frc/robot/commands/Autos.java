@@ -6,6 +6,7 @@ package frc.robot.commands;
 
 import frc.robot.commands.intakeCommands.setIntake;
 import frc.robot.subsystems.sEndAffector;
+import frc.robot.subsystems.sIntake;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 
@@ -14,8 +15,8 @@ public final class Autos {
   // public static Command exampleAuto(ExampleSubsystem subsystem) {
   //   return Commands.sequence(subsystem.exampleMethodCommand(), new ExampleCommand(subsystem));
   // }
-  public static Command getAutonomousCommand(sEndAffector sEndAffector) {
-    return Commands.sequence(new setIntake(true, true, 0.5,0, sEndAffector), new setIntake(true, false, 0.5,0, sEndAffector));
+  public static Command getAutonomousCommand(sIntake sIntake) {
+    return Commands.sequence(new setIntake(0,sIntake,false));
   }
 
   private Autos() {

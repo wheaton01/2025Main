@@ -18,8 +18,7 @@ public class placeL4 extends SequentialCommandGroup {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
-      new setIntake(false,true, intakeConstants.kIntakeSpeed,intakeConstants.kPlaceSpeed, m_endAffector).withTimeout(intakeConstants.kL4PlaceTime),
-      new setIntake(false,false, 0.0,0.0, m_endAffector).withTimeout(0)
+      
     );
   }
 }

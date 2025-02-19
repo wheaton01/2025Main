@@ -27,10 +27,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.robotConstants;
+import frc.robot.Constants.robotConstants.intakeConstants;
 
 public class sEndAffector extends SubsystemBase {
   /** Creates a new sEndAffector. */
-  VictorSPX mIntake;
   VictorSPX mPlace;
 
   //
@@ -40,44 +40,26 @@ public class sEndAffector extends SubsystemBase {
   public sEndAffector() {
     // mIntake = new SparkMax(Constants.robotConstants.kintakeSparkID, MotorType.kBrushed);
     // mPlace =  new SparkMax(Constants.robotConstants.kPlacesparkID , MotorType.kBrushed);
-    rioBus = new CANBus("rio");
-
-    mIntake = new VictorSPX(robotConstants.kintakeSparkID);
     mPlace = new  VictorSPX(robotConstants.kPlacesparkID);
     
-    aIntakeSensor = new AnalogInput(Constants.robotConstants.kIntakeSensorID);
-      //aPlaceSensor = new  AnalogInput(Constants.robotConstants.kPlaceSensorID); 
     }
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("Intake sensor val",aIntakeSensor.getValue());
-    // This method will be called once per scheduler run
   }
 
-  public void setIntake(double nintakeSpeed,double nplaceSpeed){
-      mIntake.set(VictorSPXControlMode.PercentOutput,nintakeSpeed);
-      mPlace.set(VictorSPXControlMode.PercentOutput,nplaceSpeed);
-    }
-  
-  public void setPlace(double nspeed){
-    mPlace.set(VictorSPXControlMode.PercentOutput,nspeed);
+
+  public void setBallIntake(){
+    mPlace.set(VictorSPXControlMode.PercentOutput,intakeConstants.kBallIntakeSpeed);
   }
-  public void setIntake(double nspeed){
-    mIntake.set(VictorSPXControlMode.PercentOutput,nspeed);
+  public void setPlace(){
+    mPlace.set(VictorSPXControlMode.PercentOutput,intakeConstants.kPlaceSpeed);
   }
+
   public void setZero(){
-    mIntake.set(VictorSPXControlMode.PercentOutput,0);
     mPlace.set(VictorSPXControlMode.PercentOutput,0);
   }
-  public boolean getCoralSensor(){
-    if (aIntakeSensor.getValue()>Constants.robotConstants.kintakeSensorThreshold){
-      return true;
-    } else {
-      return false;
-      
-    }
-  }
+
 
 
   public boolean hasCoral(){

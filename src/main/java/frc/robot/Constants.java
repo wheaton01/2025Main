@@ -25,7 +25,10 @@ public final class Constants {
       public static final int kintakeSparkID = 13;//TODO : CORRECT CAN ID
       public static final int kPlacesparkID = 12;//TODO : CORRECT CAN ID
 
-      public static final int kPneuExtendID = 6;//TODO : CORRECT PNEUMATIC ID
+      public static final int kPneuExtendID = 7;
+      public static final int kClimb2ID = 6;
+      public static final int kClimb1ID = 4;
+      public static final int kRamp1ID = 3;
 
 
       public static int kIntakeSensorID = 0; //TODO : CORRECT ANALOG ID
@@ -72,9 +75,10 @@ public final class Constants {
       public static class intakeConstants{
         public static final double kIdleIntakeSpeed = .5;
         public static final double kIntakeSpeed = 0.7;
+        public static final double kBallIntakeSpeed = -1.0;
         public static final double kPlaceSpeed = 1.0;
         public static final double kIntakeSensorThreshold = 0.0;
-        public static final double kIntakeTime = .25;//TODO : This value is used in the intakeCoral command to determine how long the intake should run for after coral is sensed
+        public static final double kIntakeTime = .1;//TODO : This value is used in the intakeCoral command to determine how long the intake should run for after coral is sensed
         public static final double kL4PlaceTime  = .25;//TODO : This value is used in the placeL4 to set a delay so the intake dosent retract too quickly
         public static final double kPlaceTime  = .25;//TODO : This value is used in the placeCoral to set a delay the intake doenst turn off too quickly
       }

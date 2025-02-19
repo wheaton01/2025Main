@@ -8,15 +8,19 @@ import frc.robot.commands.Autos;
 import frc.robot.commands.setCHaptics;
 import frc.robot.commands.climberCommands.setClimber;
 import frc.robot.commands.elevatorCommands.setElevatorPose;
+import frc.robot.commands.intakeCommands.intakeCoral;
 import frc.robot.commands.intakeCommands.setIntake;
 import frc.robot.commands.SwerveCommands.DriveToPoseCommand;
 import frc.robot.subsystems.sClimber;
 import frc.robot.subsystems.sControllerHaptics;
 import frc.robot.subsystems.sElevator;
 import frc.robot.subsystems.sEndAffector;
+import frc.robot.subsystems.sIntake;
+import frc.robot.subsystems.sSlider;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 
 import java.io.File;
+import java.time.Instant;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.MathUtil;
@@ -27,14 +31,18 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class RobotContainer {
     sEndAffector sEndAffector;
+    sSlider sSlider;
     sClimber sClimber;
     sElevator sElevator;
     SwerveSubsystem swerveSubsystem;
+    sIntake sIntake;
 
     setIntake defaultIntake, intakeBall;
     setClimber defaultClimber;
@@ -50,11 +58,13 @@ public class RobotContainer {
     public final CommandXboxController m_operatorController = new CommandXboxController(
             OperatorConstants.kOperatorControllerPort);
     public RobotContainer() {
-
+        sSlider = new sSlider();
         sEndAffector = new sEndAffector();
         sClimber = new sClimber();
         sElevator = new sElevator();
        m_controllerHaptics = new sControllerHaptics(m_driverController, m_operatorController);
+       sIntake = new sIntake();
+
 
         swerveSubsystem = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
                 "neo"));
@@ -64,9 +74,9 @@ public class RobotContainer {
 
     private void setupCommands() {
         // Intake Commands
-        defaultIntake = new setIntake(false, false, 0, 0, sEndAffector);
+       // defaultIntake = new setIntake(false, false, 0, 0, sEndAffector);
         defaultClimber = new setClimber(sClimber, false, false);
-        intakeBall = new setIntake(false, true, 0.0, -1.0, sEndAffector);
+        //intakeBall = new setIntake(false, true, 0.0, -1.0, sEndAffector);
 
         // Elevator Commands
         setL4Pose = new setElevatorPose(sElevator, elevatorConstants.kL4Height);
@@ -76,7 +86,7 @@ public class RobotContainer {
         setHomePose = new setElevatorPose(sElevator, elevatorConstants.kHomePose);
 
         // Setting Default Commands
-        sEndAffector.setDefaultCommand(defaultIntake);
+        //sEndAffector.setDefaultCommand(defaultIntake);
         sClimber.setDefaultCommand(defaultClimber);
 
         //swerve Commands
@@ -90,6 +100,7 @@ public class RobotContainer {
     }
 
     private void configureBindings() {
+        setDefaultCommands();
         driverControls();
         operatorControls();
     }
@@ -107,7 +118,12 @@ public class RobotContainer {
         
         m_driverController.a().onTrue(new InstantCommand(swerveSubsystem::zeroGyro));
         m_driverController.start().onTrue(new InstantCommand(swerveSubsystem::zeroGyroWithAlliance));
+        //Driver Non Driving Controls
 
+        m_driverController.rightBumper().onTrue(new ParallelCommandGroup(new InstantCommand(sIntake::setFeedIntake),
+                                      new InstantCommand(sEndAffector::setPlace)).withTimeout(0))
+        .onFalse(new ParallelCommandGroup(new InstantCommand(sIntake::setZero),
+                                          new InstantCommand(sEndAffector::setZero)).withTimeout(0));        
         // Create DriveToPoseCommand based on trigger inputs
         createDriveToPoseTrigger(m_driverController::getRightTriggerAxis, true);
         createDriveToPoseTrigger(m_driverController::getLeftTriggerAxis, false);
@@ -117,6 +133,7 @@ public class RobotContainer {
 
         // Bind right bumper to drive to nearest AprilTag pose with a special mode
         createDriveToPoseButtonTrigger(m_driverController.rightBumper(), true);
+
     }
 
     // Helper method to create drive-to-pose triggers for the right and left
@@ -171,38 +188,27 @@ private void createDriveToPoseTrigger(DoubleSupplier triggerSupplier, boolean is
         // --------------------------- Intake Controls --------------------------- //
     
         // **Left Bumper**: Deploy intake only (no motor action) -> No haptic feedback when motors are off
-        m_driverController.leftBumper()
-                .onTrue(new setIntake(false, true, 0, 0, sEndAffector)); // No haptics here since motors are off
+        m_operatorController.leftBumper()
+                .onTrue(new InstantCommand(sSlider::setExtend))
+                .onFalse(new InstantCommand(sSlider::setRetract)); // No haptics here since motors are off
+                
     
         // **Left Trigger (≥ 0.2)**: Deploy & run **intake forward, place motor in reverse**
         m_operatorController.leftTrigger(0.2)
                 .whileTrue(new ParallelCommandGroup(
-                        new setIntake(false, true, intakeConstants.kIntakeSpeed, -intakeConstants.kPlaceSpeed, sEndAffector),
-                        new setCHaptics(m_controllerHaptics, 0.5))); // Haptic feedback when motors are on
+                        new InstantCommand(sEndAffector::setBallIntake),
+                        new setCHaptics(m_controllerHaptics, 0.2))
+                        ).onFalse(new InstantCommand(sEndAffector::setZero)); // Haptic feedback when motors are on
     
-        // **Right Trigger (≥ 0.2)**: Deploy & run **both intake & place motors forward**
-        m_driverController.leftBumper()
-                .whileTrue(new ParallelCommandGroup(
-                        new setIntake(false, true, intakeConstants.kIntakeSpeed, intakeConstants.kPlaceSpeed, sEndAffector),
-                        new setCHaptics(m_controllerHaptics, 0.7))); // Haptic feedback when motors are on
-    
-        // **Right Bumper**: Auto-Intake Mode (Both Motors Forward)
-        m_operatorController.rightBumper()
-                .whileTrue(new ParallelCommandGroup(
-                        new setIntake(true, false, intakeConstants.kIntakeSpeed, intakeConstants.kPlaceSpeed, sEndAffector),
-                        new setCHaptics(m_controllerHaptics, 0.8))); // Haptic feedback when motors are on
-    
-        // **Home Position (Idle Intake Mode)**: Runs intake at low speed until a note is detected
-        new Trigger(() -> !m_operatorController.leftTrigger(0.2).getAsBoolean() &&
-                !m_operatorController.rightTrigger(0.2).getAsBoolean() &&
-                !m_driverController.leftBumper().getAsBoolean() &&
-                !m_driverController.rightBumper().getAsBoolean())
-                .whileTrue(new setIntake(false, false, intakeConstants.kIdleIntakeSpeed, 0, sEndAffector)
-                        .until(sEndAffector::getCoralSensor)); // Stops when note is detected
+        
     }
-    
+    public void setDefaultCommands(){
+            // Automatically start intakeCoral when coral is NOT detected
+
+        // sSlider.setDefaultCommand(new InstantCommand(sSlider::setRetract));
+    }
 
     public Command getAutonomousCommand() {
-        return Autos.getAutonomousCommand(sEndAffector);
+        return Autos.getAutonomousCommand(sIntake);
     }
 }

@@ -18,8 +18,7 @@ public class placeCoral extends SequentialCommandGroup {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
-      new setIntake(false,false, intakeConstants.kIntakeSpeed,intakeConstants.kPlaceSpeed, m_endAffector).withTimeout(intakeConstants.kPlaceTime),
-      new setIntake(false,false, 0.0,0.0, m_endAffector).withTimeout(0)
+      
     );
   }
 }
