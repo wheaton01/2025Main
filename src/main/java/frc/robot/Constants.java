@@ -22,22 +22,22 @@ public final class Constants {
     public static final int kelevatorSparkID2 = 11;//TODO : CORRECT CAN ID
     
     //End Affector Constants
-      public static final int kintakeSparkID = 12;//TODO : CORRECT CAN ID
-      public static final int kPlacesparkID = 13;//TODO : CORRECT CAN ID
+      public static final int kintakeSparkID = 13;//TODO : CORRECT CAN ID
+      public static final int kPlacesparkID = 12;//TODO : CORRECT CAN ID
 
-      public static final int kPneuExtendID = 0;//TODO : CORRECT PNEUMATIC ID
+      public static final int kPneuExtendID = 6;//TODO : CORRECT PNEUMATIC ID
 
 
       public static int kIntakeSensorID = 0; //TODO : CORRECT ANALOG ID
-      public static int kPlaceSensorID  = 0;      //TODO : CORRECT ANALOG ID
+      //public static int kPlaceSensorID  = 0;      //TODO : CORRECT ANALOG ID
 
 
-      public static int kintakeSensorThreshold;
+      public static double kintakeSensorThreshold = 2000;
 
 
     public static class climberConstants{
-      public static final int kClimberSolenoidID = 0;//TODO : CORRECT PNEUMATIC ID
-      public static final int kDeployClimberSolenoidID = 0;//TODO : CORRECT PNEUMATIC ID
+      public static final int kClimberSolenoidID = 4;//TODO : CORRECT PNEUMATIC ID
+      public static final int kDeployClimberSolenoidID = 5;//TODO : CORRECT PNEUMATIC ID
     }
 
       public static class elevatorConstants{
@@ -58,6 +58,9 @@ public final class Constants {
         public static final double kMaxHeight = 250.0;
 
         public static final double kTolerance = 1.0;
+        public static final int    kEncoderA  = 0;
+        public static final int    kEncoderB  = 1;
+        public static final double kEncoderDistancePerPulse = 0.1;//TODO : This value is used to convert the encoder ticks to inches. this value is pulled from cad and may need to be corrected based on field meas.
 
       }
       public static class aprilTagConstants{

@@ -4,14 +4,28 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.wpilibj.PneumaticHub;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
+import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 
 public class sSlider extends SubsystemBase {
   /** Creates a new sSlider. */
-  public sSlider() {}
+    PneumaticHub pneuHub;
+    Solenoid sEAExtend;
+
+  public sSlider() {
+    pneuHub = new PneumaticHub(3);
+    sEAExtend = new Solenoid(PneumaticsModuleType.CTREPCM, Constants.robotConstants.kPneuExtendID);
+
+  }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+  }
+  public void setExtend(boolean bextend){
+    sEAExtend.set(bextend);
   }
 }

@@ -19,14 +19,14 @@ public class sClimber extends SubsystemBase {
   boolean enableClimber = false;
 
   public sClimber() {
-    sClimb =       new Solenoid(PneumaticsModuleType.REVPH, Constants.robotConstants.climberConstants.kClimberSolenoidID);  
-    sdeployClimb = new Solenoid(PneumaticsModuleType.REVPH, Constants.robotConstants.climberConstants.kDeployClimberSolenoidID);    
+    sClimb =       new Solenoid(PneumaticsModuleType.CTREPCM, Constants.robotConstants.climberConstants.kClimberSolenoidID);  
+    sdeployClimb = new Solenoid(PneumaticsModuleType.CTREPCM, Constants.robotConstants.climberConstants.kDeployClimberSolenoidID);    
   }
 
   @Override
   public void periodic() {
     SmartDashboard.putBoolean(getName(), enableClimber);
-    SmartDashboard.putBoolean("Climber Deployed", sdeployClimb.get());
+   // SmartDashboard.putBoolean("Climber Deployed", sdeployClimb.get());
     // This method will be called once per scheduler run
   }
   public void deployClimber(boolean bdeploy){

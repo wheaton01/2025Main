@@ -20,7 +20,9 @@ import java.io.File;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -39,18 +41,20 @@ public class RobotContainer {
     sControllerHaptics m_controllerHaptics;
     setElevatorPose setL4Pose, setL3Pose, setL2Pose, setL1Pose, setHomePose;
     DriveToPoseCommand autoDriveToPoseCommand;
+    Compressor compressor = new Compressor(1, PneumaticsModuleType.CTREPCM);
+
 
     private final CommandXboxController m_driverController = new CommandXboxController(
             OperatorConstants.kDriverControllerPort);
 
     public final CommandXboxController m_operatorController = new CommandXboxController(
             OperatorConstants.kOperatorControllerPort);
-
     public RobotContainer() {
-        //sEndAffector = new sEndAffector();
-        //sClimber = new sClimber();
-        //sElevator = new sElevator();
-       // m_controllerHaptics = new sControllerHaptics(m_driverController, m_operatorController);
+
+        sEndAffector = new sEndAffector();
+        sClimber = new sClimber();
+        sElevator = new sElevator();
+       m_controllerHaptics = new sControllerHaptics(m_driverController, m_operatorController);
 
         swerveSubsystem = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
                 "neo"));
@@ -59,21 +63,21 @@ public class RobotContainer {
     }
 
     private void setupCommands() {
-        // // Intake Commands
-        // defaultIntake = new setIntake(false, false, 0, 0, sEndAffector);
-        // defaultClimber = new setClimber(sClimber, false, false);
-        // intakeBall = new setIntake(false, true, 0.0, -1.0, sEndAffector);
+        // Intake Commands
+        defaultIntake = new setIntake(false, false, 0, 0, sEndAffector);
+        defaultClimber = new setClimber(sClimber, false, false);
+        intakeBall = new setIntake(false, true, 0.0, -1.0, sEndAffector);
 
-        // // Elevator Commands
-        // setL4Pose = new setElevatorPose(sElevator, elevatorConstants.kL4Height);
-        // setL3Pose = new setElevatorPose(sElevator, elevatorConstants.kL3Height);
-        // setL2Pose = new setElevatorPose(sElevator, elevatorConstants.kL2Height);
-        // setL1Pose = new setElevatorPose(sElevator, elevatorConstants.kL1Height);
-        // setHomePose = new setElevatorPose(sElevator, elevatorConstants.kHomePose);
+        // Elevator Commands
+        setL4Pose = new setElevatorPose(sElevator, elevatorConstants.kL4Height);
+        setL3Pose = new setElevatorPose(sElevator, elevatorConstants.kL3Height);
+        setL2Pose = new setElevatorPose(sElevator, elevatorConstants.kL2Height);
+        setL1Pose = new setElevatorPose(sElevator, elevatorConstants.kL1Height);
+        setHomePose = new setElevatorPose(sElevator, elevatorConstants.kHomePose);
 
-        // // Setting Default Commands
-        // sEndAffector.setDefaultCommand(defaultIntake);
-        // sClimber.setDefaultCommand(defaultClimber);
+        // Setting Default Commands
+        sEndAffector.setDefaultCommand(defaultIntake);
+        sClimber.setDefaultCommand(defaultClimber);
 
         //swerve Commands
         autoDriveToPoseCommand = new  DriveToPoseCommand(swerveSubsystem,swerveConstants.kalignSpeed,()->0.0,
@@ -87,7 +91,7 @@ public class RobotContainer {
 
     private void configureBindings() {
         driverControls();
-        //operatorControls();
+        operatorControls();
     }
 
     public void driverControls() {
@@ -177,7 +181,7 @@ private void createDriveToPoseTrigger(DoubleSupplier triggerSupplier, boolean is
                         new setCHaptics(m_controllerHaptics, 0.5))); // Haptic feedback when motors are on
     
         // **Right Trigger (≥ 0.2)**: Deploy & run **both intake & place motors forward**
-        m_driverController.rightBumper()
+        m_driverController.leftBumper()
                 .whileTrue(new ParallelCommandGroup(
                         new setIntake(false, true, intakeConstants.kIntakeSpeed, intakeConstants.kPlaceSpeed, sEndAffector),
                         new setCHaptics(m_controllerHaptics, 0.7))); // Haptic feedback when motors are on
@@ -185,14 +189,14 @@ private void createDriveToPoseTrigger(DoubleSupplier triggerSupplier, boolean is
         // **Right Bumper**: Auto-Intake Mode (Both Motors Forward)
         m_operatorController.rightBumper()
                 .whileTrue(new ParallelCommandGroup(
-                        new setIntake(true, true, intakeConstants.kIntakeSpeed, intakeConstants.kPlaceSpeed, sEndAffector),
+                        new setIntake(true, false, intakeConstants.kIntakeSpeed, intakeConstants.kPlaceSpeed, sEndAffector),
                         new setCHaptics(m_controllerHaptics, 0.8))); // Haptic feedback when motors are on
     
         // **Home Position (Idle Intake Mode)**: Runs intake at low speed until a note is detected
         new Trigger(() -> !m_operatorController.leftTrigger(0.2).getAsBoolean() &&
                 !m_operatorController.rightTrigger(0.2).getAsBoolean() &&
-                !m_operatorController.leftBumper().getAsBoolean() &&
-                !m_operatorController.rightBumper().getAsBoolean())
+                !m_driverController.leftBumper().getAsBoolean() &&
+                !m_driverController.rightBumper().getAsBoolean())
                 .whileTrue(new setIntake(false, false, intakeConstants.kIdleIntakeSpeed, 0, sEndAffector)
                         .until(sEndAffector::getCoralSensor)); // Stops when note is detected
     }
