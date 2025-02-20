@@ -18,7 +18,7 @@ public class sElevator extends SubsystemBase {
     private Encoder mElevatorEncoder;
     private boolean tuningMode = false;
     private boolean bDownFlag = false;
-
+    double mELevatorSetpoint;
     // Constructor
     public sElevator() {
         mElevator1 = new SparkMax(robotConstants.kelevatorSparkID1, SparkMax.MotorType.kBrushless);
@@ -63,17 +63,19 @@ public class sElevator extends SubsystemBase {
             // Moving down with linear control until close enough to the setpoint
             double downSpeed = elevatorConstants.kdownSpeed;  // Adjust this value as needed for smoothness
             mElevator1.set(downSpeed + elevatorConstants.kFeedForwardDown);  // Add feedforward for gravity compensation
-             if (Math.abs(mElevatorUpPid.getSetpoint()-getHeight())<elevatorConstants.kPIDThreshold){ {
+             if (Math.abs(mElevatorUpPid.getSetpoint()-position)<elevatorConstants.kPIDThreshold || position-mElevatorUpPid.getSetpoint()<0){ 
                     mElevator1.set(elevatorConstants.kFeedForward);  // Stop once it's at the setpoint
                     bDownFlag = false;
                 
             }
         }
+        
     }
     
     
     // Set the desired height (pose) for the elevator
     public void setElevatorPose(double height) {
+        mELevatorSetpoint = height;
         if (height < elevatorConstants.kMaxHeight) {
             if (height != mElevatorUpPid.getSetpoint()){
             // Store the setpoint in both up/down PID controllers
@@ -88,6 +90,13 @@ public class sElevator extends SubsystemBase {
             SmartDashboard.putString(getSubsystem(), "Requested Height > MAX HEIGHT");
         }
      }
+    }
+
+    public void setElevatorOffset(double offset){
+        if (elevatorConstants.kHomePose-offset>0 && elevatorConstants.kMaxHeight+offset<elevatorConstants.kMaxHeight){
+        mElevatorUpPid.setSetpoint(offset+mELevatorSetpoint);
+        }
+ 
     }
 
     // Check if the elevator is at the setpoint

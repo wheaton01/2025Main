@@ -6,16 +6,18 @@ import frc.robot.subsystems.sElevator;
 
 public class setElevatorOffset extends Command {
     private final sElevator m_elevator;
-    private final DoubleSupplier m_speedSupplier;
-
-    public setElevatorOffset(sElevator elevator, DoubleSupplier speedSupplier) {
+    private final DoubleSupplier offsetSupplier;
+    private double offset;
+    public setElevatorOffset(sElevator elevator, DoubleSupplier offsetSupplier) {
         this.m_elevator = elevator;
-        this.m_speedSupplier = speedSupplier;
+        this.offsetSupplier = offsetSupplier;
         addRequirements(elevator); // Ensures no other command interrupts
     }
 
     @Override
     public void execute() {
+        offset =  offsetSupplier.getAsDouble();
+        m_elevator.setElevatorOffset(100*offset);
         //double speed = m_speedSupplier.getAsDouble(); // Get joystick value
         //m_elevator.setManualMotors(speed);
     }

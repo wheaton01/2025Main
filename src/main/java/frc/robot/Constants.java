@@ -53,22 +53,22 @@ public final class Constants {
         
         public static final double kFeedForward = .0750;//tuned in 2/20
         public static double kP_up = 0.002;
-        public  static double kI =   0.00000;
+        public  static double kI =   0.00015;
         public  static double kD =   0.0005;
 
         public static double kIZone = 5.0;
-        public static double kdownSpeed =-.3;
-        public static double kPIDThreshold = 5.0;
+        public static double kdownSpeed =-.4;
+        public static double kPIDThreshold = 2.0;
 
 
-        public static final double kL4Height = 750.0;
-        public static final double kL3Height = 500.0; 
-        public static final double kL2Height = 250.0; 
+        public static final double kL4Height = 1450.0;
+        public static final double kL3Height = 880.0; 
+        public static final double kL2Height = 520.0; 
         public static final double kL1Height = 0.0;
 
         public static final double kHomePose = 0.0;
 
-        public static final double kMaxHeight = 1000.0;
+        public static final double kMaxHeight = 2000.0;
 
         public static final double kTolerance = 1.0;
         public static final int    kEncoderA  = 0;

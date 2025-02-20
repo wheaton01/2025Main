@@ -50,6 +50,7 @@ public class RobotContainer {
     sControllerHaptics m_controllerHaptics;
     setElevatorPose setL4Pose, setL3Pose, setL2Pose, setL1Pose, setHomePose;
     DriveToPoseCommand autoDriveToPoseCommand;
+    setElevatorOffset setElevatorOffset;
     Compressor compressor = new Compressor(1, PneumaticsModuleType.CTREPCM);
 
 
@@ -89,6 +90,8 @@ public class RobotContainer {
         setL1Pose = new setElevatorPose(sElevator, elevatorConstants.kL1Height);
         setHomePose = new setElevatorPose(sElevator, elevatorConstants.kHomePose);
 
+        setElevatorOffset = new setElevatorOffset(sElevator, () -> MathUtil.applyDeadband(m_operatorController.getLeftY(),.1));
+
         // Setting Default Commands
         //sEndAffector.setDefaultCommand(defaultIntake);
         sClimber.setDefaultCommand(defaultClimber);
@@ -115,7 +118,7 @@ public class RobotContainer {
         swerveSubsystem.setDefaultCommand(
                 swerveSubsystem.driveCommand(
                         () -> MathUtil.applyDeadband(-m_driverController.getLeftY(), 0.1),
-                        () -> MathUtil.applyDeadband(m_driverController.getLeftX(), 0.1),
+                        () -> MathUtil.applyDeadband(-m_driverController.getLeftX(), 0.1),
                         () -> MathUtil.applyDeadband(m_driverController.getRightX(), 0.1)
                 )
         );
@@ -181,8 +184,12 @@ private void createDriveToPoseTrigger(DoubleSupplier triggerSupplier, boolean is
         m_operatorController.rightBumper().onTrue(setL4Pose);
         m_operatorController.b().onTrue(setL3Pose);
         m_operatorController.x().onTrue(setL2Pose);
-        m_operatorController.a().onTrue(setHomePose); // Note: A button duplicated
-    
+        m_operatorController.a().onTrue(setHomePose);
+        m_operatorController.a().and(m_operatorController.b().
+        and(m_operatorController.x().
+        and(m_operatorController.y().
+        and(m_operatorController.rightBumper().whileFalse(setElevatorOffset)))));
+        
         // ----------------------- Climber Safety Override ----------------------- //
         new Trigger(() -> m_operatorController.rightStick().getAsBoolean() &&
                 m_operatorController.leftStick().getAsBoolean())
@@ -208,6 +215,8 @@ private void createDriveToPoseTrigger(DoubleSupplier triggerSupplier, boolean is
         
     }
     public void setDefaultCommands(){
+        sElevator.setDefaultCommand(setElevatorOffset);
+
             // Automatically start intakeCoral when coral is NOT detected
 
         // sSlider.setDefaultCommand(new InstantCommand(sSlider::setRetract));
