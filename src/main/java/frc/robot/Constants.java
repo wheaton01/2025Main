@@ -35,7 +35,7 @@ public final class Constants {
       //public static int kPlaceSensorID  = 0;      //TODO : CORRECT ANALOG ID
 
 
-      public static double kintakeSensorThreshold = 2000;
+      public static double kintakeSensorThreshold = 1200;
 
 
     public static class climberConstants{
@@ -45,20 +45,23 @@ public final class Constants {
 
       public static class elevatorConstants{
 
-        public static final double kFeedForward = .070;//tuned in 2/20
+        public static final double kFeedForward = .080;//tuned in 2/20
+        public static double kP_up = 0.002;
+        public static double kP_down = .0005;
+        //public  static double kP = 0.00015;
+        public  static double kI = 0.00015;
+        public  static double kD = 0.00015;
 
-        public static final double kP = 0.0;
-        public static final double kI = 0.0;
-        public static final double kD = 0.0;
+        public static double kIZone = 5.0;
 
-        public static final double kL4Height = 150.0;
-        public static final double kL3Height = 100.0; 
-        public static final double kL2Height = 50.0; 
+        public static final double kL4Height = 750.0;
+        public static final double kL3Height = 500.0; 
+        public static final double kL2Height = 250.0; 
         public static final double kL1Height = 0.0;
 
         public static final double kHomePose = 0.0;
 
-        public static final double kMaxHeight = 250.0;
+        public static final double kMaxHeight = 1000.0;
 
         public static final double kTolerance = 1.0;
         public static final int    kEncoderA  = 0;

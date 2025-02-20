@@ -12,87 +12,82 @@ import edu.wpi.first.math.controller.PIDController;
 
 public class sElevator extends SubsystemBase {
 
-    private PIDController mElevatorPid;
+    private PIDController mElevatorUpPid;
+    private PIDController mElevatorDownPid;
     private SparkMax mElevator1, mElevator2;
-    double nTuningFF = 0.0; // Tuning feedforward value
-    // Tuning mode boolean
-    private boolean tuningMode = true; //TURN OFF ONCE TUNED
-     Encoder mElevatorEncoder;
+    private Encoder mElevatorEncoder;
+    private boolean tuningMode = false;
 
     // Constructor
     public sElevator() {
         mElevator1 = new SparkMax(robotConstants.kelevatorSparkID1, SparkMax.MotorType.kBrushless);
         mElevator2 = new SparkMax(robotConstants.kelevatorSparkID2, SparkMax.MotorType.kBrushless);
-        //encoder init
 
         mElevatorEncoder = new Encoder(elevatorConstants.kEncoderA, elevatorConstants.kEncoderB);
         mElevatorEncoder.setSamplesToAverage(5);
         mElevatorEncoder.setReverseDirection(true);
         mElevatorEncoder.setDistancePerPulse(elevatorConstants.kElevatorConversionFac);
 
-        // Initialize the PID controller with default values
-        mElevatorPid = new PIDController(robotConstants.elevatorConstants.kP, 
-                                         robotConstants.elevatorConstants.kI, 
-                                         robotConstants.elevatorConstants.kD);
-                    
+        // Initialize separate PID controllers for upward and downward motion
+        mElevatorUpPid = new PIDController(robotConstants.elevatorConstants.kP_up, 
+                                           robotConstants.elevatorConstants.kI, 
+                                           robotConstants.elevatorConstants.kD);
+        mElevatorUpPid.setIZone(elevatorConstants.kIZone);
+        mElevatorUpPid.setTolerance(elevatorConstants.kTolerance);
 
-        mElevatorPid.setTolerance(elevatorConstants.kTolerance);
+        mElevatorDownPid = new PIDController(robotConstants.elevatorConstants.kP_down, 
+                                             robotConstants.elevatorConstants.kI, 
+                                             robotConstants.elevatorConstants.kD);
+        mElevatorDownPid.setIZone(elevatorConstants.kIZone);
+        mElevatorDownPid.setTolerance(elevatorConstants.kTolerance);
     }
 
     @Override
     public void periodic() {
-        SmartDashboard.putNumber("Current Elevator Pose",mElevatorEncoder.getDistance());
-        SmartDashboard.putNumber("Current Elevator Velocity",mElevator1.get());
-        // Tuning Mode: Check if we are in tuning mode
-        if (tuningMode) {
-            // Update PID constants from SmartDashboard if tuning mode is on
-            mElevatorPid.setP(SmartDashboard.getNumber("PID P", robotConstants.elevatorConstants.kP));
-            mElevatorPid.setI(SmartDashboard.getNumber("PID I", robotConstants.elevatorConstants.kI));
-            mElevatorPid.setD(SmartDashboard.getNumber("PID D", robotConstants.elevatorConstants.kD));
-            nTuningFF = SmartDashboard.getNumber("Tuning Feedforward", robotConstants.elevatorConstants.kFeedForward);
-            double setpoint = SmartDashboard.getNumber("Elevator Setpoint Input", mElevatorPid.getSetpoint());
-            mElevatorPid.setSetpoint(setpoint);
+        double position = getHeight();
+        SmartDashboard.putNumber("Elevator Position", position);
+        SmartDashboard.putNumber("Elevator Setpoint", mElevatorUpPid.getSetpoint());  // or mElevatorDownPid.getSetpoint() if down
 
+        // Select the PID controller based on direction of movement
+        double PIDOutput = 0;
+        if (mElevatorUpPid.getSetpoint() > position) {
+            // Moving up
+            PIDOutput = mElevatorUpPid.calculate(position);
+        } else {
+            // Moving down
+            PIDOutput = mElevatorDownPid.calculate(position);
         }
 
-        // Get the elevator position from the encoder
-        double position = getHeight();
-
-        // Update SmartDashboard with elevator position and setpoint
-        SmartDashboard.putNumber("Elevator Position", position);
-        SmartDashboard.putNumber("Elevator Setpoint", mElevatorPid.getSetpoint());
-
-        // Calculate PID output based on current position
-        double PIDOutput = mElevatorPid.calculate(position + robotConstants.elevatorConstants.kFeedForward+ nTuningFF);
-
-        // Control the motors based on the PID output
-        mElevator1.set(PIDOutput);
-        // mElevator2.set(-PIDOutput);  // Opposing motor for synchronization
+        // Apply the PID output with feedforward
+        double finalOutput = PIDOutput + elevatorConstants.kFeedForward;
+        mElevator1.set(finalOutput);
+        // mElevator2.set(-finalOutput);  // Optionally mirror the second motor
     }
 
     // Set the desired height (pose) for the elevator
     public void setElevatorPose(double height) {
-        if(height<elevatorConstants.kMaxHeight){
-        mElevatorPid.setSetpoint(height);
-        }else {SmartDashboard.putString(getSubsystem(),"requested Height > MAX HEIGHT");}
+        if (height < elevatorConstants.kMaxHeight) {
+            // Store the setpoint in both up/down PID controllers
+            mElevatorUpPid.setSetpoint(height);
+            mElevatorDownPid.setSetpoint(height);
+        } else {
+            SmartDashboard.putString(getSubsystem(), "Requested Height > MAX HEIGHT");
+        }
     }
 
     // Check if the elevator is at the setpoint
     public boolean isAtSetpoint() {
-        return mElevatorPid.atSetpoint();
-    }
-    public void zeroElevator(){
-
+        return mElevatorUpPid.atSetpoint() || mElevatorDownPid.atSetpoint();
     }
 
-    // Method to toggle tuning mode on/off
+    public double getHeight() {
+        return mElevatorEncoder.getDistance();
+    }
+
+    // Toggle tuning mode on/off
     public void setTuningMode(boolean isEnabled) {
         tuningMode = isEnabled;
     }
-    public void setManualMotors(double speed) {
-        mElevator1.set(speed+elevatorConstants.kFeedForward);
-    }
-    public double getHeight(){
-        return mElevatorEncoder.getDistance();
-    } 
 }
+
+

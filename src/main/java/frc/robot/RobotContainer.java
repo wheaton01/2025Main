@@ -7,7 +7,7 @@ import frc.robot.Constants.robotConstants.intakeConstants;
 import frc.robot.commands.Autos;
 import frc.robot.commands.setCHaptics;
 import frc.robot.commands.climberCommands.setClimber;
-import frc.robot.commands.elevatorCommands.SetManualElevator;
+import frc.robot.commands.elevatorCommands.setElevatorOffset;
 import frc.robot.commands.elevatorCommands.setElevatorPose;
 import frc.robot.commands.intakeCommands.intakeCoral;
 import frc.robot.commands.intakeCommands.setIntake;
@@ -74,10 +74,10 @@ public class RobotContainer {
     }
 
     private void setupCommands() {
-        sElevator.setDefaultCommand(new SetManualElevator(
-                sElevator,
-                () -> 1.0 * MathUtil.applyDeadband(m_operatorController.getLeftY(), 0.2) 
-            ));        // Intake Commands
+        // sElevator.setDefaultCommand(new SetManualElevator(
+        //         sElevator,
+        //         () -> 1.0 * MathUtil.applyDeadband(m_operatorController.getLeftY(), 0.2) 
+        //     ));        // Intake Commands
        // defaultIntake = new setIntake(false, false, 0, 0, sEndAffector);
         defaultClimber = new setClimber(sClimber, false, false);
         //intakeBall = new setIntake(false, true, 0.0, -1.0, sEndAffector);
@@ -177,7 +177,8 @@ private void createDriveToPoseTrigger(DoubleSupplier triggerSupplier, boolean is
     
     public void operatorControls() {
         // ------------------------- Preset Pose Commands ------------------------- //
-        m_operatorController.a().onTrue(setL1Pose);
+        // m_operatorController.a().onTrue(setL1Pose);
+        m_operatorController.rightBumper().onTrue(setL4Pose);
         m_operatorController.b().onTrue(setL3Pose);
         m_operatorController.x().onTrue(setL2Pose);
         m_operatorController.a().onTrue(setHomePose); // Note: A button duplicated
