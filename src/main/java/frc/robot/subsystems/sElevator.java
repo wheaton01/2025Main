@@ -24,10 +24,11 @@ public class sElevator extends SubsystemBase {
         mElevator1 = new SparkMax(robotConstants.kelevatorSparkID1, SparkMax.MotorType.kBrushless);
         mElevator2 = new SparkMax(robotConstants.kelevatorSparkID2, SparkMax.MotorType.kBrushless);
         //encoder init
-        mElevatorEncoder = new Encoder(elevatorConstants.kEncoderA, elevatorConstants.kEncoderB);
-        mElevatorEncoder.setDistancePerPulse(elevatorConstants.kEncoderDistancePerPulse);
-        mElevatorEncoder.setSamplesToAverage(5);
 
+        mElevatorEncoder = new Encoder(elevatorConstants.kEncoderA, elevatorConstants.kEncoderB);
+        mElevatorEncoder.setSamplesToAverage(5);
+        mElevatorEncoder.setReverseDirection(true);
+        mElevatorEncoder.setDistancePerPulse(elevatorConstants.kElevatorConversionFac);
 
         // Initialize the PID controller with default values
         mElevatorPid = new PIDController(robotConstants.elevatorConstants.kP, 
@@ -55,7 +56,7 @@ public class sElevator extends SubsystemBase {
         }
 
         // Get the elevator position from the encoder
-        double position = mElevator1.getEncoder().getPosition();
+        double position = getHeight();
 
         // Update SmartDashboard with elevator position and setpoint
         SmartDashboard.putNumber("Elevator Position", position);
@@ -65,18 +66,23 @@ public class sElevator extends SubsystemBase {
         double PIDOutput = mElevatorPid.calculate(position + robotConstants.elevatorConstants.kFeedForward+ nTuningFF);
 
         // Control the motors based on the PID output
-        // mElevator1.set(PIDOutput);
+        mElevator1.set(PIDOutput);
         // mElevator2.set(-PIDOutput);  // Opposing motor for synchronization
     }
 
     // Set the desired height (pose) for the elevator
     public void setElevatorPose(double height) {
+        if(height<elevatorConstants.kMaxHeight){
         mElevatorPid.setSetpoint(height);
+        }else {SmartDashboard.putString(getSubsystem(),"requested Height > MAX HEIGHT");}
     }
 
     // Check if the elevator is at the setpoint
     public boolean isAtSetpoint() {
         return mElevatorPid.atSetpoint();
+    }
+    public void zeroElevator(){
+
     }
 
     // Method to toggle tuning mode on/off
@@ -84,7 +90,9 @@ public class sElevator extends SubsystemBase {
         tuningMode = isEnabled;
     }
     public void setManualMotors(double speed) {
-        mElevator1.set(speed);
-        mElevator2.set(-speed);  // Opposing motor for synchronization
+        mElevator1.set(speed+elevatorConstants.kFeedForward);
     }
+    public double getHeight(){
+        return mElevatorEncoder.getDistance();
+    } 
 }

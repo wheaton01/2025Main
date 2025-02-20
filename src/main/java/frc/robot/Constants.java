@@ -45,7 +45,7 @@ public final class Constants {
 
       public static class elevatorConstants{
 
-        public static final double kFeedForward = 0.0005;
+        public static final double kFeedForward = .070;//tuned in 2/20
 
         public static final double kP = 0.0;
         public static final double kI = 0.0;
@@ -63,7 +63,7 @@ public final class Constants {
         public static final double kTolerance = 1.0;
         public static final int    kEncoderA  = 0;
         public static final int    kEncoderB  = 1;
-        public static final double kEncoderDistancePerPulse = 0.1;//TODO : This value is used to convert the encoder ticks to inches. this value is pulled from cad and may need to be corrected based on field meas.
+        public static final double kElevatorConversionFac = 0.18838;//TODO : This value is used to convert the encoder ticks to inches. this value is pulled from cad and may need to be corrected based on field meas.
 
       }
       public static class aprilTagConstants{
