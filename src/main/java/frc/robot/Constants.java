@@ -45,14 +45,21 @@ public final class Constants {
 
       public static class elevatorConstants{
 
-        public static final double kFeedForward = .080;//tuned in 2/20
+        public static double kP_down = 0.0025;  // Slightly higher P for more correction towards target
+        public static double kI_down = 0.0002;  // Small increase in I to help with steady-state error
+        public static double kD_down = 0.00005; // Keep D low to avoid jerky motion
+        
+        public static double kFeedForwardDown = 0.12;  // Slight increase for better gravity compensation
+        
+        public static final double kFeedForward = .0750;//tuned in 2/20
         public static double kP_up = 0.002;
-        public static double kP_down = .0005;
-        //public  static double kP = 0.00015;
-        public  static double kI = 0.00015;
-        public  static double kD = 0.00015;
+        public  static double kI =   0.00000;
+        public  static double kD =   0.0005;
 
         public static double kIZone = 5.0;
+        public static double kdownSpeed =-.3;
+        public static double kPIDThreshold = 5.0;
+
 
         public static final double kL4Height = 750.0;
         public static final double kL3Height = 500.0; 

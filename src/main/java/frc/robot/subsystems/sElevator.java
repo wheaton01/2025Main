@@ -17,6 +17,7 @@ public class sElevator extends SubsystemBase {
     private SparkMax mElevator1, mElevator2;
     private Encoder mElevatorEncoder;
     private boolean tuningMode = false;
+    private boolean bDownFlag = false;
 
     // Constructor
     public sElevator() {
@@ -36,43 +37,57 @@ public class sElevator extends SubsystemBase {
         mElevatorUpPid.setTolerance(elevatorConstants.kTolerance);
 
         mElevatorDownPid = new PIDController(robotConstants.elevatorConstants.kP_down, 
-                                             robotConstants.elevatorConstants.kI, 
-                                             robotConstants.elevatorConstants.kD);
+                                             robotConstants.elevatorConstants.kI_down, 
+                                             robotConstants.elevatorConstants.kD_down);
         mElevatorDownPid.setIZone(elevatorConstants.kIZone);
         mElevatorDownPid.setTolerance(elevatorConstants.kTolerance);
+
     }
 
     @Override
     public void periodic() {
+        SmartDashboard.putBoolean("downflag", bDownFlag);
+
         double position = getHeight();
         SmartDashboard.putNumber("Elevator Position", position);
         SmartDashboard.putNumber("Elevator Setpoint", mElevatorUpPid.getSetpoint());  // or mElevatorDownPid.getSetpoint() if down
-
+    
         // Select the PID controller based on direction of movement
         double PIDOutput = 0;
-        if (mElevatorUpPid.getSetpoint() > position) {
-            // Moving up
+    
+        if (!bDownFlag) {
+            // Moving up with PID
             PIDOutput = mElevatorUpPid.calculate(position);
+            mElevator1.set(PIDOutput + elevatorConstants.kFeedForward);
         } else {
-            // Moving down
-            PIDOutput = mElevatorDownPid.calculate(position);
+            // Moving down with linear control until close enough to the setpoint
+            double downSpeed = elevatorConstants.kdownSpeed;  // Adjust this value as needed for smoothness
+            mElevator1.set(downSpeed + elevatorConstants.kFeedForwardDown);  // Add feedforward for gravity compensation
+             if (Math.abs(mElevatorUpPid.getSetpoint()-getHeight())<elevatorConstants.kPIDThreshold){ {
+                    mElevator1.set(elevatorConstants.kFeedForward);  // Stop once it's at the setpoint
+                    bDownFlag = false;
+                
+            }
         }
-
-        // Apply the PID output with feedforward
-        double finalOutput = PIDOutput + elevatorConstants.kFeedForward;
-        mElevator1.set(finalOutput);
-        // mElevator2.set(-finalOutput);  // Optionally mirror the second motor
     }
-
+    
+    
     // Set the desired height (pose) for the elevator
     public void setElevatorPose(double height) {
         if (height < elevatorConstants.kMaxHeight) {
+            if (height != mElevatorUpPid.getSetpoint()){
             // Store the setpoint in both up/down PID controllers
+            if (height > getHeight()) {
+                bDownFlag = false;
+            }else {
+                bDownFlag = true;
+            }
             mElevatorUpPid.setSetpoint(height);
-            mElevatorDownPid.setSetpoint(height);
+            // mElevatorDownPid.setSetpoint(height);
         } else {
             SmartDashboard.putString(getSubsystem(), "Requested Height > MAX HEIGHT");
         }
+     }
     }
 
     // Check if the elevator is at the setpoint
