@@ -2,6 +2,7 @@ package frc.robot.commands.SwerveCommands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.robotConstants;
+import frc.robot.Constants.swerveConstants;
 import frc.robot.Constants.robotConstants.aprilTagConstants;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -91,7 +92,7 @@ public class DriveToPoseCommand extends Command {
     swerveSubsystem.setTargetPose(adjustedPose);
   
     // Command the swerve drive system to move to the adjusted pose at the scaled speed
-    swerveSubsystem.driveToPose(adjustedPose, scaledSpeed);
+    swerveSubsystem.driveToPose(adjustedPose);
   }
   
   
@@ -101,14 +102,14 @@ public class DriveToPoseCommand extends Command {
    */
   private Pose2d getNearestReefTagPose() {
       if (leftTriggerSupplier.getAsDouble() > rightTriggerSupplier.getAsDouble()) {
-          return swerveSubsystem.getNearestReefAprilTagPose("left"); // Offset left
+          return swerveSubsystem.getNearestReefAprilTagPose(-swerveConstants.sideOffsetDistance,swerveConstants.kforwardOffsetDistance); // Offset left
       }
       if (leftTriggerSupplier.getAsDouble() <= rightTriggerSupplier.getAsDouble()) {
-          return swerveSubsystem.getNearestReefAprilTagPose("right"); // Offset right
+          return swerveSubsystem.getNearestReefAprilTagPose(swerveConstants.sideOffsetDistance,swerveConstants.kforwardOffsetDistance); // Offset right
       }
       
       // Default case: Center robot to tag. for algae!
-      return swerveSubsystem.getNearestReefAprilTagPose("center");
+      return swerveSubsystem.getNearestReefAprilTagPose(0,swerveConstants.kforwardOffsetDistance);
 
   }
   private Pose2d getHPStation(){

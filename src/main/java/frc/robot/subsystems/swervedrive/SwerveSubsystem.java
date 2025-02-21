@@ -4,8 +4,10 @@
 
 package frc.robot.subsystems.swervedrive;
 
+import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Meter;
 
+import com.ctre.phoenix.sensors.PigeonIMU;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.commands.PathfindingCommand;
@@ -24,11 +26,13 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
@@ -39,6 +43,11 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants;
 import frc.robot.Constants.swerveConstants;
 import frc.robot.subsystems.swervedrive.Vision.Cameras;
+import limelight.Limelight;
+import limelight.networktables.AngularVelocity3d;
+import limelight.networktables.Orientation3d;
+import limelight.networktables.PoseEstimate;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
@@ -51,6 +60,7 @@ import org.photonvision.targeting.PhotonPipelineResult;
 import swervelib.SwerveController;
 import swervelib.SwerveDrive;
 import swervelib.SwerveDriveTest;
+import swervelib.imu.SwerveIMU;
 import swervelib.math.SwerveMath;
 import swervelib.parser.SwerveControllerConfiguration;
 import swervelib.parser.SwerveDriveConfiguration;
@@ -72,6 +82,7 @@ public class SwerveSubsystem extends SubsystemBase
   /**
    * Enable vision odometry updates while driving.
    */
+  Limelight myLimelight = new Limelight("limelight");
   private final boolean             visionDriveTest     = true;
   /**
    * PhotonVision class to keep an accurate odometry.
@@ -90,6 +101,8 @@ PIDController thetaPID = new PIDController(0.8, 0, 0.005);
 
   public SwerveSubsystem(File directory)
   {
+
+
     XdeltaPID.setTolerance(.2);
     YdeltaPID.setTolerance(.2);
     thetaPID.setTolerance(2);
@@ -123,6 +136,11 @@ PIDController thetaPID = new PIDController(0.8, 0, 0.005);
       swerveDrive.stopOdometryThread();
     }
     setupPathPlanner();
+
+        // grabs gyro from swerve
+      swerveDrive.getAccel();
+    
+
   }
 
   /**
@@ -154,8 +172,9 @@ PIDController thetaPID = new PIDController(0.8, 0, 0.005);
     // When vision is enabled we must manually update odometry in SwerveDrive
     if (visionDriveTest)
     {
-      swerveDrive.updateOdometry();
-      vision.updatePoseEstimation(swerveDrive);
+      //swerveDrive.updateOdometry();
+      //vision.updatePoseEstimation(swerveDrive);
+      updatePoseWithLimelight();
     }
   }
 
@@ -763,7 +782,7 @@ PIDController thetaPID = new PIDController(0.8, 0, 0.005);
     swerveDrive.drive(new ChassisSpeeds(0, 0, 0));
   }
 
-  public Pose2d getNearestReefAprilTagPose(String offsetDirection) { 
+  public Pose2d getNearestReefAprilTagPose(double xOffset, double zOffset) { 
     int[] blueReefTags = {17, 18, 19, 20, 21, 22}; // Blue reef tags
     int[] redReefTags = {6, 7, 8, 9, 10, 11};     // Red reef tags
 
@@ -785,36 +804,23 @@ PIDController thetaPID = new PIDController(0.8, 0, 0.005);
     }
 
     if (nearestTagPose == null) {
-        return null; // No valid tag found
+        return null; // No valid AprilTags found
     }
 
-    // Get the AprilTag's rotation (assumes tags face "forward" into the field)
-    Rotation2d tagRotation = nearestTagPose.getRotation();
+    // Extract tag rotation (heading in radians)
+    double tagAngle = nearestTagPose.getRotation().getRadians();
 
-    // Compute offsets
-    Translation2d sideOffset = new Translation2d(0, 0); // Left/Right Offset
-    Translation2d forwardOffset = new Translation2d( // Forward/Backward Offset
-        -swerveConstants.kforwardOffsetDistance * Math.cos(tagRotation.getRadians()),  
-        -swerveConstants.kforwardOffsetDistance * Math.sin(tagRotation.getRadians())
+    // Compute field-relative offsets
+    double fieldOffsetX = xOffset * Math.cos(tagAngle) - zOffset * Math.sin(tagAngle);
+    double fieldOffsetY = xOffset * Math.sin(tagAngle) + zOffset * Math.cos(tagAngle);
+
+    // Compute new target pose
+    Pose2d offsetTagPose = new Pose2d(
+        nearestTagPose.getTranslation().plus(new Translation2d(fieldOffsetX, fieldOffsetY)),
+        nearestTagPose.getRotation() // Keep the same orientation as the tag
     );
 
-    if ("left".equalsIgnoreCase(offsetDirection)) {
-        sideOffset = new Translation2d(
-          swerveConstants.sideOffsetDistance * Math.cos(tagRotation.getRadians() + Math.PI / 2), 
-          swerveConstants.sideOffsetDistance * Math.sin(tagRotation.getRadians() + Math.PI / 2)
-        );
-    } else if ("right".equalsIgnoreCase(offsetDirection)) {
-        sideOffset = new Translation2d(
-            -swerveConstants.sideOffsetDistance * Math.cos(tagRotation.getRadians() + Math.PI / 2), 
-            -swerveConstants.sideOffsetDistance * Math.sin(tagRotation.getRadians() + Math.PI / 2)
-        );
-    }
-
-    // Apply the offsets to get the final target pose
-    return new Pose2d(
-        nearestTagPose.getTranslation().plus(sideOffset).plus(forwardOffset), 
-        nearestTagPose.getRotation()
-    );
+    return offsetTagPose;
 }
 private Pose2d targetPose = new Pose2d(); // Store the latest pose to drive to
 
@@ -865,6 +871,41 @@ public Pose2d getNearestHumanPlayerTagPose() {
 
   return nearestTagPose; // Return the nearest tag pose, or null if no valid tag is found
 }
+double[] rawGyro = new double[3];
+PigeonIMU pigeonIMU = new PigeonIMU(4);
+    private void updatePoseWithLimelight() {
+
+    // Get the gyro angular velocities
+      pigeonIMU.getRawGyro(rawGyro);
+    
+    // Extract pitch, roll, and yaw velocities
+      double pitchVelocity = rawGyro[0];  // X-axis (pitch)
+      double rollVelocity = rawGyro[1];   // Y-axis (roll)
+      double yawVelocity = rawGyro[2];    // Z-axis (yaw)
+    
+    // Create the robot's orientation with updated gyro velocities
+    Orientation3d robotOrientation = new Orientation3d(
+        swerveDrive.getGyroRotation3d(),
+        new AngularVelocity3d(
+            DegreesPerSecond.of(pitchVelocity),
+            DegreesPerSecond.of(rollVelocity),
+            DegreesPerSecond.of(yawVelocity)
+        ));
+        // Update Limelight with robot orientation for MegaTag2
+        myLimelight.getSettings()
+        .withRobotOrientation(robotOrientation)
+        .save();
+
+        // Get MegaTag2 pose estimation
+        Optional<PoseEstimate> visionEstimate = myLimelight.getPoseEstimator(true).getPoseEstimate();
+        
+        // If a valid pose is found, update the robot’s odometry
+        visionEstimate.ifPresent(poseEstimate -> {
+            double timestamp = poseEstimate.timestampSeconds;
+            Pose2d estimatedPose = poseEstimate.pose.toPose2d();
+            swerveDrive.addVisionMeasurement(estimatedPose, timestamp);
+        });
+    }
 
 
 

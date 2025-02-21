@@ -15,19 +15,21 @@ public class sElevator extends SubsystemBase {
     private PIDController mElevatorUpPid;
     private PIDController mElevatorDownPid;
     private SparkMax mElevator1, mElevator2;
-    private Encoder mElevatorEncoder;
+    //private Encoder mElevatorEncoder;
     private boolean tuningMode = false;
     private boolean bDownFlag = false;
     double mELevatorSetpoint;
+    RelativeEncoder mElevatorEncoder;
     // Constructor
     public sElevator() {
         mElevator1 = new SparkMax(robotConstants.kelevatorSparkID1, SparkMax.MotorType.kBrushless);
         mElevator2 = new SparkMax(robotConstants.kelevatorSparkID2, SparkMax.MotorType.kBrushless);
-
-        mElevatorEncoder = new Encoder(elevatorConstants.kEncoderA, elevatorConstants.kEncoderB);
-        mElevatorEncoder.setSamplesToAverage(5);
-        mElevatorEncoder.setReverseDirection(true);
-        mElevatorEncoder.setDistancePerPulse(elevatorConstants.kElevatorConversionFac);
+        mElevatorEncoder = mElevator1.getEncoder();
+        
+        // mElevatorEncoder = new Encoder(elevatorConstants.kEncoderA, elevatorConstants.kEncoderB);
+        // mElevatorEncoder.setSamplesToAverage(5);
+        // mElevatorEncoder.setReverseDirection(true);
+        // mElevatorEncoder.setDistancePerPulse(elevatorConstants.kElevatorConversionFac);
 
         // Initialize separate PID controllers for upward and downward motion
         mElevatorUpPid = new PIDController(robotConstants.elevatorConstants.kP_up, 
@@ -105,7 +107,7 @@ public class sElevator extends SubsystemBase {
     }
 
     public double getHeight() {
-        return mElevatorEncoder.getDistance();
+        return mElevatorEncoder.getPosition()*elevatorConstants.kElevatorConversionFac;
     }
 
     // Toggle tuning mode on/off
