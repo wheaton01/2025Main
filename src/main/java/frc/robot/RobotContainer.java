@@ -190,12 +190,17 @@ private void createDriveToPoseTrigger(DoubleSupplier triggerSupplier, boolean is
         and(m_operatorController.y().
         and(m_operatorController.rightBumper().whileFalse(setElevatorOffset)))));
         
-        // ----------------------- Climber Safety Override ----------------------- //
+        // ----------------------- Climber Commands ----------------------- //
         new Trigger(() -> m_operatorController.rightStick().getAsBoolean() &&
                 m_operatorController.leftStick().getAsBoolean())
                 .onTrue(new ParallelCommandGroup(
                         new setCHaptics(m_controllerHaptics, 0.8).withTimeout(1.2),
                         new InstantCommand(sClimber::disableSafety)).withTimeout(.8));
+
+                        m_operatorController.povDown().onTrue(new InstantCommand(sClimber::climb));
+                        m_operatorController.povUp().onTrue(new InstantCommand(sClimber::unClimb));
+                        m_operatorController.povLeft().onTrue(new InstantCommand(sClimber::stowClimber));
+                        m_operatorController.povRight().onTrue(new InstantCommand(sClimber::deployClimber));
     
         // --------------------------- Intake Controls --------------------------- //
     

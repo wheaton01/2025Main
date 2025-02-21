@@ -29,11 +29,28 @@ public class sClimber extends SubsystemBase {
    // SmartDashboard.putBoolean("Climber Deployed", sdeployClimb.get());
     // This method will be called once per scheduler run
   }
-  public void deployClimber(boolean bdeploy){
-    sdeployClimb.set(bdeploy);
+  public void deployClimber(){
+    if (enableClimber) {
+
+    sdeployClimb.set(true);
+    }
+  } 
+  public void stowClimber(){
+    if (enableClimber) {
+
+    sdeployClimb.set(true);
+    }
   }
-  public void climb(boolean bclimb){
-    sClimb.set(bclimb);
+  public void climb(){
+    if (enableClimber) {
+
+    sClimb.set(true);
+  }
+  }  
+  public void unClimb(){
+    if (enableClimber) {
+      sClimb.set(false);
+    }
   } 
   public void disableSafety(){
     enableClimber = true;

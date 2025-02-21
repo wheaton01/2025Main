@@ -11,7 +11,8 @@ public class setClimber extends Command {
   /** Creates a new setClimber. */
   sClimber sClimber;
   boolean bdeploy, bclimb;
-
+// Not really using this command as it is easier to just directly call into the subsystem using instant commands in this case
+//as they are all setting boolean values
   public setClimber(sClimber sClimber, boolean bdeploy, boolean bclimb) {
     this.sClimber = sClimber;
     this.bdeploy = bdeploy;
@@ -23,8 +24,7 @@ public class setClimber extends Command {
 
     @Override
     public void initialize() {
-      sClimber.deployClimber(bdeploy);
-      sClimber.climb(bclimb);
+
       }
   
     // Called every time the scheduler runs while the command is scheduled.
