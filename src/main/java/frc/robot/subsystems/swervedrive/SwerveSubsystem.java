@@ -778,10 +778,10 @@ PIDController thetaPID = new PIDController(0.8, 0, 0.005);
   //   ChassisSpeeds chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, thetaSpeed, currentPose.getRotation());
   //   swerveDrive.drive(chassisSpeeds);
   // }
-  // public void stop()
-  // {
-  //   swerveDrive.drive(new ChassisSpeeds(0, 0, 0));
-  // }
+  public void stop()
+  {
+    swerveDrive.drive(new ChassisSpeeds(0, 0, 0));
+  }
   public void driveToPose(Pose2d pose, double speed) {
     currentPose = getPose();
     Translation2d delta = pose.getTranslation().minus(currentPose.getTranslation());
