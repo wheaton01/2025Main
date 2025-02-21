@@ -14,13 +14,14 @@ import frc.robot.Constants;
 
 public class sClimber extends SubsystemBase {
   /** Creates a new sClimber. */
-  Solenoid sClimb,sdeployClimb;
+  Solenoid sClimb,sdeployClimb,sdropRamp;
 
   boolean enableClimber = false;
 
   public sClimber() {
-    sClimb =       new Solenoid(PneumaticsModuleType.CTREPCM, Constants.robotConstants.climberConstants.kClimberSolenoidID);  
-    sdeployClimb = new Solenoid(PneumaticsModuleType.CTREPCM, Constants.robotConstants.climberConstants.kDeployClimberSolenoidID);    
+    sClimb =       new Solenoid(PneumaticsModuleType.CTREPCM, Constants.robotConstants.climberConstants.kClimb2ID);  
+    sdeployClimb = new Solenoid(PneumaticsModuleType.CTREPCM, Constants.robotConstants.climberConstants.kClimb1ID);    
+    sdropRamp =    new Solenoid(PneumaticsModuleType.CTREPCM, Constants.robotConstants.climberConstants.kRamp1ID);    
   }
 
   @Override
@@ -54,6 +55,9 @@ public class sClimber extends SubsystemBase {
   } 
   public void disableSafety(){
     enableClimber = true;
+  }
+  public void dropRamp(){
+    sdeployClimb.set(enableClimber);
   }
 
 }

@@ -67,8 +67,8 @@ public class DriveToPoseCommand extends Command {
     }
   
     // Get predefined offsets from constants
-    double leftOffset  = aprilTagConstants.klReefOffset;
-    double rightOffset = aprilTagConstants.krReefOffset;
+    // double leftOffset  = aprilTagConstants.klReefOffset;
+    // double rightOffset = aprilTagConstants.krReefOffset;
   
     // Get the dynamic offset values from the controller inputs
     double xOffset = xOffsetSupplier.getAsDouble();
@@ -91,7 +91,6 @@ public class DriveToPoseCommand extends Command {
     );
     swerveSubsystem.setTargetPose(adjustedPose);
   
-    // Command the swerve drive system to move to the adjusted pose at the scaled speed
     swerveSubsystem.driveToPose(adjustedPose);
   }
   

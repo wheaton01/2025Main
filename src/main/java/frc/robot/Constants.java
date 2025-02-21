@@ -26,9 +26,7 @@ public final class Constants {
       public static final int kPlacesparkID = 12;//TODO : CORRECT CAN ID
 
       public static final int kPneuExtendID = 7;
-      public static final int kClimb2ID = 6;
-      public static final int kClimb1ID = 4;
-      public static final int kRamp1ID = 3;
+
 
 
       public static int kIntakeSensorID = 0; //TODO : CORRECT ANALOG ID
@@ -39,10 +37,10 @@ public final class Constants {
 
 
     public static class climberConstants{
-      public static final int kClimberSolenoidID = 4;//TODO : CORRECT PNEUMATIC ID
-      public static final int kDeployClimberSolenoidID = 5;//TODO : CORRECT PNEUMATIC ID
+      public static final int kClimb2ID = 6;
+      public static final int kClimb1ID = 4;
+      public static final int kRamp1ID = 3;    
     }
-
       public static class elevatorConstants{
 
         public static double kP_down = 0.0025;  // Slightly higher P for more correction towards target

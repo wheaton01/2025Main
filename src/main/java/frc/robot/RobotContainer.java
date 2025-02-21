@@ -140,7 +140,7 @@ public class RobotContainer {
 
         // Bind right bumper to drive to nearest AprilTag pose with a special mode
         createDriveToPoseButtonTrigger(m_driverController.rightBumper(), true);
-
+        createDriveToPoseButtonTrigger(m_driverController.x(), true);
     }
 
     // Helper method to create drive-to-pose triggers for the right and left
@@ -164,7 +164,7 @@ private void createDriveToPoseTrigger(DoubleSupplier triggerSupplier, boolean is
 
 
     // Helper method to bind a button to a DriveToPoseCommand
-    private void createDriveToPoseButtonTrigger(Trigger button, boolean specialMode) {
+    private void createDriveToPoseButtonTrigger(Trigger button, boolean HPStation) {
         button.whileTrue(new DriveToPoseCommand(
                 swerveSubsystem,
                 swerveConstants.MAX_SPEED,
@@ -173,7 +173,7 @@ private void createDriveToPoseTrigger(DoubleSupplier triggerSupplier, boolean is
                 m_driverController::getRightX,
                 m_driverController::getLeftTriggerAxis,
                 m_driverController::getRightTriggerAxis,
-                specialMode,
+                HPStation,
                 false
         ));
     }
@@ -201,6 +201,7 @@ private void createDriveToPoseTrigger(DoubleSupplier triggerSupplier, boolean is
                         m_operatorController.povUp().onTrue(new InstantCommand(sClimber::unClimb));
                         m_operatorController.povLeft().onTrue(new InstantCommand(sClimber::stowClimber));
                         m_operatorController.povRight().onTrue(new InstantCommand(sClimber::deployClimber));
+                        m_driverController.rightStick().onTrue(new InstantCommand(sClimber::dropRamp))
     
         // --------------------------- Intake Controls --------------------------- //
     
@@ -216,6 +217,8 @@ private void createDriveToPoseTrigger(DoubleSupplier triggerSupplier, boolean is
                         new InstantCommand(sEndAffector::setBallIntake),
                         new setCHaptics(m_controllerHaptics, 0.2))
                         ).onFalse(new InstantCommand(sEndAffector::setZero)); // Haptic feedback when motors are on
+
+
     
         
     }
