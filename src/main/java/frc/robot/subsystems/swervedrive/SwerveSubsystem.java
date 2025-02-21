@@ -21,6 +21,7 @@ import com.pathplanner.lib.util.swerve.SwerveSetpoint;
 import com.pathplanner.lib.util.swerve.SwerveSetpointGenerator;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -82,12 +83,12 @@ public class SwerveSubsystem extends SubsystemBase
   /**
    * Enable vision odometry updates while driving.
    */
-  Limelight myLimelight = new Limelight("limelight");
-  private final boolean             visionDriveTest     = true;
+  private final boolean             visionDriveTest     = false;
   /**
    * PhotonVision class to keep an accurate odometry.
    */
   private Vision vision;
+  Limelight myLimelight;
 
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
@@ -105,7 +106,7 @@ PIDController thetaPID = new PIDController(0.8, 0, 0.005);
 
     XdeltaPID.setTolerance(.2);
     YdeltaPID.setTolerance(.2);
-    thetaPID.setTolerance(2);
+    thetaPID.setTolerance(2.0);
 
     // Configure the Telemetry before creating the SwerveDrive to avoid unnecessary objects being created.
     SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
@@ -766,21 +767,42 @@ PIDController thetaPID = new PIDController(0.8, 0, 0.005);
 
 
 
-  public void driveToPose(Pose2d pose, double speed)
-  {
+  // public void driveToPose(Pose2d pose, double speed)
+  // {
+  //   currentPose = getPose();
+  //   Translation2d delta = pose.getTranslation().minus(currentPose.getTranslation());
+  //   double xSpeed = XdeltaPID.calculate(currentPose.getX(), pose.getX()) * speed;
+  //   double ySpeed = YdeltaPID.calculate(currentPose.getY(), pose.getY()) * speed;
+  //   double thetaSpeed = thetaPID.calculate(currentPose.getRotation().getRadians(), pose.getRotation().getRadians()) * speed;
+
+  //   ChassisSpeeds chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, thetaSpeed, currentPose.getRotation());
+  //   swerveDrive.drive(chassisSpeeds);
+  // }
+  // public void stop()
+  // {
+  //   swerveDrive.drive(new ChassisSpeeds(0, 0, 0));
+  // }
+  public void driveToPose(Pose2d pose, double speed) {
     currentPose = getPose();
     Translation2d delta = pose.getTranslation().minus(currentPose.getTranslation());
+    
     double xSpeed = XdeltaPID.calculate(currentPose.getX(), pose.getX()) * speed;
     double ySpeed = YdeltaPID.calculate(currentPose.getY(), pose.getY()) * speed;
-    double thetaSpeed = thetaPID.calculate(currentPose.getRotation().getRadians(), pose.getRotation().getRadians()) * speed;
-
+    
+    // Normalize theta error to [-π, π] to avoid long rotation paths
+    double thetaError = pose.getRotation().getRadians() - currentPose.getRotation().getRadians();
+    thetaError = MathUtil.angleModulus(thetaError); // Ensures shortest path rotation
+    
+    double distance = delta.getNorm(); // Distance from target
+    double thetaSpeed = thetaPID.calculate(currentPose.getRotation().getRadians(), currentPose.getRotation().getRadians() + thetaError) 
+                        * (speed * Math.min(1.0, distance)); // Scale rotation speed based on distance
+    
+    // Ensure robot-relative or field-relative control is correct
     ChassisSpeeds chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, thetaSpeed, currentPose.getRotation());
+    
     swerveDrive.drive(chassisSpeeds);
-  }
-  public void stop()
-  {
-    swerveDrive.drive(new ChassisSpeeds(0, 0, 0));
-  }
+}
+
 
   public Pose2d getNearestReefAprilTagPose(double xOffset, double zOffset) { 
     int[] blueReefTags = {17, 18, 19, 20, 21, 22}; // Blue reef tags
