@@ -93,7 +93,7 @@ public final class Constants {
             public static final double kTolerance = 1.0;
             public static final int kEncoderA = 0;
             public static final int kEncoderB = 1;
-            public static final double kElevatorConversionFac = 0.18838; // Conversion factor for encoder ticks to inches
+            public static final double kElevatorConversionFac = 8.665511; // Conversion factor for encoder ticks to inches
         }
 
         //==================================================================================

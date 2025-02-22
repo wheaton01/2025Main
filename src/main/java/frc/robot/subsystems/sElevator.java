@@ -45,7 +45,7 @@ public class sElevator extends SubsystemBase {
         mElevator1 = new SparkMax(robotConstants.kelevatorSparkID1, SparkMax.MotorType.kBrushless);
         mElevator2 = new SparkMax(robotConstants.kelevatorSparkID2, SparkMax.MotorType.kBrushless);
         mElevatorEncoder = mElevator1.getEncoder();
-        mElevatorEncoder2 = mElevator2.getEncoder();
+        mElevatorEncoder2 = mElevator2.getEncoder();        
 
         
         // mElevatorEncoder = new Encoder(elevatorConstants.kEncoderA, elevatorConstants.kEncoderB);
@@ -78,6 +78,8 @@ public class sElevator extends SubsystemBase {
         // ╔════════════════════════════╗
         // ║       Debugging Output     ║
         // ╚════════════════════════════╝
+        SmartDashboard.putNumber("elevator Pose",getHeight());
+        SmartDashboard.putNumber("elevator Pose2",getHeight2());
         if (!elevatorConstants.btestMode) {
             SmartDashboard.putBoolean("Down Flag ", bDownFlag);
     
@@ -128,6 +130,9 @@ public class sElevator extends SubsystemBase {
                     bDownFlag = false; // Reset flag when target is reached
                 }
             }
+
+                SmartDashboard.putNumber("elevator Pose",mElevatorEncoder.getPosition());
+            
     
             // ╔════════════════════════════╗
             // ║   Apply Motor Output       ║
@@ -170,6 +175,8 @@ public class sElevator extends SubsystemBase {
     //this looks way more complicated than it is. 
     //it just is a command to manually move the elevator and so we can run this as two separate motors instead of one being a follower
     public Command setElevator(DoubleSupplier speed) {
+
+
         if (elevatorConstants.btwoMotorMode) {
             return new RunCommand(() -> mElevator1.set(speed.getAsDouble()), this)
                 .alongWith(new RunCommand(() -> mElevator2.set(speed.getAsDouble()), this));
@@ -184,10 +191,10 @@ public class sElevator extends SubsystemBase {
     }
 
     public double getHeight() {
-        return mElevatorEncoder.getPosition()*elevatorConstants.kElevatorConversionFac;
+        return mElevatorEncoder.getPosition();//*elevatorConstants.kElevatorConversionFac;
     }
     public double getHeight2() {
-        return mElevatorEncoder2.getPosition()*elevatorConstants.kElevatorConversionFac;
+        return mElevatorEncoder2.getPosition();//*elevatorConstants.kElevatorConversionFac;
     }
 
     // Toggle tuning mode on/off

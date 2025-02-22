@@ -92,7 +92,7 @@ public class SwerveSubsystem extends SubsystemBase
   /**
    * Enable vision odometry updates while driving.
    */
-  private final boolean             visionDriveTest     = false;
+  private final boolean             visionDriveTest     = true;
   /**
    * PhotonVision class to keep an accurate odometry.
    */
@@ -142,8 +142,10 @@ PIDController thetaPID = new PIDController(0.8, 0, 0.005);
 //    swerveDrive.pushOffsetsToEncoders(); // Set the absolute encoder to be used over the internal encoder and push the offsets onto it. Throws warning if not possible
     if (visionDriveTest)
     {
-      setupPhotonVision();
+      //setupPhotonVision();
+      myLimelight = new Limelight("limelight");
       // Stop the odometry thread if we are using vision that way we can synchronize updates better.
+      setupPoseWithLimelight();
       swerveDrive.stopOdometryThread();
     }
     setupPathPlanner();
@@ -183,9 +185,10 @@ PIDController thetaPID = new PIDController(0.8, 0, 0.005);
     // When vision is enabled we must manually update odometry in SwerveDrive
     if (visionDriveTest)
     {
+      updatePoseWithLimelight();
       //swerveDrive.updateOdometry();
       //vision.updatePoseEstimation(swerveDrive);
-      updatePoseWithLimelight();
+      //updatePoseWithLimelight();
     }
   }
 
@@ -905,7 +908,7 @@ public Pose2d getNearestHumanPlayerTagPose() {
 }
 double[] rawGyro = new double[3];
 PigeonIMU pigeonIMU = new PigeonIMU(4);
-    private void updatePoseWithLimelight() {
+    private void setupPoseWithLimelight() {
 
     // Get the gyro angular velocities
       pigeonIMU.getRawGyro(rawGyro);
@@ -938,5 +941,18 @@ PigeonIMU pigeonIMU = new PigeonIMU(4);
             swerveDrive.addVisionMeasurement(estimatedPose, timestamp);
         });
     }
+    private void updatePoseWithLimelight() {
+      Optional<PoseEstimate> visionEstimate = myLimelight.getPoseEstimator(true).getPoseEstimate();
+  
+      visionEstimate.ifPresent(poseEstimate -> {
+          double timestamp = poseEstimate.timestampSeconds;
+          Pose2d estimatedPose = poseEstimate.pose.toPose2d(); // Convert Limelight pose to WPILib Pose2d
+          swerveDrive.addVisionMeasurement(estimatedPose, timestamp); // Update odometry
+      });
+  }
+  public Pose2d getRobotPose() {
+    return swerveDrive.getPose();
+}
+  
 
 }
