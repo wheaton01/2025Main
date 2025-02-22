@@ -5,7 +5,6 @@
 package frc.robot.commands.intakeCommands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.sEndAffector;
 import frc.robot.subsystems.sIntake;
 /* 
 ╔══════════════════════════════════════════════════════════════════════════════════════╗

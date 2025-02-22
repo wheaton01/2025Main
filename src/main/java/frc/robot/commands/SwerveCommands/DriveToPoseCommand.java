@@ -1,9 +1,7 @@
 package frc.robot.commands.SwerveCommands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants.robotConstants;
 import frc.robot.Constants.swerveConstants;
-import frc.robot.Constants.robotConstants.aprilTagConstants;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -28,6 +26,7 @@ public class DriveToPoseCommand extends Command {
   private final SwerveSubsystem swerveSubsystem;
   
   // Speed at which the robot should drive
+  @SuppressWarnings("unused")
   private final double speed;
   
   // Suppliers for offsets and trigger inputs (dynamically received from the controller)
@@ -93,6 +92,7 @@ public class DriveToPoseCommand extends Command {
   
     // You can choose to take the average of both triggers or scale the speed based on whichever trigger is pressed more
     double triggerScale = Math.max(leftTrigger, rightTrigger); // Use the highest trigger value
+    @SuppressWarnings("unused")//this stuff was mostly used when using more custom code for pathing, pathplanner should handle this
     double scaledSpeed = triggerScale; // Scale the speed accordingly
     
     // Create a new target pose with the adjusted offsets
