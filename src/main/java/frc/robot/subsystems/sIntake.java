@@ -15,7 +15,7 @@ public class sIntake extends SubsystemBase {
   private final Timer intakeTimer = new Timer();
   private boolean coralDetectedLastCycle = false;
   private boolean extraIntakeActive = false;
-
+  private boolean coralPlaceMode = false;
   /** Creates a new sIntake. */
   public sIntake() {
       mIntake = new VictorSPX(robotConstants.kintakeSparkID);
@@ -34,6 +34,7 @@ public class sIntake extends SubsystemBase {
     SmartDashboard.putNumber("Intake Timer", intakeTimer.get());
 
     // If a new coral is detected, reset and start the timer
+    if (!coralPlaceMode){
     if (coralDetected && !coralDetectedLastCycle) {
         intakeTimer.reset(); // Ensures a fresh start every time a new coral is detected
         intakeTimer.start();
@@ -56,6 +57,10 @@ public class sIntake extends SubsystemBase {
             intakeTimer.stop();
             extraIntakeActive = false;
         }
+      }
+    }
+    if (coralPlaceMode){
+      mIntake.set(VictorSPXControlMode.Velocity, 1.0);
     }
 
     // Update coral detection for the next loop
