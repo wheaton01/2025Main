@@ -79,6 +79,7 @@ import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 ║      ____/\\\/___________/\\\________\/\\\___/\\\________\/\\\___/\\\______/\\\_____ ║
 ║       __/\\\/____________\//\\\\\\\\\\\\\/___\//\\\\\\\\\\\\\/___\///\\\\\\\\\/_____ ║
 ║        _\///_______________\/////////////______\/////////////_______\/////////______ ║
+║        THIS CODE IS LARGELY YAGSL EXAMPLE CODE WITH SOME LIMELIGHT POSE ESTIMATION   ║
 ╚══════════════════════════════════════════════════════════════════════════════════════╝
 */
 public class SwerveSubsystem extends SubsystemBase
