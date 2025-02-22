@@ -3,13 +3,10 @@ package frc.robot;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.swerveConstants;
 import frc.robot.Constants.robotConstants.elevatorConstants;
-import frc.robot.Constants.robotConstants.intakeConstants;
-import frc.robot.commands.Autos;
 import frc.robot.commands.setCHaptics;
 import frc.robot.commands.climberCommands.setClimber;
 import frc.robot.commands.elevatorCommands.setElevatorOffset;
 import frc.robot.commands.elevatorCommands.setElevatorPose;
-import frc.robot.commands.intakeCommands.intakeCoral;
 import frc.robot.commands.intakeCommands.setIntake;
 import frc.robot.commands.SwerveCommands.DriveToPoseCommand;
 import frc.robot.subsystems.sClimber;
@@ -21,21 +18,17 @@ import frc.robot.subsystems.sSlider;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 
 import java.io.File;
-import java.time.Instant;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 /* 
