@@ -80,7 +80,7 @@ public class RobotContainer {
 
     /* 
     ╔══════════════════════════════════════════════════════════════════════════════════════════╗
-    ║                                RobotContainer Constructor                                      ║
+    ║                                RobotContainer Constructor                                ║
     ╚══════════════════════════════════════════════════════════════════════════════════════════╝
     */
     private final SendableChooser<Command> autoChooser = new SendableChooser<>();
@@ -104,7 +104,7 @@ public class RobotContainer {
 
     /* 
     ╔════════════════════════════════════════════════════════════════════════════════════════════╗
-    ║                                      Setup Commands                                           ║
+    ║                                      Setup Commands                                        ║
     ╚════════════════════════════════════════════════════════════════════════════════════════════╝
     */
     private void setupCommands() {
