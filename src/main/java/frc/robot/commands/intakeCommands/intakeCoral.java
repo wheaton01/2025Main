@@ -11,7 +11,6 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.sControllerHaptics;
 import frc.robot.subsystems.sEndAffector;
 import frc.robot.subsystems.sIntake;
-import frc.robot.Constants.robotConstants;
 import frc.robot.Constants.robotConstants.intakeConstants;
 import frc.robot.commands.setCHaptics;
 
