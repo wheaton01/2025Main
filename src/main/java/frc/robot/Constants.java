@@ -42,6 +42,7 @@ public final class Constants {
       public static final int kRamp1ID = 3;    
     }
       public static class elevatorConstants{
+        public static boolean btestMode;
 
         public static double kP_down = 0.0025;  // Slightly higher P for more correction towards target
         public static double kI_down = 0.0002;  // Small increase in I to help with steady-state error
@@ -81,7 +82,7 @@ public final class Constants {
 
       }
       public static class intakeConstants{
-        public static final double kIdleIntakeSpeed = .5;
+        public static final double kIdleIntakeSpeed = 1.0;
         public static final double kIntakeSpeed = 1.0;
         public static final double kBallIntakeSpeed = -1.0;
         public static final double kPlaceSpeed = 1.0;

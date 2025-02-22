@@ -2,9 +2,13 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.robotConstants;
 import frc.robot.Constants.robotConstants.elevatorConstants;
+
+import java.util.function.DoubleSupplier;
 
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.*;
@@ -99,6 +103,10 @@ public class sElevator extends SubsystemBase {
         mElevatorUpPid.setSetpoint(offset+mELevatorSetpoint);
         }
  
+    }
+    DoubleSupplier speed;
+    public Command setElevator(DoubleSupplier speed) {
+        return new RunCommand(() -> mElevator1.set(speed.getAsDouble()), this);
     }
 
     // Check if the elevator is at the setpoint

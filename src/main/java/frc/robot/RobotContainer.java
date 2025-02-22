@@ -122,15 +122,18 @@ public class RobotContainer {
                         () -> MathUtil.applyDeadband(m_driverController.getRightX(), 0.1)
                 )
         );
+        sElevator.setDefaultCommand(sElevator.setElevator(()-> MathUtil.applyDeadband(m_operatorController.getLeftY(),.1)));
         
         m_driverController.a().onTrue(new InstantCommand(swerveSubsystem::zeroGyro));
         m_driverController.start().onTrue(new InstantCommand(swerveSubsystem::zeroGyroWithAlliance));
         //Driver Non Driving Controls
 
         m_driverController.rightBumper().onTrue(new ParallelCommandGroup(new InstantCommand(sIntake::setFeedIntake),
-                                      new InstantCommand(sEndAffector::setPlace)).withTimeout(0))
-        .onFalse(new ParallelCommandGroup(new InstantCommand(sIntake::setZero),
-                                          new InstantCommand(sEndAffector::setZero)).withTimeout(0));        
+                                                                         new InstantCommand(sEndAffector::setPlace),
+                                                                         new InstantCommand(sIntake::setCoralPlaceMode)))
+                                          .onFalse(new ParallelCommandGroup(new InstantCommand(sIntake::setZero),
+                                          new InstantCommand(sEndAffector::setZero),
+                                          new InstantCommand(sIntake::setIntakeMode)).withTimeout(0));        
         // Create DriveToPoseCommand based on trigger inputs
         createDriveToPoseTrigger(m_driverController::getRightTriggerAxis, true);
         createDriveToPoseTrigger(m_driverController::getLeftTriggerAxis, false);
@@ -145,39 +148,7 @@ public class RobotContainer {
 
     // Helper method to create drive-to-pose triggers for the right and left
     // triggersprivate void createDriveToPoseTrigger(DoubleSupplier triggerSupplier, boolean isRightTrigger) {
-private void createDriveToPoseTrigger(DoubleSupplier triggerSupplier, boolean isRightTrigger) {
-    
-        new Trigger(() -> triggerSupplier.getAsDouble() > 0.5)
-            .whileTrue(new DriveToPoseCommand(
-                    swerveSubsystem,
-                    swerveConstants.MAX_SPEED,
-                    m_driverController::getLeftY,
-                    m_driverController::getLeftX,
-                    m_driverController::getRightX,
-                    m_driverController::getLeftTriggerAxis,
-                    m_driverController::getRightTriggerAxis,
-                    !isRightTrigger,
-                    false
-            ));
-}
 
-
-
-    // Helper method to bind a button to a DriveToPoseCommand
-    private void createDriveToPoseButtonTrigger(Trigger button, boolean HPStation) {
-        button.whileTrue(new DriveToPoseCommand(
-                swerveSubsystem,
-                swerveConstants.MAX_SPEED,
-                m_driverController::getLeftY,
-                m_driverController::getLeftX,
-                m_driverController::getRightX,
-                m_driverController::getLeftTriggerAxis,
-                m_driverController::getRightTriggerAxis,
-                HPStation,
-                false
-        ));
-    }
-    
     public void operatorControls() {
         // ------------------------- Preset Pose Commands ------------------------- //
         // m_operatorController.a().onTrue(setL1Pose);
@@ -223,7 +194,10 @@ private void createDriveToPoseTrigger(DoubleSupplier triggerSupplier, boolean is
         
     }
     public void setDefaultCommands(){
-        sElevator.setDefaultCommand(setElevatorOffset);
+        if(elevatorConstants.btestMode){
+        sElevator.setDefaultCommand(sElevator.setElevator(()-> MathUtil.applyDeadband(m_operatorController.getLeftY(),.1)));
+        }
+        //sElevator.setDefaultCommand(setElevatorOffset);
 
             // Automatically start intakeCoral when coral is NOT detected
 
@@ -233,4 +207,39 @@ private void createDriveToPoseTrigger(DoubleSupplier triggerSupplier, boolean is
     public Command getAutonomousCommand() {
         return Autos.getAutonomousCommand(sIntake);
     }
+
+
+    private void createDriveToPoseTrigger(DoubleSupplier triggerSupplier, boolean isRightTrigger) {
+    
+        new Trigger(() -> triggerSupplier.getAsDouble() > 0.5)
+            .whileTrue(new DriveToPoseCommand(
+                    swerveSubsystem,
+                    swerveConstants.MAX_SPEED,
+                    m_driverController::getLeftY,
+                    m_driverController::getLeftX,
+                    m_driverController::getRightX,
+                    m_driverController::getLeftTriggerAxis,
+                    m_driverController::getRightTriggerAxis,
+                    !isRightTrigger,
+                    false
+            ));
+}
+
+
+
+    // Helper method to bind a button to a DriveToPoseCommand
+    private void createDriveToPoseButtonTrigger(Trigger button, boolean HPStation) {
+        button.whileTrue(new DriveToPoseCommand(
+                swerveSubsystem,
+                swerveConstants.MAX_SPEED,
+                m_driverController::getLeftY,
+                m_driverController::getLeftX,
+                m_driverController::getRightX,
+                m_driverController::getLeftTriggerAxis,
+                m_driverController::getRightTriggerAxis,
+                HPStation,
+                false
+        ));
+    }
+    
 }

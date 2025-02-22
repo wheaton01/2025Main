@@ -83,6 +83,8 @@ public class sIntake extends SubsystemBase {
   /** Sets intake to idle speed. */
   public void setIntakeMode() {
     mIntake.set(VictorSPXControlMode.PercentOutput, intakeConstants.kIdleIntakeSpeed);
+    coralPlaceMode = false;
+
   }
 
   /** Runs intake at feeding speed. */
@@ -104,5 +106,8 @@ public class sIntake extends SubsystemBase {
    */
   public boolean getCoralSensor() {
     return aIntakeSensor.getValue() < robotConstants.kintakeSensorThreshold;
+  }
+  public void setCoralPlaceMode(){
+    coralPlaceMode = true;
   }
 }
