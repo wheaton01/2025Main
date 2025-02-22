@@ -13,6 +13,19 @@ import java.util.function.DoubleSupplier;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.*;
 import edu.wpi.first.math.controller.PIDController;
+/* 
+╔══════════════════════════════════════════════════════════════════════════════════════╗
+║  __/\\\\\\\\\\\\\\\___/\\\\\\\\\\\\\\\____/\\\\\\\\\\\\\\\______/\\\\\\\\\\_________ ║
+║  _\/////////////\\\__\/\\\///////////____\/\\\///////////_____/\\\///////\\\________ ║
+║   ____________/\\\/___\/\\\_______________\/\\\_______________\///______/\\\________ ║
+║   __________/\\\/_____\/\\\\\\\\\\\\______\/\\\\\\\\\\\\_____________/\\\//_________ ║
+║    ________/\\\/_______\////////////\\\____\////////////\\\__________\////\\\_______ ║
+║     ______/\\\/____________________\//\\\______________\//\\\____________\//\\\_____ ║
+║      ____/\\\/___________/\\\________\/\\\___/\\\________\/\\\___/\\\______/\\\_____ ║
+║       __/\\\/____________\//\\\\\\\\\\\\\/___\//\\\\\\\\\\\\\/___\///\\\\\\\\\/_____ ║
+║        _\///_______________\/////////////______\/////////////_______\/////////______ ║
+╚══════════════════════════════════════════════════════════════════════════════════════╝
+*/
 
 public class sElevator extends SubsystemBase {
 
@@ -49,34 +62,47 @@ public class sElevator extends SubsystemBase {
         mElevatorDownPid.setTolerance(elevatorConstants.kTolerance);
 
     }
-
     @Override
     public void periodic() {
-        SmartDashboard.putBoolean("downflag", bDownFlag);
-
-        double position = getHeight();
-        SmartDashboard.putNumber("Elevator Position", position);
-        SmartDashboard.putNumber("Elevator Setpoint", mElevatorUpPid.getSetpoint());  // or mElevatorDownPid.getSetpoint() if down
+        // ╔════════════════════════════╗
+        // ║       Debugging Output     ║
+        // ╚════════════════════════════╝
+        if (!elevatorConstants.btestMode) {
+            SmartDashboard.putBoolean("Down Flag", bDownFlag);
     
-        // Select the PID controller based on direction of movement
-        double PIDOutput = 0;
+            double position = getHeight(); // Current elevator height
+            SmartDashboard.putNumber("Elevator Position", position);
+            SmartDashboard.putNumber("Elevator Setpoint", mElevatorUpPid.getSetpoint());
     
-        if (!bDownFlag) {
-            // Moving up with PID
-            PIDOutput = mElevatorUpPid.calculate(position);
-            mElevator1.set(PIDOutput + elevatorConstants.kFeedForward);
-        } else {
-            // Moving down with linear control until close enough to the setpoint
-            double downSpeed = elevatorConstants.kdownSpeed;  // Adjust this value as needed for smoothness
-            mElevator1.set(downSpeed + elevatorConstants.kFeedForwardDown);  // Add feedforward for gravity compensation
-             if (Math.abs(mElevatorUpPid.getSetpoint()-position)<elevatorConstants.kPIDThreshold || position-mElevatorUpPid.getSetpoint()<0){ 
-                    mElevator1.set(elevatorConstants.kFeedForward);  // Stop once it's at the setpoint
-                    bDownFlag = false;
-                
+            double output = 0.0; // Motor power output
+    
+            // ╔════════════════════════════╗
+            // ║     Elevator Control       ║
+            // ╚════════════════════════════╝
+            if (!bDownFlag) {
+                // ─── Ascending ───
+                output = mElevatorUpPid.calculate(position) + elevatorConstants.kFeedForward;
+            } else {
+                // ─── Descending ───
+                output = elevatorConstants.kdownSpeed + elevatorConstants.kFeedForwardDown;
+    
+                // Stop the descent when near the setpoint
+                boolean atSetpoint = Math.abs(mElevatorUpPid.getSetpoint() - position) < elevatorConstants.kPIDThreshold
+                                     || (position - mElevatorUpPid.getSetpoint()) < 0;
+    
+                if (atSetpoint) { 
+                    output = elevatorConstants.kFeedForward; // Hold position
+                    bDownFlag = false; // Reset flag when target is reached
+                }
             }
+    
+            // ╔════════════════════════════╗
+            // ║   Apply Motor Output       ║
+            // ╚════════════════════════════╝
+            mElevator1.set(output);
         }
-        
     }
+    
     
     
     // Set the desired height (pose) for the elevator

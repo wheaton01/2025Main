@@ -1,112 +1,134 @@
 // Copyright (c) FIRST and other WPILib contributors.
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
-
 package frc.robot;
+/* 
+╔══════════════════════════════════════════════════════════════════════════════════════╗
+║  __/\\\\\\\\\\\\\\\___/\\\\\\\\\\\\\\\____/\\\\\\\\\\\\\\\______/\\\\\\\\\\_________ ║
+║  _\/////////////\\\__\/\\\///////////____\/\\\///////////_____/\\\///////\\\________ ║
+║   ____________/\\\/___\/\\\_______________\/\\\_______________\///______/\\\________ ║
+║   __________/\\\/_____\/\\\\\\\\\\\\______\/\\\\\\\\\\\\_____________/\\\//_________ ║
+║    ________/\\\/_______\////////////\\\____\////////////\\\__________\////\\\_______ ║
+║     ______/\\\/____________________\//\\\______________\//\\\____________\//\\\_____ ║
+║      ____/\\\/___________/\\\________\/\\\___/\\\________\/\\\___/\\\______/\\\_____ ║
+║       __/\\\/____________\//\\\\\\\\\\\\\/___\//\\\\\\\\\\\\\/___\///\\\\\\\\\/_____ ║
+║        _\///_______________\/////////////______\/////////////_______\/////////______ ║
+╚══════════════════════════════════════════════════════════════════════════════════════╝ 
+╔══════════════════════════════════════════════════════════════════════════════════════╗
+║                             ROBOT CONSTANTS CONFIGURATION                            ║
+╚══════════════════════════════════════════════════════════════════════════════════════╝
+*/
 
-/**
- * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
- * constants. This class should not be used for any other purpose. All constants should be declared
- * globally (i.e. public static). Do not put anything functional in this class.
- *
- * <p>It is advised to statically import this class (or one of its inner classes) wherever the
- * constants are needed, to reduce verbosity.
- */
 public final class Constants {
-  public static class OperatorConstants {
-    public static final int kDriverControllerPort = 0;
-    public static final int kOperatorControllerPort = 1;
-  }
-  public static class robotConstants{
-    public static final int kelevatorSparkID1 = 10;//TODO : CORRECT CAN ID
-    public static final int kelevatorSparkID2 = 11;//TODO : CORRECT CAN ID
-    
-    //End Affector Constants
-      public static final int kintakeSparkID = 13;//TODO : CORRECT CAN ID
-      public static final int kPlacesparkID = 12;//TODO : CORRECT CAN ID
 
-      public static final int kPneuExtendID = 7;
-
-
-
-      public static int kIntakeSensorID = 0; //TODO : CORRECT ANALOG ID
-      //public static int kPlaceSensorID  = 0;      //TODO : CORRECT ANALOG ID
-
-
-      public static double kintakeSensorThreshold = 1200;
-
-
-    public static class climberConstants{
-      public static final int kClimb2ID = 6;
-      public static final int kClimb1ID = 4;
-      public static final int kRamp1ID = 3;    
+    //======================================================================================
+    // Operator Constants
+    //======================================================================================
+    public static class OperatorConstants {
+        public static final int kDriverControllerPort = 0;
+        public static final int kOperatorControllerPort = 1;
     }
-      public static class elevatorConstants{
-        public static boolean btestMode;
 
-        public static double kP_down = 0.0025;  // Slightly higher P for more correction towards target
-        public static double kI_down = 0.0002;  // Small increase in I to help with steady-state error
-        public static double kD_down = 0.00005; // Keep D low to avoid jerky motion
+    //======================================================================================
+    // Robot Constants - Elevator, Intake, and Climber Configuration
+    //======================================================================================
+    public static class robotConstants {
         
-        public static double kFeedForwardDown = 0.12;  // Slight increase for better gravity compensation
+        // Elevator Spark IDs (Motor Controllers)
+        public static final int kelevatorSparkID1 = 10; // TODO : CORRECT CAN ID
+        public static final int kelevatorSparkID2 = 11; // TODO : CORRECT CAN ID
         
-        public static final double kFeedForward = .0750;//tuned in 2/20
-        public static double kP_up = 0.002;
-        public  static double kI =   0.00015;
-        public  static double kD =   0.0005;
+        // End Effector Constants (Intake, Placement, Pneumatics)
+        public static final int kintakeSparkID = 13;    // TODO : CORRECT CAN ID
+        public static final int kPlacesparkID = 12;     // TODO : CORRECT CAN ID
+        public static final int kPneuExtendID = 7;       // Pneumatic extend ID
+        
+        // Intake Sensor ID and Threshold
+        public static int kIntakeSensorID = 0;          // TODO : CORRECT ANALOG ID
+        public static double kintakeSensorThreshold = 1200;
 
-        public static double kIZone = 5.0;
-        public static double kdownSpeed =-.4;
-        public static double kPIDThreshold = 2.0;
+        //==================================================================================
+        // Climber Constants
+        //==================================================================================
+        public static class climberConstants {
+            public static final int kClimb2ID = 6;
+            public static final int kClimb1ID = 4;
+            public static final int kRamp1ID = 3;    
+        }
 
+        //==================================================================================
+        // Elevator Constants
+        //==================================================================================
+        public static class elevatorConstants {
+            public static boolean btestMode;
 
-        public static final double kL4Height = 1450.0;
-        public static final double kL3Height = 880.0; 
-        public static final double kL2Height = 520.0; 
-        public static final double kL1Height = 0.0;
+            // PID Constants for Upward and Downward Movement
+            public static double kP_down = 0.0025;  // Slightly higher P for more correction towards target
+            public static double kI_down = 0.0002;  // Small increase in I to help with steady-state error
+            public static double kD_down = 0.00005; // Keep D low to avoid jerky motion
+            
+            public static double kFeedForwardDown = 0.12;  // Slight increase for better gravity compensation
+            public static final double kFeedForward = 0.0750; // Tuned in 2/20
+            public static double kP_up = 0.002;
+            public static double kI = 0.00015;
+            public static double kD = 0.0005;
 
-        public static final double kHomePose = 0.0;
+            // PID Zone and Threshold Constants
+            public static double kIZone = 5.0;
+            public static double kdownSpeed = -0.4;
+            public static double kPIDThreshold = 2.0;
 
-        public static final double kMaxHeight = 2000.0;
+            // Elevator Height Constants
+            public static final double kL4Height = 1450.0;
+            public static final double kL3Height = 880.0; 
+            public static final double kL2Height = 520.0; 
+            public static final double kL1Height = 0.0;
 
-        public static final double kTolerance = 1.0;
-        public static final int    kEncoderA  = 0;
-        public static final int    kEncoderB  = 1;
-        public static final double kElevatorConversionFac = 0.18838;//TODO : This value is used to convert the encoder ticks to inches. this value is pulled from cad and may need to be corrected based on field meas.
+            // Home and Max Height Constants
+            public static final double kHomePose = 0.0;
+            public static final double kMaxHeight = 2000.0;
 
-      }
-      public static class aprilTagConstants{
+            // Encoder Constants
+            public static final double kTolerance = 1.0;
+            public static final int kEncoderA = 0;
+            public static final int kEncoderB = 1;
+            public static final double kElevatorConversionFac = 0.18838; // Conversion factor for encoder ticks to inches
+        }
 
-        public static double klReefOffset= -5.0;
-        public static double krReefOffset= 5.0;
+        //==================================================================================
+        // AprilTag Constants (Offsets)
+        //==================================================================================
+        public static class aprilTagConstants {
+            public static double klReefOffset = -5.0;
+            public static double krReefOffset = 5.0;
+        }
 
-      }
-      public static class intakeConstants{
-        public static final double kIdleIntakeSpeed = 1.0;
-        public static final double kIntakeSpeed = 1.0;
-        public static final double kBallIntakeSpeed = -1.0;
-        public static final double kPlaceSpeed = 1.0;
-        public static final double kIntakeSensorThreshold = 0.0;
-        public static final double kIntakeTime = .1;
-        public static final double kL4PlaceTime  = .25;//TODO : This value is used in the placeL4 to set a delay so the intake dosent retract too quickly
-        public static final double kPlaceTime  = .25;//TODO : This value is used in the placeCoral to set a delay the intake doenst turn off too quickly
-      }
+        //==================================================================================
+        // Intake Constants
+        //==================================================================================
+        public static class intakeConstants {
+            public static final double kIdleIntakeSpeed = 1.0;
+            public static final double kIntakeSpeed = 1.0;
+            public static final double kBallIntakeSpeed = -1.0;
+            public static final double kPlaceSpeed = 1.0;
+            public static final double kIntakeSensorThreshold = 0.0;
+            public static final double kIntakeTime = 0.1;
+            public static final double kL4PlaceTime = 0.25;  // Delay for intake retraction
+            public static final double kPlaceTime = 0.25;    // Delay for intake stop after placement
+        }
+    }
 
-  }
+    //======================================================================================
+    // Swerve Drive Constants
+    //======================================================================================
+    public static class swerveConstants {
+        public static final double kalignSpeed = 0.4;
+        public static final double MAX_SPEED = 5.09;
+        public static double kforwardOffsetDistance = 0.460; // Distance for drive-to-pose
+        public static double sideOffsetDistance = 0.165;     // Distance between robot center and AprilTag
 
-
-  public static class swerveConstants{
-    public static final double kalignSpeed = .4;
-    public static final double MAX_SPEED = 5.09;
-    public static double kforwardOffsetDistance = .460;//TODO : This value is pulled from cad and may need to be corrected based on field meas. this is used for the drivetoPose command
-    public static double sideOffsetDistance     = .165;//TODO : Sets distance between the center of the robot and april tag
-
-    public static final double POSITION_TOLERANCE = 0.5;//TODO : this value is used in the swerveSubsystem to determine how close the robot is to the target pose
-    public static final double ROTATION_TOLERANCE = 0.5;
-    
-  }
-
-    
-    
-  
+        // Tolerance Constants for Position and Rotation
+        public static final double POSITION_TOLERANCE = 0.5;  // Tolerance for position accuracy
+        public static final double ROTATION_TOLERANCE = 0.5;  // Tolerance for rotation accuracy
+    }
 }
