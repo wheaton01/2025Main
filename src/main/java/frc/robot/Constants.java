@@ -60,7 +60,8 @@ public final class Constants {
         // Elevator Constants
         //==================================================================================
         public static class elevatorConstants {
-            public static boolean btestMode;
+            public static boolean btestMode = true;
+            public static boolean btwoMotorMode = false;
 
             // PID Constants for Upward and Downward Movement
             public static double kP_down = 0.0025;  // Slightly higher P for more correction towards target

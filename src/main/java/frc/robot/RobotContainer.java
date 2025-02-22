@@ -29,6 +29,8 @@ import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -49,7 +51,8 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 ║        _\///_______________\/////////////______\/////////////_______\/////////______ ║
 ╚══════════════════════════════════════════════════════════════════════════════════════╝
 ╔════════════════════════════════════════════════════════════════════════════════════════════════╗
-║                         RobotContainer Class  ::  This is like our main class                  ║ 
+║                         RobotContainer Class  ::  This is like our main class                  ║
+║                                                 creates button binds and commands              ║ 
 ╚════════════════════════════════════════════════════════════════════════════════════════════════╝
 */
 public class RobotContainer {
@@ -80,7 +83,11 @@ public class RobotContainer {
     ║                                RobotContainer Constructor                                      ║
     ╚══════════════════════════════════════════════════════════════════════════════════════════╝
     */
+    private final SendableChooser<Command> autoChooser = new SendableChooser<>();
+
     public RobotContainer() {
+        SmartDashboard.putData("SELECT AUTON", autoChooser);   
+
         sSlider = new sSlider();
         sEndAffector = new sEndAffector();
         sClimber = new sClimber();
@@ -92,6 +99,7 @@ public class RobotContainer {
                 "neo"));
         setupCommands();
         configureBindings();
+        getAutonomousCommand();
     }
 
     /* 
@@ -133,7 +141,7 @@ public class RobotContainer {
 
     /* 
     ╔══════════════════════════════════════════════════════════════════════════════════════════╗
-    ║                                 Configure Controller Bindings                                 ║
+    ║                                 Configure Controller Bindings                            ║
     ╚══════════════════════════════════════════════════════════════════════════════════════════╝
     */
     private void configureBindings() {
@@ -144,7 +152,7 @@ public class RobotContainer {
 
     /* 
     ╔════════════════════════════════════════════════════════════════════════════════════════╗
-    ║                              Driver Control Configuration                                    ║
+    ║                              Driver Control Configuration                              ║
     ╚════════════════════════════════════════════════════════════════════════════════════════╝
     */
     public void driverControls() {
@@ -183,7 +191,7 @@ public class RobotContainer {
 
     /* 
     ╔════════════════════════════════════════════════════════════════════════════════════════╗
-    ║                                 Operator Control Configuration                             ║
+    ║                                 Operator Control Configuration                         ║
     ╚════════════════════════════════════════════════════════════════════════════════════════╝
     */
     public void operatorControls() {
@@ -228,7 +236,7 @@ public class RobotContainer {
 
     /* 
     ╔════════════════════════════════════════════════════════════════════════════════════════════╗
-    ║                              Set Default Commands                                            ║
+    ║                              Set Default Commands                                          ║
     ╚════════════════════════════════════════════════════════════════════════════════════════════╝
     */
     public void setDefaultCommands() {
@@ -244,16 +252,16 @@ public class RobotContainer {
 
     /* 
     ╔══════════════════════════════════════════════════════════════════════════════════════════╗
-    ║                            Get Autonomous Command                                           ║
+    ║                            Get Autonomous Command                                        ║
     ╚══════════════════════════════════════════════════════════════════════════════════════════╝
     */
     public Command getAutonomousCommand() {
-        return Autos.getAutonomousCommand(sIntake);
-    }
+
+        return autoChooser.getSelected(); }
 
     /* 
     ╔══════════════════════════════════════════════════════════════════════════════════════════╗
-    ║                            Create Drive-to-Pose Trigger                                      ║
+    ║                            Create Drive-to-Pose Trigger                                  ║
     ╚══════════════════════════════════════════════════════════════════════════════════════════╝
     */
     private void createDriveToPoseTrigger(DoubleSupplier triggerSupplier, boolean isRightTrigger) {
@@ -274,7 +282,7 @@ public class RobotContainer {
 
     /* 
     ╔══════════════════════════════════════════════════════════════════════════════════════════╗
-    ║                           Create Drive-to-Pose Button Trigger                                ║
+    ║                           Create Drive-to-Pose Button Trigger                            ║
     ╚══════════════════════════════════════════════════════════════════════════════════════════╝
     */
     private void createDriveToPoseButtonTrigger(Trigger button, boolean HPStation) {

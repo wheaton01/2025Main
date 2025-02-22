@@ -28,8 +28,9 @@ import edu.wpi.first.math.controller.PIDController;
 */
 
 public class sElevator extends SubsystemBase {
-
+    
     private PIDController mElevatorUpPid;
+    private PIDController mElevatorUpPid2;
     private PIDController mElevatorDownPid;
     private SparkMax mElevator1, mElevator2;
     //private Encoder mElevatorEncoder;
@@ -37,11 +38,14 @@ public class sElevator extends SubsystemBase {
     private boolean bDownFlag = false;
     double mELevatorSetpoint;
     RelativeEncoder mElevatorEncoder;
+    RelativeEncoder mElevatorEncoder2;
     // Constructor
     public sElevator() {
         mElevator1 = new SparkMax(robotConstants.kelevatorSparkID1, SparkMax.MotorType.kBrushless);
         mElevator2 = new SparkMax(robotConstants.kelevatorSparkID2, SparkMax.MotorType.kBrushless);
         mElevatorEncoder = mElevator1.getEncoder();
+        mElevatorEncoder2 = mElevator2.getEncoder();
+
         
         // mElevatorEncoder = new Encoder(elevatorConstants.kEncoderA, elevatorConstants.kEncoderB);
         // mElevatorEncoder.setSamplesToAverage(5);
@@ -52,9 +56,15 @@ public class sElevator extends SubsystemBase {
         mElevatorUpPid = new PIDController(robotConstants.elevatorConstants.kP_up, 
                                            robotConstants.elevatorConstants.kI, 
                                            robotConstants.elevatorConstants.kD);
+        mElevatorUpPid2 = new PIDController(robotConstants.elevatorConstants.kP_up, 
+                                           robotConstants.elevatorConstants.kI, 
+                                           robotConstants.elevatorConstants.kD);
         mElevatorUpPid.setIZone(elevatorConstants.kIZone);
         mElevatorUpPid.setTolerance(elevatorConstants.kTolerance);
-
+        
+        mElevatorUpPid2.setIZone(elevatorConstants.kIZone);
+        mElevatorUpPid2.setTolerance(elevatorConstants.kTolerance);
+                                   
         mElevatorDownPid = new PIDController(robotConstants.elevatorConstants.kP_down, 
                                              robotConstants.elevatorConstants.kI_down, 
                                              robotConstants.elevatorConstants.kD_down);
@@ -71,10 +81,12 @@ public class sElevator extends SubsystemBase {
             SmartDashboard.putBoolean("Down Flag", bDownFlag);
     
             double position = getHeight(); // Current elevator height
+            double position2 = getHeight2(); // Current elevator height
             SmartDashboard.putNumber("Elevator Position", position);
             SmartDashboard.putNumber("Elevator Setpoint", mElevatorUpPid.getSetpoint());
     
             double output = 0.0; // Motor power output
+            double output2 = 0.0;
     
             // ╔════════════════════════════╗
             // ║     Elevator Control       ║
@@ -95,11 +107,30 @@ public class sElevator extends SubsystemBase {
                     bDownFlag = false; // Reset flag when target is reached
                 }
             }
+            if (!bDownFlag && elevatorConstants.btwoMotorMode) {
+                // ─── Ascending ───
+                output2 = mElevatorUpPid2.calculate(position2) + elevatorConstants.kFeedForward;
+            } else {
+                // ─── Descending ───
+                output2 = elevatorConstants.kdownSpeed + elevatorConstants.kFeedForwardDown;
+    
+                // Stop the descent when near the setpoint
+                boolean atSetpoint2 = Math.abs(mElevatorUpPid2.getSetpoint() - position2) < elevatorConstants.kPIDThreshold
+                                     || (position2 - mElevatorUpPid2.getSetpoint()) < 0;
+    
+                if (atSetpoint2) { 
+                    output2 = elevatorConstants.kFeedForward; // Hold position
+                    bDownFlag = false; // Reset flag when target is reached
+                }
+            }
     
             // ╔════════════════════════════╗
             // ║   Apply Motor Output       ║
             // ╚════════════════════════════╝
             mElevator1.set(output);
+            if(elevatorConstants.btwoMotorMode){
+                mElevator2.set(output2);
+            }
         }
     }
     
@@ -131,8 +162,15 @@ public class sElevator extends SubsystemBase {
  
     }
     DoubleSupplier speed;
+    //this looks way more complicated than it is. 
+    //it just is a command to manually move the elevator and so we can run this as two separate motors instead of one being a follower
     public Command setElevator(DoubleSupplier speed) {
-        return new RunCommand(() -> mElevator1.set(speed.getAsDouble()), this);
+        if (elevatorConstants.btwoMotorMode) {
+            return new RunCommand(() -> mElevator1.set(speed.getAsDouble()), this)
+                .alongWith(new RunCommand(() -> mElevator2.set(speed.getAsDouble()), this));
+        } else {
+            return new RunCommand(() -> mElevator1.set(speed.getAsDouble()), this);
+        }    
     }
 
     // Check if the elevator is at the setpoint
@@ -143,11 +181,15 @@ public class sElevator extends SubsystemBase {
     public double getHeight() {
         return mElevatorEncoder.getPosition()*elevatorConstants.kElevatorConversionFac;
     }
+    public double getHeight2() {
+        return mElevatorEncoder2.getPosition()*elevatorConstants.kElevatorConversionFac;
+    }
 
     // Toggle tuning mode on/off
     public void setTuningMode(boolean isEnabled) {
         tuningMode = isEnabled;
     }
 }
+
 
 
