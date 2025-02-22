@@ -35,17 +35,17 @@ public final class Constants {
     public static class robotConstants {
         
         // Elevator Spark IDs (Motor Controllers)
-        public static final int kelevatorSparkID1 = 10; // TODO : CORRECT CAN ID
-        public static final int kelevatorSparkID2 = 11; // TODO : CORRECT CAN ID
+        public static final int kelevatorSparkID1 = 10; 
+        public static final int kelevatorSparkID2 = 11; 
         
         // End Effector Constants (Intake, Placement, Pneumatics)
-        public static final int kintakeSparkID = 13;    // TODO : CORRECT CAN ID
-        public static final int kPlacesparkID = 12;     // TODO : CORRECT CAN ID
+        public static final int kintakeSparkID = 13;   
+        public static final int kPlacesparkID = 12;    
         public static final int kPneuExtendID = 7;       // Pneumatic extend ID
         
         // Intake Sensor ID and Threshold
         public static int kIntakeSensorID = 0;          // TODO : CORRECT ANALOG ID
-        public static double kintakeSensorThreshold = 1200;
+        public static double kintakeSensorThreshold = 1800.0;
 
         //==================================================================================
         // Climber Constants
@@ -60,34 +60,34 @@ public final class Constants {
         // Elevator Constants
         //==================================================================================
         public static class elevatorConstants {
-            public static boolean btestMode = true;
+            public static boolean btestMode = false;
             public static boolean btwoMotorMode = false;
 
             // PID Constants for Upward and Downward Movement
-            public static double kP_down = 0.0025;  // Slightly higher P for more correction towards target
+            public static double kP_down = 0.0035;  // Slightly higher P for more correction towards target
             public static double kI_down = 0.0002;  // Small increase in I to help with steady-state error
-            public static double kD_down = 0.00005; // Keep D low to avoid jerky motion
+            public static double kD_down = 0.00003; // Keep D low to avoid jerky motion
             
             public static double kFeedForwardDown = 0.12;  // Slight increase for better gravity compensation
             public static final double kFeedForward = 0.0750; // Tuned in 2/20
-            public static double kP_up = 0.002;
-            public static double kI = 0.00015;
-            public static double kD = 0.0005;
+            public static double kP_up = 0.015;
+            public static double kI =    0.00015;
+            public static double kD =    0.0001;
 
             // PID Zone and Threshold Constants
             public static double kIZone = 5.0;
-            public static double kdownSpeed = -0.4;
+            public static double kdownSpeed = -0.3;
             public static double kPIDThreshold = 2.0;
 
             // Elevator Height Constants
-            public static final double kL4Height = 1450.0;
-            public static final double kL3Height = 880.0; 
-            public static final double kL2Height = 520.0; 
+            public static final double kL4Height = 950.0;
+            public static final double kL3Height = 700.0; 
+            public static final double kL2Height = 450.0; 
             public static final double kL1Height = 0.0;
 
             // Home and Max Height Constants
             public static final double kHomePose = 0.0;
-            public static final double kMaxHeight = 2000.0;
+            public static final double kMaxHeight = 1000.0;
 
             // Encoder Constants
             public static final double kTolerance = 1.0;

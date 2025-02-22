@@ -191,10 +191,10 @@ public class sElevator extends SubsystemBase {
     }
 
     public double getHeight() {
-        return mElevatorEncoder.getPosition();//*elevatorConstants.kElevatorConversionFac;
+        return mElevatorEncoder.getPosition()*elevatorConstants.kElevatorConversionFac;
     }
     public double getHeight2() {
-        return mElevatorEncoder2.getPosition();//*elevatorConstants.kElevatorConversionFac;
+        return mElevatorEncoder2.getPosition()*elevatorConstants.kElevatorConversionFac;
     }
 
     // Toggle tuning mode on/off

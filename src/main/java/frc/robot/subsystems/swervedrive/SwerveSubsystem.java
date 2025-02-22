@@ -145,7 +145,7 @@ PIDController thetaPID = new PIDController(0.8, 0, 0.005);
       //setupPhotonVision();
       myLimelight = new Limelight("limelight");
       // Stop the odometry thread if we are using vision that way we can synchronize updates better.
-      setupPoseWithLimelight();
+      //setupPoseWithLimelight();
       swerveDrive.stopOdometryThread();
     }
     setupPathPlanner();
@@ -185,7 +185,7 @@ PIDController thetaPID = new PIDController(0.8, 0, 0.005);
     // When vision is enabled we must manually update odometry in SwerveDrive
     if (visionDriveTest)
     {
-      updatePoseWithLimelight();
+      //updatePoseWithLimelight();
       //swerveDrive.updateOdometry();
       //vision.updatePoseEstimation(swerveDrive);
       //updatePoseWithLimelight();
@@ -906,50 +906,59 @@ public Pose2d getNearestHumanPlayerTagPose() {
 
   return nearestTagPose; // Return the nearest tag pose, or null if no valid tag is found
 }
-double[] rawGyro = new double[3];
-PigeonIMU pigeonIMU = new PigeonIMU(4);
-    private void setupPoseWithLimelight() {
+// double[] rawGyro = new double[3];
+// PigeonIMU pigeonIMU = new PigeonIMU(4);
+//     private void setupPoseWithLimelight() {
 
-    // Get the gyro angular velocities
-      pigeonIMU.getRawGyro(rawGyro);
+//     // Get the gyro angular velocities
+//       pigeonIMU.getRawGyro(rawGyro);
     
-    // Extract pitch, roll, and yaw velocities
-      double pitchVelocity = rawGyro[0];  // X-axis (pitch)
-      double rollVelocity = rawGyro[1];   // Y-axis (roll)
-      double yawVelocity = rawGyro[2];    // Z-axis (yaw)
+//     // Extract pitch, roll, and yaw velocities
+//       double pitchVelocity = rawGyro[0];  // X-axis (pitch)
+//       double rollVelocity = rawGyro[1];   // Y-axis (roll)
+//       double yawVelocity = rawGyro[2];    // Z-axis (yaw)
     
-    // Create the robot's orientation with updated gyro velocities
-    Orientation3d robotOrientation = new Orientation3d(
-        swerveDrive.getGyroRotation3d(),
-        new AngularVelocity3d(
-            DegreesPerSecond.of(pitchVelocity),
-            DegreesPerSecond.of(rollVelocity),
-            DegreesPerSecond.of(yawVelocity)
-        ));
-        // Update Limelight with robot orientation for MegaTag2
-        myLimelight.getSettings()
-        .withRobotOrientation(robotOrientation)
-        .save();
+//     // Create the robot's orientation with updated gyro velocities
+//     Orientation3d robotOrientation = new Orientation3d(
+//         swerveDrive.getGyroRotation3d(),
+//         new AngularVelocity3d(
+//             DegreesPerSecond.of(pitchVelocity),
+//             DegreesPerSecond.of(rollVelocity),
+//             DegreesPerSecond.of(yawVelocity)
+//         ));
+//         // Update Limelight with robot orientation for MegaTag2
+//         myLimelight.getSettings()
+//         .withRobotOrientation(robotOrientation)
+//         .save();
 
-        // Get MegaTag2 pose estimation
-        Optional<PoseEstimate> visionEstimate = myLimelight.getPoseEstimator(true).getPoseEstimate();
+//         // Get MegaTag2 pose estimation
+//         Optional<PoseEstimate> visionEstimate = myLimelight.getPoseEstimator(true).getPoseEstimate();
         
-        // If a valid pose is found, update the robot’s odometry
-        visionEstimate.ifPresent(poseEstimate -> {
-            double timestamp = poseEstimate.timestampSeconds;
-            Pose2d estimatedPose = poseEstimate.pose.toPose2d();
-            swerveDrive.addVisionMeasurement(estimatedPose, timestamp);
-        });
-    }
-    private void updatePoseWithLimelight() {
-      Optional<PoseEstimate> visionEstimate = myLimelight.getPoseEstimator(true).getPoseEstimate();
-  
-      visionEstimate.ifPresent(poseEstimate -> {
-          double timestamp = poseEstimate.timestampSeconds;
-          Pose2d estimatedPose = poseEstimate.pose.toPose2d(); // Convert Limelight pose to WPILib Pose2d
-          swerveDrive.addVisionMeasurement(estimatedPose, timestamp); // Update odometry
-      });
-  }
+//         // If a valid pose is found, update the robot’s odometry
+//         visionEstimate.ifPresent(poseEstimate -> {
+//             double timestamp = poseEstimate.timestampSeconds;
+//             Pose2d estimatedPose = poseEstimate.pose.toPose2d();
+//             swerveDrive.addVisionMeasurement(estimatedPose, timestamp);
+//         });
+//     }
+//     private long lastUpdateTime = System.currentTimeMillis();
+
+//     private void updatePoseWithLimelight() {
+//         // Update at a limited frequency (e.g., once every 100ms)
+//         long currentTime = System.currentTimeMillis();
+//         if (currentTime - lastUpdateTime >= 200) {
+//             lastUpdateTime = currentTime;
+            
+//             Optional<PoseEstimate> visionEstimate = myLimelight.getPoseEstimator(true).getPoseEstimate();
+        
+//             visionEstimate.ifPresent(poseEstimate -> {
+//                 double timestamp = poseEstimate.timestampSeconds;
+//                 Pose2d estimatedPose = poseEstimate.pose.toPose2d(); // Convert Limelight pose to WPILib Pose2d
+//                 swerveDrive.addVisionMeasurement(estimatedPose, timestamp); // Update odometry
+//             });
+//         }
+//     }
+    
   public Pose2d getRobotPose() {
     return swerveDrive.getPose();
 }

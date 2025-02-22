@@ -116,7 +116,7 @@ public class RobotContainer {
         setL1Pose = new setElevatorPose(sElevator, elevatorConstants.kL1Height);
         setHomePose = new setElevatorPose(sElevator, elevatorConstants.kHomePose);
 
-        setElevatorOffset = new setElevatorOffset(sElevator, () -> MathUtil.applyDeadband(m_operatorController.getLeftY(), .1));
+        //setElevatorOffset = new setElevatorOffset(sElevator, () -> MathUtil.applyDeadband(m_operatorController.getLeftY(), .1));
 
         // Setting Default Commands
         //sEndAffector.setDefaultCommand(defaultIntake);
@@ -153,12 +153,12 @@ public class RobotContainer {
         // Set default drive command
         swerveSubsystem.setDefaultCommand(
                 swerveSubsystem.driveCommand(
-                        () -> MathUtil.applyDeadband(-m_driverController.getLeftY(), 0.1),
-                        () -> MathUtil.applyDeadband(-m_driverController.getLeftX(), 0.1),
+                        () -> MathUtil.applyDeadband(m_driverController.getLeftY(), 0.1),
+                        () -> MathUtil.applyDeadband(m_driverController.getLeftX(), 0.1),
                         () -> MathUtil.applyDeadband(m_driverController.getRightX(), 0.1)
                 )
         );
-        sElevator.setDefaultCommand(sElevator.setElevator(() -> MathUtil.applyDeadband(m_operatorController.getLeftY(), .1)));
+        //sElevator.setDefaultCommand(sElevator.setElevator(() -> MathUtil.applyDeadband(m_operatorController.getLeftY(), .1)));
         
         m_driverController.a().onTrue(new InstantCommand(swerveSubsystem::zeroGyro));
         m_driverController.start().onTrue(new InstantCommand(swerveSubsystem::zeroGyroWithAlliance));
@@ -188,16 +188,17 @@ public class RobotContainer {
     ╚════════════════════════════════════════════════════════════════════════════════════════╝
     */
     public void operatorControls() {
+        
         // ------------------------- Preset Pose Commands ------------------------- //
         // m_operatorController.a().onTrue(setL1Pose);
         m_operatorController.rightBumper().onTrue(setL4Pose);
         m_operatorController.b().onTrue(setL3Pose);
         m_operatorController.x().onTrue(setL2Pose);
         m_operatorController.a().onTrue(setHomePose);
-        m_operatorController.a().and(m_operatorController.b().
-        and(m_operatorController.x().
-        and(m_operatorController.y().
-        and(m_operatorController.rightBumper().whileFalse(setElevatorOffset)))));
+        // m_operatorController.a().and(m_operatorController.b().
+        // and(m_operatorController.x().
+        // and(m_operatorController.y().
+        // and(m_operatorController.rightBumper().whileFalse(setElevatorOffset)))));
         
         // ----------------------- Climber Commands ----------------------- //
         new Trigger(() -> m_operatorController.rightStick().getAsBoolean() &&
@@ -233,9 +234,9 @@ public class RobotContainer {
     ╚════════════════════════════════════════════════════════════════════════════════════════════╝
     */
     public void setDefaultCommands() {
-        if (elevatorConstants.btestMode) {
-            sElevator.setDefaultCommand(sElevator.setElevator(() -> MathUtil.applyDeadband(m_operatorController.getLeftY(), .1)));
-        }
+        // if (elevatorConstants.btestMode) {
+        //     sElevator.setDefaultCommand(sElevator.setElevator(() -> MathUtil.applyDeadband(m_operatorController.getLeftY(), .1)));
+        // }
         //sElevator.setDefaultCommand(setElevatorOffset);
 
         // Automatically start intakeCoral when coral is NOT detected
