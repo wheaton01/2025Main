@@ -39,6 +39,7 @@ public class sElevator extends SubsystemBase {
     double mELevatorSetpoint;
     RelativeEncoder mElevatorEncoder;
     RelativeEncoder mElevatorEncoder2;
+    double position2;
     // Constructor
     public sElevator() {
         mElevator1 = new SparkMax(robotConstants.kelevatorSparkID1, SparkMax.MotorType.kBrushless);
@@ -78,12 +79,16 @@ public class sElevator extends SubsystemBase {
         // ║       Debugging Output     ║
         // ╚════════════════════════════╝
         if (!elevatorConstants.btestMode) {
-            SmartDashboard.putBoolean("Down Flag", bDownFlag);
+            SmartDashboard.putBoolean("Down Flag ", bDownFlag);
     
             double position = getHeight(); // Current elevator height
-            double position2 = getHeight2(); // Current elevator height
-            SmartDashboard.putNumber("Elevator Position", position);
-            SmartDashboard.putNumber("Elevator Setpoint", mElevatorUpPid.getSetpoint());
+            if(elevatorConstants.btwoMotorMode){
+                SmartDashboard.putNumber("Elevator Position 2 ", getHeight2());
+                position2 = getHeight2(); // Current elevator height
+
+            }
+            SmartDashboard.putNumber("Elevator Position 1 ", position);
+            SmartDashboard.putNumber("Elevator Setpoint 1 ", mElevatorUpPid.getSetpoint());
     
             double output = 0.0; // Motor power output
             double output2 = 0.0;
