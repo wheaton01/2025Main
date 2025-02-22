@@ -48,6 +48,9 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 ║       __/\\\/____________\//\\\\\\\\\\\\\/___\//\\\\\\\\\\\\\/___\///\\\\\\\\\/_____ ║
 ║        _\///_______________\/////////////______\/////////////_______\/////////______ ║
 ╚══════════════════════════════════════════════════════════════════════════════════════╝
+╔════════════════════════════════════════════════════════════════════════════════════════════════╗
+║                         RobotContainer Class  ::  This is like our main class                  ║ 
+╚════════════════════════════════════════════════════════════════════════════════════════════════╝
 */
 public class RobotContainer {
     sEndAffector sEndAffector;
@@ -71,14 +74,19 @@ public class RobotContainer {
 
     public final CommandXboxController m_operatorController = new CommandXboxController(
             OperatorConstants.kOperatorControllerPort);
+
+    /* 
+    ╔══════════════════════════════════════════════════════════════════════════════════════════╗
+    ║                                RobotContainer Constructor                                      ║
+    ╚══════════════════════════════════════════════════════════════════════════════════════════╝
+    */
     public RobotContainer() {
         sSlider = new sSlider();
         sEndAffector = new sEndAffector();
         sClimber = new sClimber();
         sElevator = new sElevator();
-       m_controllerHaptics = new sControllerHaptics(m_driverController, m_operatorController);
-       sIntake = new sIntake();
-
+        m_controllerHaptics = new sControllerHaptics(m_driverController, m_operatorController);
+        sIntake = new sIntake();
 
         swerveSubsystem = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
                 "neo"));
@@ -86,12 +94,17 @@ public class RobotContainer {
         configureBindings();
     }
 
+    /* 
+    ╔════════════════════════════════════════════════════════════════════════════════════════════╗
+    ║                                      Setup Commands                                           ║
+    ╚════════════════════════════════════════════════════════════════════════════════════════════╝
+    */
     private void setupCommands() {
         // sElevator.setDefaultCommand(new SetManualElevator(
         //         sElevator,
         //         () -> 1.0 * MathUtil.applyDeadband(m_operatorController.getLeftY(), 0.2) 
         //     ));        // Intake Commands
-       // defaultIntake = new setIntake(false, false, 0, 0, sEndAffector);
+        // defaultIntake = new setIntake(false, false, 0, 0, sEndAffector);
         defaultClimber = new setClimber(sClimber, false, false);
         //intakeBall = new setIntake(false, true, 0.0, -1.0, sEndAffector);
 
@@ -102,28 +115,38 @@ public class RobotContainer {
         setL1Pose = new setElevatorPose(sElevator, elevatorConstants.kL1Height);
         setHomePose = new setElevatorPose(sElevator, elevatorConstants.kHomePose);
 
-        setElevatorOffset = new setElevatorOffset(sElevator, () -> MathUtil.applyDeadband(m_operatorController.getLeftY(),.1));
+        setElevatorOffset = new setElevatorOffset(sElevator, () -> MathUtil.applyDeadband(m_operatorController.getLeftY(), .1));
 
         // Setting Default Commands
         //sEndAffector.setDefaultCommand(defaultIntake);
         sClimber.setDefaultCommand(defaultClimber);
 
         //swerve Commands
-        autoDriveToPoseCommand = new  DriveToPoseCommand(swerveSubsystem,swerveConstants.kalignSpeed,()->0.0,
-        ()->0.0, 
-        ()->0.0,
-        ()->0.0, 
-        ()->0.0,
-        false, 
-        true);
+        autoDriveToPoseCommand = new DriveToPoseCommand(swerveSubsystem, swerveConstants.kalignSpeed, () -> 0.0,
+                () -> 0.0,
+                () -> 0.0,
+                () -> 0.0,
+                () -> 0.0,
+                false,
+                true);
     }
 
+    /* 
+    ╔══════════════════════════════════════════════════════════════════════════════════════════╗
+    ║                                 Configure Controller Bindings                                 ║
+    ╚══════════════════════════════════════════════════════════════════════════════════════════╝
+    */
     private void configureBindings() {
         setDefaultCommands();
         driverControls();
         operatorControls();
     }
 
+    /* 
+    ╔════════════════════════════════════════════════════════════════════════════════════════╗
+    ║                              Driver Control Configuration                                    ║
+    ╚════════════════════════════════════════════════════════════════════════════════════════╝
+    */
     public void driverControls() {
         
         // Set default drive command
@@ -134,7 +157,7 @@ public class RobotContainer {
                         () -> MathUtil.applyDeadband(m_driverController.getRightX(), 0.1)
                 )
         );
-        sElevator.setDefaultCommand(sElevator.setElevator(()-> MathUtil.applyDeadband(m_operatorController.getLeftY(),.1)));
+        sElevator.setDefaultCommand(sElevator.setElevator(() -> MathUtil.applyDeadband(m_operatorController.getLeftY(), .1)));
         
         m_driverController.a().onTrue(new InstantCommand(swerveSubsystem::zeroGyro));
         m_driverController.start().onTrue(new InstantCommand(swerveSubsystem::zeroGyroWithAlliance));
@@ -158,9 +181,11 @@ public class RobotContainer {
         createDriveToPoseButtonTrigger(m_driverController.x(), true);
     }
 
-    // Helper method to create drive-to-pose triggers for the right and left
-    // triggersprivate void createDriveToPoseTrigger(DoubleSupplier triggerSupplier, boolean isRightTrigger) {
-
+    /* 
+    ╔════════════════════════════════════════════════════════════════════════════════════════╗
+    ║                                 Operator Control Configuration                             ║
+    ╚════════════════════════════════════════════════════════════════════════════════════════╝
+    */
     public void operatorControls() {
         // ------------------------- Preset Pose Commands ------------------------- //
         // m_operatorController.a().onTrue(setL1Pose);
@@ -180,11 +205,11 @@ public class RobotContainer {
                         new setCHaptics(m_controllerHaptics, 0.8).withTimeout(1.2),
                         new InstantCommand(sClimber::disableSafety)).withTimeout(.8));
 
-                        m_operatorController.povDown().onTrue(new InstantCommand(sClimber::climb));
-                        m_operatorController.povUp().onTrue(new InstantCommand(sClimber::unClimb));
-                        m_operatorController.povLeft().onTrue(new InstantCommand(sClimber::stowClimber));
-                        m_operatorController.povRight().onTrue(new InstantCommand(sClimber::deployClimber));
-                        m_driverController.rightStick().onTrue(new InstantCommand(sClimber::dropRamp));
+        m_operatorController.povDown().onTrue(new InstantCommand(sClimber::climb));
+        m_operatorController.povUp().onTrue(new InstantCommand(sClimber::unClimb));
+        m_operatorController.povLeft().onTrue(new InstantCommand(sClimber::stowClimber));
+        m_operatorController.povRight().onTrue(new InstantCommand(sClimber::deployClimber));
+        m_driverController.rightStick().onTrue(new InstantCommand(sClimber::dropRamp));
     
         // --------------------------- Intake Controls --------------------------- //
     
@@ -193,34 +218,44 @@ public class RobotContainer {
                 .onTrue(new InstantCommand(sSlider::setExtend))
                 .onFalse(new InstantCommand(sSlider::setRetract)); // No haptics here since motors are off
                 
-    
         // **Left Trigger (≥ 0.2)**: Deploy & run **intake forward, place motor in reverse**
         m_operatorController.leftTrigger(0.2)
                 .whileTrue(new ParallelCommandGroup(
                         new InstantCommand(sEndAffector::setBallIntake),
                         new setCHaptics(m_controllerHaptics, 0.2))
                         ).onFalse(new InstantCommand(sEndAffector::setZero)); // Haptic feedback when motors are on
-
-
-    
-        
     }
-    public void setDefaultCommands(){
-        if(elevatorConstants.btestMode){
-        sElevator.setDefaultCommand(sElevator.setElevator(()-> MathUtil.applyDeadband(m_operatorController.getLeftY(),.1)));
+
+    /* 
+    ╔════════════════════════════════════════════════════════════════════════════════════════════╗
+    ║                              Set Default Commands                                            ║
+    ╚════════════════════════════════════════════════════════════════════════════════════════════╝
+    */
+    public void setDefaultCommands() {
+        if (elevatorConstants.btestMode) {
+            sElevator.setDefaultCommand(sElevator.setElevator(() -> MathUtil.applyDeadband(m_operatorController.getLeftY(), .1)));
         }
         //sElevator.setDefaultCommand(setElevatorOffset);
 
-            // Automatically start intakeCoral when coral is NOT detected
+        // Automatically start intakeCoral when coral is NOT detected
 
         // sSlider.setDefaultCommand(new InstantCommand(sSlider::setRetract));
     }
 
+    /* 
+    ╔══════════════════════════════════════════════════════════════════════════════════════════╗
+    ║                            Get Autonomous Command                                           ║
+    ╚══════════════════════════════════════════════════════════════════════════════════════════╝
+    */
     public Command getAutonomousCommand() {
         return Autos.getAutonomousCommand(sIntake);
     }
 
-
+    /* 
+    ╔══════════════════════════════════════════════════════════════════════════════════════════╗
+    ║                            Create Drive-to-Pose Trigger                                      ║
+    ╚══════════════════════════════════════════════════════════════════════════════════════════╝
+    */
     private void createDriveToPoseTrigger(DoubleSupplier triggerSupplier, boolean isRightTrigger) {
     
         new Trigger(() -> triggerSupplier.getAsDouble() > 0.5)
@@ -235,11 +270,13 @@ public class RobotContainer {
                     !isRightTrigger,
                     false
             ));
-}
+    }
 
-
-
-    // Helper method to bind a button to a DriveToPoseCommand
+    /* 
+    ╔══════════════════════════════════════════════════════════════════════════════════════════╗
+    ║                           Create Drive-to-Pose Button Trigger                                ║
+    ╚══════════════════════════════════════════════════════════════════════════════════════════╝
+    */
     private void createDriveToPoseButtonTrigger(Trigger button, boolean HPStation) {
         button.whileTrue(new DriveToPoseCommand(
                 swerveSubsystem,
@@ -253,5 +290,4 @@ public class RobotContainer {
                 false
         ));
     }
-    
 }
