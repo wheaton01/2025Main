@@ -29,9 +29,9 @@ public class sClimber extends SubsystemBase {
   boolean enableClimber = false;
 
   public sClimber() {
-    sClimb =       new Solenoid(PneumaticsModuleType.CTREPCM, Constants.robotConstants.climberConstants.kClimb2ID);  
-    sdeployClimb = new Solenoid(PneumaticsModuleType.CTREPCM, Constants.robotConstants.climberConstants.kClimb1ID);    
-    sdropRamp =    new Solenoid(PneumaticsModuleType.CTREPCM, Constants.robotConstants.climberConstants.kRamp1ID);    
+    sClimb =       new Solenoid(1,PneumaticsModuleType.CTREPCM, Constants.robotConstants.climberConstants.kClimb2ID);  
+    sdeployClimb = new Solenoid(1,PneumaticsModuleType.CTREPCM, Constants.robotConstants.climberConstants.kClimb1ID);    
+    sdropRamp =    new Solenoid(1,PneumaticsModuleType.CTREPCM, Constants.robotConstants.climberConstants.kRamp1ID);    
   }
 
   @Override
