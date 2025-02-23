@@ -191,6 +191,7 @@ PoseEstimator m_poseEstimator;
     // When vision is enabled we must manually update odometry in SwerveDrive
     if (visionDriveTest)
     {
+      updateBotPose();
       //updatePoseWithLimelight();
       //swerveDrive.updateOdometry();
       //vision.updatePoseEstimation(swerveDrive);
@@ -809,26 +810,26 @@ public void updateBotPose(){
   {
     swerveDrive.drive(new ChassisSpeeds(0, 0, 0));
   }
-  public void driveToPose(Pose2d pose, double speed) {
-    currentPose = getPose();
-    Translation2d delta = pose.getTranslation().minus(currentPose.getTranslation());
+//   public void driveToPose(Pose2d pose, double speed) {
+//     currentPose = getPose();
+//     Translation2d delta = pose.getTranslation().minus(currentPose.getTranslation());
     
-    double xSpeed = XdeltaPID.calculate(currentPose.getX(), pose.getX()) * speed;
-    double ySpeed = YdeltaPID.calculate(currentPose.getY(), pose.getY()) * speed;
+//     double xSpeed = XdeltaPID.calculate(currentPose.getX(), pose.getX()) * speed;
+//     double ySpeed = YdeltaPID.calculate(currentPose.getY(), pose.getY()) * speed;
     
-    // Normalize theta error to [-π, π] to avoid long rotation paths
-    double thetaError = pose.getRotation().getRadians() - currentPose.getRotation().getRadians();
-    thetaError = MathUtil.angleModulus(thetaError); // Ensures shortest path rotation
+//     // Normalize theta error to [-π, π] to avoid long rotation paths
+//     double thetaError = pose.getRotation().getRadians() - currentPose.getRotation().getRadians();
+//     thetaError = MathUtil.angleModulus(thetaError); // Ensures shortest path rotation
     
-    double distance = delta.getNorm(); // Distance from target
-    double thetaSpeed = thetaPID.calculate(currentPose.getRotation().getRadians(), currentPose.getRotation().getRadians() + thetaError) 
-                        * (speed * Math.min(1.0, distance)); // Scale rotation speed based on distance
+//     double distance = delta.getNorm(); // Distance from target
+//     double thetaSpeed = thetaPID.calculate(currentPose.getRotation().getRadians(), currentPose.getRotation().getRadians() + thetaError) 
+//                         * (speed * Math.min(1.0, distance)); // Scale rotation speed based on distance
     
-    // Ensure robot-relative or field-relative control is correct
-    ChassisSpeeds chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, thetaSpeed, currentPose.getRotation());
+//     // Ensure robot-relative or field-relative control is correct
+//     ChassisSpeeds chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, thetaSpeed, currentPose.getRotation());
     
-    swerveDrive.drive(chassisSpeeds);
-}
+//     swerveDrive.drive(chassisSpeeds);
+// }
 
 
   public Pose2d getNearestReefAprilTagPose(double xOffset, double zOffset) { 
