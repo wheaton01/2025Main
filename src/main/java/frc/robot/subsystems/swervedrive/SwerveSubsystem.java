@@ -22,8 +22,11 @@ import com.pathplanner.lib.util.swerve.SwerveSetpointGenerator;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.estimator.PoseEstimator;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -64,6 +67,7 @@ import swervelib.parser.SwerveDriveConfiguration;
 import swervelib.parser.SwerveParser;
 import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
+import frc.robot.LimelightHelpers;
 /* 
 ╔══════════════════════════════════════════════════════════════════════════════════════╗
 ║  __/\\\\\\\\\\\\\\\___/\\\\\\\\\\\\\\\____/\\\\\\\\\\\\\\\______/\\\\\\\\\\_________ ║
@@ -109,7 +113,8 @@ public class SwerveSubsystem extends SubsystemBase
 PIDController XdeltaPID = new PIDController(1.2, 0, 0.01);
 PIDController YdeltaPID = new PIDController(1.2, 0, 0.01);
 PIDController thetaPID = new PIDController(0.8, 0, 0.005);
-
+LimelightHelpers LimelightHelpers = new LimelightHelpers();
+PoseEstimator m_poseEstimator;
   public SwerveSubsystem(File directory)
   {
 
@@ -144,6 +149,7 @@ PIDController thetaPID = new PIDController(0.8, 0, 0.005);
     {
       //setupPhotonVision();
       myLimelight = new Limelight("limelight");
+      m_poseEstimator= swerveDrive.swerveDrivePoseEstimator;
       // Stop the odometry thread if we are using vision that way we can synchronize updates better.
       //setupPoseWithLimelight();
       swerveDrive.stopOdometryThread();
@@ -767,6 +773,27 @@ PIDController thetaPID = new PIDController(0.8, 0, 0.005);
     swerveDrive.addVisionMeasurement(new Pose2d(3, 3, Rotation2d.fromDegrees(65)), Timer.getFPGATimestamp());
   }
 
+
+  boolean doRejectUpdate = false;
+public void updateBotPose(){
+  LimelightHelpers.SetRobotOrientation("limelight", m_poseEstimator.getEstimatedPosition().getRotation().getDegrees(), 0, 0, 0, 0, 0);
+      LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight");
+      if(Math.abs() > 720) // if our angular velocity is greater than 720 degrees per second, ignore vision updates
+      {
+        doRejectUpdate = true;
+      }
+      if(mt2.tagCount == 0)
+      {
+        doRejectUpdate = true;
+      }
+      if(!doRejectUpdate)
+      {
+        swerveDrive.swerveDrivePoseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.7,.7,9999999));
+        swerveDrive.addVisionMeasurement(
+            mt2.pose,
+            mt2.timestampSeconds);
+      }
+}
   /**
    * Gets the swerve drive object.
    *
@@ -778,19 +805,6 @@ PIDController thetaPID = new PIDController(0.8, 0, 0.005);
   }
   
 
-
-
-  // public void driveToPose(Pose2d pose, double speed)
-  // {
-  //   currentPose = getPose();
-  //   Translation2d delta = pose.getTranslation().minus(currentPose.getTranslation());
-  //   double xSpeed = XdeltaPID.calculate(currentPose.getX(), pose.getX()) * speed;
-  //   double ySpeed = YdeltaPID.calculate(currentPose.getY(), pose.getY()) * speed;
-  //   double thetaSpeed = thetaPID.calculate(currentPose.getRotation().getRadians(), pose.getRotation().getRadians()) * speed;
-
-  //   ChassisSpeeds chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, thetaSpeed, currentPose.getRotation());
-  //   swerveDrive.drive(chassisSpeeds);
-  // }
   public void stop()
   {
     swerveDrive.drive(new ChassisSpeeds(0, 0, 0));
