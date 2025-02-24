@@ -211,7 +211,7 @@ public class RobotContainer {
         m_operatorController.povUp().onTrue(new InstantCommand(sClimber::unClimb));
         m_operatorController.povLeft().onTrue(new InstantCommand(sClimber::stowClimber));
         m_operatorController.povRight().onTrue(new InstantCommand(sClimber::deployClimber));
-        m_driverController.rightStick().onTrue(new InstantCommand(sClimber::dropRamp));
+        m_operatorController.start().onTrue(new InstantCommand(sClimber::dropRamp));
     
         // --------------------------- Intake Controls --------------------------- //
     

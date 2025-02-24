@@ -70,7 +70,7 @@ public final class Constants {
             
             public static double kFeedForwardDown = 0.12;  // Slight increase for better gravity compensation
             public static final double kFeedForward = 0.0750; // Tuned in 2/20
-            public static double kP_up = 0.015;
+            public static double kP_up = 0.02;
             public static double kI =    0.00015;
             public static double kD =    0.0001;
 

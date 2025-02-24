@@ -49,7 +49,7 @@ public class sClimber extends SubsystemBase {
   public void stowClimber(){
     if (enableClimber) {
 
-    sdeployClimb.set(true);
+    sdeployClimb.set(false);
     }
   }
   public void climb(){
@@ -67,7 +67,7 @@ public class sClimber extends SubsystemBase {
     enableClimber = true;
   }
   public void dropRamp(){
-    sdeployClimb.set(enableClimber);
+    sdropRamp.set(enableClimber);
   }
 
 }

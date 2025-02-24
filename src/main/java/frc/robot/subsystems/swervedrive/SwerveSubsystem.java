@@ -4,10 +4,8 @@
 
 package frc.robot.subsystems.swervedrive;
 
-import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Meter;
 
-import com.ctre.phoenix.sensors.PigeonIMU;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.commands.PathfindingCommand;
@@ -21,12 +19,7 @@ import com.pathplanner.lib.util.swerve.SwerveSetpoint;
 import com.pathplanner.lib.util.swerve.SwerveSetpointGenerator;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.math.estimator.PoseEstimator;
-import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -42,13 +35,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
+import frc.robot.Constants;
 import frc.robot.Constants.swerveConstants;
 import frc.robot.subsystems.swervedrive.Vision.Cameras;
-import limelight.Limelight;
-import limelight.networktables.AngularVelocity3d;
-import limelight.networktables.Orientation3d;
-import limelight.networktables.PoseEstimate;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
@@ -67,32 +56,14 @@ import swervelib.parser.SwerveDriveConfiguration;
 import swervelib.parser.SwerveParser;
 import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
-import frc.robot.LimelightHelpers;
-/* 
-╔══════════════════════════════════════════════════════════════════════════════════════╗
-║  __/\\\\\\\\\\\\\\\___/\\\\\\\\\\\\\\\____/\\\\\\\\\\\\\\\______/\\\\\\\\\\_________ ║
-║  _\/////////////\\\__\/\\\///////////____\/\\\///////////_____/\\\///////\\\________ ║
-║   ____________/\\\/___\/\\\_______________\/\\\_______________\///______/\\\________ ║
-║   __________/\\\/_____\/\\\\\\\\\\\\______\/\\\\\\\\\\\\_____________/\\\//_________ ║
-║    ________/\\\/_______\////////////\\\____\////////////\\\__________\////\\\_______ ║
-║     ______/\\\/____________________\//\\\______________\//\\\____________\//\\\_____ ║
-║      ____/\\\/___________/\\\________\/\\\___/\\\________\/\\\___/\\\______/\\\_____ ║
-║       __/\\\/____________\//\\\\\\\\\\\\\/___\//\\\\\\\\\\\\\/___\///\\\\\\\\\/_____ ║
-║        _\///_______________\/////////////______\/////////////_______\/////////______ ║
-║        THIS CODE IS LARGELY YAGSL EXAMPLE CODE WITH SOME LIMELIGHT POSE ESTIMATION   ║
-╚══════════════════════════════════════════════════════════════════════════════════════╝
-*/
+
 public class SwerveSubsystem extends SubsystemBase
 {
-
+  AprilTagFieldLayout aprilTagFieldLayout;
   /**
    * Swerve drive object.
    */
   private final SwerveDrive         swerveDrive;
-  /**
-   * AprilTag field layout.
-   */
-  private final AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
   /**
    * Enable vision odometry updates while driving.
    */
@@ -100,29 +71,15 @@ public class SwerveSubsystem extends SubsystemBase
   /**
    * PhotonVision class to keep an accurate odometry.
    */
-  @SuppressWarnings("unused")
   private Vision vision;
-  Limelight myLimelight;
 
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
    *
    * @param directory Directory of swerve drive config files.
    */
-  Pose2d currentPose;
-PIDController XdeltaPID = new PIDController(1.2, 0, 0.01);
-PIDController YdeltaPID = new PIDController(1.2, 0, 0.01);
-PIDController thetaPID = new PIDController(0.8, 0, 0.005);
-// Removed unnecessary instance creation
-PoseEstimator m_poseEstimator;
   public SwerveSubsystem(File directory)
   {
-
-
-    XdeltaPID.setTolerance(.2);
-    YdeltaPID.setTolerance(.2);
-    thetaPID.setTolerance(2.0);
-
     // Configure the Telemetry before creating the SwerveDrive to avoid unnecessary objects being created.
     SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
     try
@@ -147,19 +104,11 @@ PoseEstimator m_poseEstimator;
 //    swerveDrive.pushOffsetsToEncoders(); // Set the absolute encoder to be used over the internal encoder and push the offsets onto it. Throws warning if not possible
     if (visionDriveTest)
     {
-      //setupPhotonVision();
-      myLimelight = new Limelight("limelight");
-      m_poseEstimator= swerveDrive.swerveDrivePoseEstimator;
+      setupPhotonVision();
       // Stop the odometry thread if we are using vision that way we can synchronize updates better.
-      //setupPoseWithLimelight();
       swerveDrive.stopOdometryThread();
     }
     setupPathPlanner();
-
-        // grabs gyro from swerve
-      swerveDrive.getAccel();
-    
-
   }
 
   /**
@@ -191,11 +140,8 @@ PoseEstimator m_poseEstimator;
     // When vision is enabled we must manually update odometry in SwerveDrive
     if (visionDriveTest)
     {
-      updateBotPose();
-      //updatePoseWithLimelight();
-      //swerveDrive.updateOdometry();
-      //vision.updatePoseEstimation(swerveDrive);
-      //updatePoseWithLimelight();
+      swerveDrive.updateOdometry();
+      vision.updatePoseEstimation(swerveDrive);
     }
   }
 
@@ -774,27 +720,6 @@ PoseEstimator m_poseEstimator;
     swerveDrive.addVisionMeasurement(new Pose2d(3, 3, Rotation2d.fromDegrees(65)), Timer.getFPGATimestamp());
   }
 
-
-  boolean doRejectUpdate = false;
-public void updateBotPose(){
-  LimelightHelpers.SetRobotOrientation("limelight", swerveDrive.getPose().getRotation().getDegrees(), 0, 0, 0, 0, 0);
-      LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight");
-      if(Math.abs(swerveDrive.getRobotVelocity().omegaRadiansPerSecond) > Math.toRadians(720)) // if our angular velocity is greater than 720 degrees per second, ignore vision updates
-      {
-        doRejectUpdate = true;
-      }
-      if(mt2.tagCount == 0)
-      {
-        doRejectUpdate = true;
-      }
-      if(!doRejectUpdate)
-      {
-        swerveDrive.swerveDrivePoseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.7,.7,9999999));
-        swerveDrive.addVisionMeasurement(
-            mt2.pose,
-            mt2.timestampSeconds);
-      }
-}
   /**
    * Gets the swerve drive object.
    *
@@ -804,6 +729,7 @@ public void updateBotPose(){
   {
     return swerveDrive;
   }
+
   
 
   public void stop()
