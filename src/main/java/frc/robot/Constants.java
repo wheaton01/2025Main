@@ -53,7 +53,8 @@ public final class Constants {
         public static class climberConstants {
             public static final int kClimb2ID = 6;
             public static final int kClimb1ID = 4;
-            public static final int kRamp1ID = 3;    
+            public static final int kRamp1ID = 3;
+            public static final int kMotorID = 18;    
         }
 
         //==================================================================================
@@ -70,9 +71,9 @@ public final class Constants {
             
             public static double kFeedForwardDown = 0.12;  // Slight increase for better gravity compensation
             public static final double kFeedForward = 0.0750; // Tuned in 2/20
-            public static double kP_up = 0.02;
+            public static double kP_up = 0.03;
             public static double kI =    0.00015;
-            public static double kD =    0.0001;
+            public static double kD =    0.00005;
 
             // PID Zone and Threshold Constants
             public static double kIZone = 5.0;
@@ -80,14 +81,14 @@ public final class Constants {
             public static double kPIDThreshold = 2.0;
 
             // Elevator Height Constants
-            public static final double kL4Height = 950.0;
-            public static final double kL3Height = 700.0; 
+            public static final double kL4Height = 1000.0;
+            public static final double kL3Height = 750.0; 
             public static final double kL2Height = 450.0; 
             public static final double kL1Height = 0.0;
 
             // Home and Max Height Constants
             public static final double kHomePose = 0.0;
-            public static final double kMaxHeight = 1000.0;
+            public static final double kMaxHeight = 1200.0;
 
             // Encoder Constants
             public static final double kTolerance = 1.0;

@@ -30,6 +30,7 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -59,8 +60,8 @@ import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 
 public class SwerveSubsystem extends SubsystemBase
 {
-  AprilTagFieldLayout aprilTagFieldLayout;
-  /**
+  public static final AprilTagFieldLayout fieldLayout                     = AprilTagFieldLayout.loadField(
+      AprilTagFields.k2025ReefscapeWelded);  /**
    * Swerve drive object.
    */
   private final SwerveDrive         swerveDrive;
@@ -85,7 +86,7 @@ public class SwerveSubsystem extends SubsystemBase
     try
     {
       swerveDrive = new SwerveParser(directory).createSwerveDrive(swerveConstants.MAX_SPEED,
-                                                                  new Pose2d(new Translation2d(Meter.of(1),
+                                                                  new Pose2d(new Translation2d(Meter.of(7.17),
                                                                                                Meter.of(4)),
                                                                              Rotation2d.fromDegrees(0)));
       // Alternative method if you don't want to supply the conversion factor via JSON files.
@@ -768,7 +769,7 @@ public class SwerveSubsystem extends SubsystemBase
     double nearestDistance = Double.MAX_VALUE;
     
     for (int tagID : reefTags) {
-        Optional<Pose3d> tagPose3d = aprilTagFieldLayout.getTagPose(tagID);
+        Optional<Pose3d> tagPose3d = fieldLayout.getTagPose(tagID);
         if (tagPose3d.isPresent()) {
             Pose2d tagPose = tagPose3d.get().toPose2d();
             double distance = currentPose.getTranslation().getDistance(tagPose.getTranslation());
@@ -834,7 +835,7 @@ public Pose2d getNearestHumanPlayerTagPose() {
   
   // Find the closest human player station tag
   for (int tagID : humanPlayerTags) {
-      Optional<Pose3d> tagPose3d = aprilTagFieldLayout.getTagPose(tagID);
+      Optional<Pose3d> tagPose3d = fieldLayout.getTagPose(tagID);
       if (tagPose3d.isPresent()) {
           Pose2d tagPose = tagPose3d.get().toPose2d();
           double distance = currentPose.getTranslation().getDistance(tagPose.getTranslation());
