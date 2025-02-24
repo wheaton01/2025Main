@@ -113,7 +113,7 @@ public class SwerveSubsystem extends SubsystemBase
 PIDController XdeltaPID = new PIDController(1.2, 0, 0.01);
 PIDController YdeltaPID = new PIDController(1.2, 0, 0.01);
 PIDController thetaPID = new PIDController(0.8, 0, 0.005);
-LimelightHelpers LimelightHelpers = new LimelightHelpers();
+// Removed unnecessary instance creation
 PoseEstimator m_poseEstimator;
   public SwerveSubsystem(File directory)
   {
