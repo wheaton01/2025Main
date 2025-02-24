@@ -1,6 +1,7 @@
 package frc.robot;
 
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.Constants.fieldPoses;
 import frc.robot.Constants.swerveConstants;
 import frc.robot.Constants.robotConstants.elevatorConstants;
 import frc.robot.commands.setCHaptics;
@@ -9,6 +10,7 @@ import frc.robot.commands.elevatorCommands.setElevatorOffset;
 import frc.robot.commands.elevatorCommands.setElevatorPose;
 import frc.robot.commands.intakeCommands.setIntake;
 import frc.robot.commands.SwerveCommands.DriveToPoseCommand;
+import frc.robot.commands.SwerveCommands.driveToPose;
 import frc.robot.subsystems.sClimber;
 import frc.robot.subsystems.sControllerHaptics;
 import frc.robot.subsystems.sElevator;
@@ -153,11 +155,20 @@ public class RobotContainer {
         // Set default drive command
         swerveSubsystem.setDefaultCommand(
                 swerveSubsystem.driveCommand(
-                        () -> MathUtil.applyDeadband(m_driverController.getLeftY(), 0.1),
-                        () -> MathUtil.applyDeadband(m_driverController.getLeftX(), 0.1),
-                        () -> MathUtil.applyDeadband(m_driverController.getRightX(), 0.1)
+                        () -> MathUtil.applyDeadband(-m_driverController.getLeftY(), 0.1),
+                        () -> MathUtil.applyDeadband(-m_driverController.getLeftX(), 0.1),
+                        () -> MathUtil.applyDeadband(-m_driverController.getRightX(), 0.1)
                 )
         );
+        // swerveSubsystem.setDefaultCommand(
+        //         swerveSubsystem.driveCommand(
+        //                 () -> MathUtil.applyDeadband(-m_driverController.getLeftY(), 0.1),
+        //                 () -> MathUtil.applyDeadband(-m_driverController.getLeftX(), 0.1),
+        //                 () -> MathUtil.applyDeadband(-m_driverController.getRightX(), 0.1),
+        //                 () -> MathUtil.applyDeadband(-m_driverController.getRightY(), 0.1)
+                        
+        //         )
+        // );
         //sElevator.setDefaultCommand(sElevator.setElevator(() -> MathUtil.applyDeadband(m_operatorController.getLeftY(), .1)));
         
         m_driverController.a().onTrue(new InstantCommand(swerveSubsystem::zeroGyro));
@@ -171,15 +182,16 @@ public class RobotContainer {
                                           new InstantCommand(sEndAffector::setZero),
                                           new InstantCommand(sIntake::setIntakeMode)).withTimeout(0));        
         // Create DriveToPoseCommand based on trigger inputs
-        createDriveToPoseTrigger(m_driverController::getRightTriggerAxis, true);
+        createDriveToPoseTrigger(m_driverController::getRightTriggerAxis, false);
         createDriveToPoseTrigger(m_driverController::getLeftTriggerAxis, false);
-                
+        
         // Bind B button to drive to nearest AprilTag pose at center
-        createDriveToPoseButtonTrigger(m_driverController.b(), false);
+        //createDriveToPoseButtonTrigger(m_driverController.b(), false);
 
         // Bind right bumper to drive to nearest AprilTag pose with a special mode
-        createDriveToPoseButtonTrigger(m_driverController.rightBumper(), true);
+        //createDriveToPoseButtonTrigger(m_driverController.rightBumper(), true);
         createDriveToPoseButtonTrigger(m_driverController.x(), true);
+        m_driverController.b().whileTrue(new driveToPose(swerveSubsystem,fieldPoses.reefPose));
     }
 
     /* 
@@ -226,7 +238,12 @@ public class RobotContainer {
                         new InstantCommand(sEndAffector::setBallIntake),
                         new setCHaptics(m_controllerHaptics, 0.2))
                         ).onFalse(new InstantCommand(sEndAffector::setZero)); // Haptic feedback when motors are on
-    }
+        m_operatorController.rightTrigger(0.2)
+                        .whileTrue(new ParallelCommandGroup(
+                                new InstantCommand(sEndAffector::setPlace),
+                                new setCHaptics(m_controllerHaptics, 0.2))
+                                ).onFalse(new InstantCommand(sEndAffector::setZero)); // Haptic feedback when motors are on
+            }
 
     /* 
     ╔════════════════════════════════════════════════════════════════════════════════════════════╗
@@ -258,7 +275,7 @@ public class RobotContainer {
     ║                            Create Drive-to-Pose Trigger                                  ║
     ╚══════════════════════════════════════════════════════════════════════════════════════════╝
     */
-    private void createDriveToPoseTrigger(DoubleSupplier triggerSupplier, boolean isRightTrigger) {
+    private void createDriveToPoseTrigger(DoubleSupplier triggerSupplier, boolean isHPStation) {
     
         new Trigger(() -> triggerSupplier.getAsDouble() > 0.5)
             .whileTrue(new DriveToPoseCommand(
@@ -269,7 +286,7 @@ public class RobotContainer {
                     m_driverController::getRightX,
                     m_driverController::getLeftTriggerAxis,
                     m_driverController::getRightTriggerAxis,
-                    !isRightTrigger,
+                    isHPStation,
                     false
             ));
     }

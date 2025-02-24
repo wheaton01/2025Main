@@ -19,6 +19,10 @@ package frc.robot;
 ╚══════════════════════════════════════════════════════════════════════════════════════╝
 */
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+
 public final class Constants {
 
     //======================================================================================
@@ -126,11 +130,14 @@ public final class Constants {
     public static class swerveConstants {
         public static final double kalignSpeed = 0.4;
         public static final double MAX_SPEED = 5.09;
-        public static double kforwardOffsetDistance = 0.460; // Distance for drive-to-pose
+        public static double kforwardOffsetDistance = 1.460; // Distance for drive-to-pose
         public static double sideOffsetDistance = 0.165;     // Distance between robot center and AprilTag
 
         // Tolerance Constants for Position and Rotation
         public static final double POSITION_TOLERANCE = 0.5;  // Tolerance for position accuracy
         public static final double ROTATION_TOLERANCE = 0.5;  // Tolerance for rotation accuracy
+    }
+    public static class fieldPoses {
+        public static final Pose2d reefPose = new Pose2d(new Translation2d(5.034, 5.317), Rotation2d.fromDegrees(117));
     }
 }
