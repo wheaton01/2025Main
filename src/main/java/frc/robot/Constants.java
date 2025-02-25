@@ -58,7 +58,9 @@ public final class Constants {
             public static final int kClimb2ID = 6;
             public static final int kClimb1ID = 4;
             public static final int kRamp1ID = 3;
-            public static final int kMotorID = 18;    
+            public static final int kwinchMotorID = 18;   
+            public static double kmaxClimb = 200.0;
+            public static double kminClimb = 0.0; 
         }
 
         //==================================================================================
@@ -131,7 +133,8 @@ public final class Constants {
         public static final double kalignSpeed = 0.4;
         public static final double MAX_SPEED = 5.09;
         public static double kforwardOffsetDistance = 1.460; // Distance for drive-to-pose
-        public static double sideOffsetDistance = 0.165;     // Distance between robot center and AprilTag
+        public static double ksideOffsetDistance = 0.165;     // Distance between robot center and AprilTag
+        public static double kHPForwardOffsetDistance = 1.460; // Distance for drive-to-pose
 
         // Tolerance Constants for Position and Rotation
         public static final double POSITION_TOLERANCE = 0.5;  // Tolerance for position accuracy

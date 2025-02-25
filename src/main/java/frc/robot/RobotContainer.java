@@ -191,7 +191,7 @@ public class RobotContainer {
         // Bind right bumper to drive to nearest AprilTag pose with a special mode
         //createDriveToPoseButtonTrigger(m_driverController.rightBumper(), true);
         createDriveToPoseButtonTrigger(m_driverController.x(), true);
-        m_driverController.b().whileTrue(new driveToPose(swerveSubsystem,fieldPoses.reefPose));
+        //m_driverController.b().whileTrue(new driveToPose(swerveSubsystem,fieldPoses.reefPose));
     }
 
     /* 
