@@ -57,7 +57,7 @@ public final class Constants {
         public static class climberConstants {
             public static final int kClimb2ID = 6;
             public static final int kClimb1ID = 4;
-            public static final int kRamp1ID = 3;
+            public static final int kRamp1ID = 5;
             public static final int kwinchMotorID = 18;   
             public static double kmaxClimb = 200.0;
             public static double kminClimb = 0.0; 
