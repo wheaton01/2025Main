@@ -3,6 +3,8 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot.commands.climberCommands;
+import java.util.function.DoubleSupplier;
+
 import edu.wpi.first.wpilibj2.command.Command;
 
 import frc.robot.subsystems.sClimber;
@@ -23,12 +25,10 @@ public class setClimber extends Command {
   /** Creates a new setClimber. */
   sClimber sClimber;
   boolean bdeploy, bclimb;
-// Not really using this command as it is easier to just directly call into the subsystem using instant commands in this case
-//as they are all setting boolean values
-  public setClimber(sClimber sClimber, boolean bdeploy, boolean bclimb) {
+  DoubleSupplier setpoint;
+  public setClimber(sClimber sClimber, DoubleSupplier setpoint) {
     this.sClimber = sClimber;
-    this.bdeploy = bdeploy;
-    this.bclimb = bclimb;
+    this.setpoint = setpoint;
     // Use addRequirements() here to declare subsystem dependencies.
 
   addRequirements(sClimber);
@@ -41,7 +41,9 @@ public class setClimber extends Command {
   
     // Called every time the scheduler runs while the command is scheduled.
     @Override
-    public void execute() {}
+    public void execute() {
+      sClimber.setSetpoint(setpoint.getAsDouble());
+    }
   
     // Called once the command ends or is interrupted.
     @Override

@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
@@ -32,10 +33,13 @@ public class sClimber extends SubsystemBase {
   Solenoid sClimb,sdeployClimb,sdropRamp;
 
   boolean enableClimber = false;
-  SparkMax climberMotor;
+  SparkMax climbMotor;
+  RelativeEncoder climbEncoder;
+  double setpoint = 0;
 
   public sClimber() {
-    climberMotor = new SparkMax(climberConstants.kMotorID,MotorType.kBrushless);
+    climbMotor = new SparkMax(climberConstants.kwinchMotorID,MotorType.kBrushless);
+    climbEncoder = climbMotor.getAlternateEncoder();
     sClimb =       new Solenoid(1,PneumaticsModuleType.CTREPCM, Constants.robotConstants.climberConstants.kClimb2ID);  
     sdeployClimb = new Solenoid(1,PneumaticsModuleType.CTREPCM, Constants.robotConstants.climberConstants.kClimb1ID);    
     sdropRamp =    new Solenoid(1,PneumaticsModuleType.CTREPCM, Constants.robotConstants.climberConstants.kRamp1ID);    
@@ -44,11 +48,29 @@ public class sClimber extends SubsystemBase {
   @Override
   public void periodic() {
     SmartDashboard.putBoolean(getName(), enableClimber);
+    if (enableClimber) {
+    if (getEncoder()<climberConstants.kmaxClimb && getSetpoint()>0){      
+       climbMotor.set(getSetpoint());
+      }
+      if (getEncoder()>climberConstants.kminClimb && getSetpoint()<0){
+        climbMotor.set(getSetpoint());
+      }
+    }
    // SmartDashboard.putBoolean("Climber Deployed", sdeployClimb.get());
     // This method will be called once per scheduler run
   }
+  public double getSetpoint(){
+    return setpoint;
+  }
+  public double getEncoder(){
+    return climbEncoder.getPosition();
+  }
+  public void setSetpoint(double setpoint){
+    this.setpoint = setpoint;
+  }
   public void deployClimber(){
     if (enableClimber) {
+
     sdeployClimb.set(true);
     }
   } 
@@ -60,17 +82,15 @@ public class sClimber extends SubsystemBase {
   }
   public void climb(){
     if (enableClimber) {
-      climberMotor.set(1.0);
-   }
+
+    sClimb.set(true);
+  }
   }  
   public void unClimb(){
     if (enableClimber) {
-      climberMotor.set(-1.0);
+      sClimb.set(false);
     }
   } 
-  public void zeroClimb(){
-    climberMotor.set(0);
-  }
   public void disableSafety(){
     enableClimber = true;
   }

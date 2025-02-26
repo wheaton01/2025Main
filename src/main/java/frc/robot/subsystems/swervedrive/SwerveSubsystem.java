@@ -277,7 +277,7 @@ public class SwerveSubsystem extends SubsystemBase
         swerveDrive.getMaximumChassisAngularVelocity(), Units.degreesToRadians(720));
 
 // Since AutoBuilder is configured, we can use it to build pathfinding commands
-    DogLog.log(getName(), pose);
+   // DogLog.log(getName(), pose);
     
     return AutoBuilder.pathfindToPose(
         pose,
@@ -747,29 +747,8 @@ public class SwerveSubsystem extends SubsystemBase
   {
     swerveDrive.drive(new ChassisSpeeds(0, 0, 0));
   }
-//   public void driveToPose(Pose2d pose, double speed) {
-//     currentPose = getPose();
-//     Translation2d delta = pose.getTranslation().minus(currentPose.getTranslation());
-    
-//     double xSpeed = XdeltaPID.calculate(currentPose.getX(), pose.getX()) * speed;
-//     double ySpeed = YdeltaPID.calculate(currentPose.getY(), pose.getY()) * speed;
-    
-//     // Normalize theta error to [-π, π] to avoid long rotation paths
-//     double thetaError = pose.getRotation().getRadians() - currentPose.getRotation().getRadians();
-//     thetaError = MathUtil.angleModulus(thetaError); // Ensures shortest path rotation
-    
-//     double distance = delta.getNorm(); // Distance from target
-//     double thetaSpeed = thetaPID.calculate(currentPose.getRotation().getRadians(), currentPose.getRotation().getRadians() + thetaError) 
-//                         * (speed * Math.min(1.0, distance)); // Scale rotation speed based on distance
-    
-//     // Ensure robot-relative or field-relative control is correct
-//     ChassisSpeeds chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, thetaSpeed, currentPose.getRotation());
-    
-//     swerveDrive.drive(chassisSpeeds);
-// }
 
-
-  public Pose2d getNearestReefAprilTagPose(double xOffset, double zOffset) { 
+  public Pose2d getNearestReefAprilTagPose(double lateralOffset, double depthOffset) { 
     int[] blueReefTags = {17, 18, 19, 20, 21, 22}; // Blue reef tags
     int[] redReefTags = {6, 7, 8, 9, 10, 11};     // Red reef tags
 
@@ -794,21 +773,24 @@ public class SwerveSubsystem extends SubsystemBase
         return null; // No valid AprilTags found
     }
 
-    // Extract tag rotation (heading in radians)
+    // Extract tag orientation (facing direction in radians)
     double tagAngle = nearestTagPose.getRotation().getRadians();
 
     // Compute field-relative offsets
-    double fieldOffsetX = xOffset * Math.cos(tagAngle) - zOffset * Math.sin(tagAngle);
-    double fieldOffsetY = xOffset * Math.sin(tagAngle) + zOffset * Math.cos(tagAngle);
+    double fieldOffsetX = depthOffset * Math.sin(tagAngle) + lateralOffset * Math.cos(tagAngle); // Depth moves outward, lateral is perpendicular
+    double fieldOffsetY = -depthOffset * Math.cos(tagAngle) + lateralOffset * Math.sin(tagAngle); // Depth moves outward, lateral is perpendicular
 
     // Compute new target pose
     Pose2d offsetTagPose = new Pose2d(
         nearestTagPose.getTranslation().plus(new Translation2d(fieldOffsetX, fieldOffsetY)),
-        nearestTagPose.getRotation() // Keep the same orientation as the tag
+        nearestTagPose.getRotation().rotateBy(Rotation2d.fromDegrees(180)) // Face away from tag
     );
 
     return offsetTagPose;
 }
+
+
+
 private Pose2d targetPose = new Pose2d(); // Store the latest pose to drive to
 
 public void setTargetPose(Pose2d pose) {
@@ -831,19 +813,15 @@ public boolean isAtPose() {
 
   return (xError < positionTolerance && yError < positionTolerance && rotationError < rotationTolerance);
 }
-public Pose2d getNearestHumanPlayerTagPose() { 
-  // Define AprilTag IDs for the Human Player Stations
+public Pose2d getNearestHumanPlayerTagPose(double lateralOffset, double depthOffset) { 
   int[] blueHumanPlayerTags = {12, 13}; // Blue alliance human player station tags
   int[] redHumanPlayerTags = {1, 2};    // Red alliance human player station tags
 
-  // Select the correct tag set based on the alliance color
   int[] humanPlayerTags = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue ? blueHumanPlayerTags : redHumanPlayerTags;
-  
   Pose2d currentPose = getPose();
   Pose2d nearestTagPose = null;
   double nearestDistance = Double.MAX_VALUE;
   
-  // Find the closest human player station tag
   for (int tagID : humanPlayerTags) {
       Optional<Pose3d> tagPose3d = fieldLayout.getTagPose(tagID);
       if (tagPose3d.isPresent()) {
@@ -856,60 +834,26 @@ public Pose2d getNearestHumanPlayerTagPose() {
       }
   }
 
-  return nearestTagPose; // Return the nearest tag pose, or null if no valid tag is found
+  if (nearestTagPose == null) {
+      return null; // No valid AprilTags found
+  }
+
+  // Extract tag orientation (facing direction in radians)
+  double tagAngle = nearestTagPose.getRotation().getRadians();
+
+  // Compute field-relative offsets
+  double fieldOffsetX = -depthOffset * Math.cos(tagAngle) + lateralOffset * Math.sin(tagAngle); // Depth is backward, lateral is sideways
+  double fieldOffsetY = -depthOffset * Math.sin(tagAngle) - lateralOffset * Math.cos(tagAngle); // Depth is backward, lateral is sideways
+
+  // Compute new target pose
+  Pose2d offsetTagPose = new Pose2d(
+      nearestTagPose.getTranslation().plus(new Translation2d(fieldOffsetX, fieldOffsetY)),
+      nearestTagPose.getRotation() // Keep the same orientation as the tag
+  );
+
+  return offsetTagPose;
 }
-// double[] rawGyro = new double[3];
-// PigeonIMU pigeonIMU = new PigeonIMU(4);
-//     private void setupPoseWithLimelight() {
 
-//     // Get the gyro angular velocities
-//       pigeonIMU.getRawGyro(rawGyro);
-    
-//     // Extract pitch, roll, and yaw velocities
-//       double pitchVelocity = rawGyro[0];  // X-axis (pitch)
-//       double rollVelocity = rawGyro[1];   // Y-axis (roll)
-//       double yawVelocity = rawGyro[2];    // Z-axis (yaw)
-    
-//     // Create the robot's orientation with updated gyro velocities
-//     Orientation3d robotOrientation = new Orientation3d(
-//         swerveDrive.getGyroRotation3d(),
-//         new AngularVelocity3d(
-//             DegreesPerSecond.of(pitchVelocity),
-//             DegreesPerSecond.of(rollVelocity),
-//             DegreesPerSecond.of(yawVelocity)
-//         ));
-//         // Update Limelight with robot orientation for MegaTag2
-//         myLimelight.getSettings()
-//         .withRobotOrientation(robotOrientation)
-//         .save();
-
-//         // Get MegaTag2 pose estimation
-//         Optional<PoseEstimate> visionEstimate = myLimelight.getPoseEstimator(true).getPoseEstimate();
-        
-//         // If a valid pose is found, update the robot’s odometry
-//         visionEstimate.ifPresent(poseEstimate -> {
-//             double timestamp = poseEstimate.timestampSeconds;
-//             Pose2d estimatedPose = poseEstimate.pose.toPose2d();
-//             swerveDrive.addVisionMeasurement(estimatedPose, timestamp);
-//         });
-//     }
-//     private long lastUpdateTime = System.currentTimeMillis();
-
-//     private void updatePoseWithLimelight() {
-//         // Update at a limited frequency (e.g., once every 100ms)
-//         long currentTime = System.currentTimeMillis();
-//         if (currentTime - lastUpdateTime >= 200) {
-//             lastUpdateTime = currentTime;
-            
-//             Optional<PoseEstimate> visionEstimate = myLimelight.getPoseEstimator(true).getPoseEstimate();
-        
-//             visionEstimate.ifPresent(poseEstimate -> {
-//                 double timestamp = poseEstimate.timestampSeconds;
-//                 Pose2d estimatedPose = poseEstimate.pose.toPose2d(); // Convert Limelight pose to WPILib Pose2d
-//                 swerveDrive.addVisionMeasurement(estimatedPose, timestamp); // Update odometry
-//             });
-//         }
-//     }
     
   public Pose2d getRobotPose() {
     return swerveDrive.getPose();
