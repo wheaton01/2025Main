@@ -1,6 +1,7 @@
 package frc.robot.commands.SwerveCommands;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants.poseConstants;
 import frc.robot.Constants.swerveConstants;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -26,10 +27,9 @@ public class DriveToPoseCommand extends Command {
   
   private boolean bInAuton = false;
   private boolean bhumanPlayerStation = false;
-  
   public Pose2d adjustedPose;
   private Command pathFindingCommand; // Command to drive to the target pose
-
+  Pose2d targetPose;
   // Constructor to initialize the command
   public DriveToPoseCommand(SwerveSubsystem swerveSubsystem, double speed, 
                             DoubleSupplier xOffsetSupplier, DoubleSupplier yOffsetSupplier, 
@@ -55,11 +55,15 @@ public class DriveToPoseCommand extends Command {
     SmartDashboard.putString(getSubsystem(), "Now Driving To nearest pose");
 
     // Get the closest AprilTag pose for the reef
-    Pose2d targetPose = getNearestReefTagPose();
+    if(!bhumanPlayerStation){
+    targetPose = swerveSubsystem.getNearestReefAprilTagPose();
     SmartDashboard.putString("DistToReefTag", targetPose.getX() + " " + targetPose.getY());
+    adjustedPose = calculateOffsetPose(targetPose,poseConstants.xOffsetReef,poseConstants.yOffsetReef);
+    }
 
     if (bhumanPlayerStation) {
       targetPose = getHPStation();
+      adjustedPose = calculateHPpose(targetPose, poseConstants.xOffsetHPStation,poseConstants.yOffsetHPStation);
     }
 
     // If no valid tag is found, exit early to avoid errors
@@ -68,16 +72,12 @@ public class DriveToPoseCommand extends Command {
     }
 
     // Get dynamic offset values from the controller inputs
-    double xOffset = xOffsetSupplier.getAsDouble();
-    double yOffset = yOffsetSupplier.getAsDouble();
-    double rotationOffset = rotationOffsetSupplier.getAsDouble();
+    // double xOffset = xOffsetSupplier.getAsDouble();
+    // double yOffset = yOffsetSupplier.getAsDouble();
+    // double rotationOffset = rotationOffsetSupplier.getAsDouble();
 
     // Adjust the target pose based on the dynamic offsets
-    adjustedPose = new Pose2d(
-      targetPose.getX() + xOffset,
-      targetPose.getY() + yOffset,
-      targetPose.getRotation().plus(Rotation2d.fromDegrees(rotationOffset))
-    );
+
 
     swerveSubsystem.setTargetPose(adjustedPose);
 
@@ -91,18 +91,6 @@ public class DriveToPoseCommand extends Command {
   @Override
   public void execute() {
     // Pathfinding command is already running, no need to implement custom logic here
-  }
-
-  private Pose2d getNearestReefTagPose() {
-    if (leftTriggerSupplier.getAsDouble() > rightTriggerSupplier.getAsDouble()) {
-      return swerveSubsystem.getNearestReefAprilTagPose(-swerveConstants.sideOffsetDistance, swerveConstants.kforwardOffsetDistance); // Offset left
-    }
-    if (leftTriggerSupplier.getAsDouble() <= rightTriggerSupplier.getAsDouble()) {
-      return swerveSubsystem.getNearestReefAprilTagPose(swerveConstants.sideOffsetDistance, swerveConstants.kforwardOffsetDistance); // Offset right
-    }
-
-    // Default case: Center robot to tag
-    return swerveSubsystem.getNearestReefAprilTagPose(0, swerveConstants.kforwardOffsetDistance);
   }
 
   private Pose2d getHPStation() {
@@ -126,4 +114,33 @@ public class DriveToPoseCommand extends Command {
       swerveSubsystem.stop();
     }
   }
+  public Pose2d calculateOffsetPose(Pose2d tagPose, double dF, double dS) {
+    double xT = tagPose.getX();
+    double yT = tagPose.getY();
+    double thetaT = tagPose.getRotation().getRadians();
+
+    // Compute new x, y
+    double xR = xT + dF * Math.cos(thetaT) - dS * Math.sin(thetaT);
+    double yR = yT + dF * Math.sin(thetaT) + dS * Math.cos(thetaT);
+    
+    // Compute new heading (180 degrees flipped)
+    Rotation2d thetaR = tagPose.getRotation().rotateBy(Rotation2d.fromDegrees(180));
+
+    return new Pose2d(xR, yR, thetaR);
+}
+public Pose2d calculateHPpose(Pose2d tagPose, double dF, double dS) {
+  double xT = tagPose.getX();
+  double yT = tagPose.getY();
+  double thetaT = tagPose.getRotation().getRadians();
+
+  // Compute new x, y
+  double xR = xT + dF * Math.cos(thetaT) - dS * Math.sin(thetaT);
+  double yR = yT + dF * Math.sin(thetaT) + dS * Math.cos(thetaT);
+  
+  // Keep the same heading as the tag
+  Rotation2d thetaR = tagPose.getRotation();
+
+  return new Pose2d(xR, yR, thetaR);
+}
+
 }

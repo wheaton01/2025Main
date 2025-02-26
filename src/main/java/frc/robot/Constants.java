@@ -19,9 +19,11 @@ package frc.robot;
 ╚══════════════════════════════════════════════════════════════════════════════════════╝
 */
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 
 public final class Constants {
 
@@ -49,7 +51,7 @@ public final class Constants {
         
         // Intake Sensor ID and Threshold
         public static int kIntakeSensorID = 0;          // TODO : CORRECT ANALOG ID
-        public static double kintakeSensorThreshold = 2300.0;
+        public static double kintakeSensorThreshold = 1400.0;
 
         //==================================================================================
         // Climber Constants
@@ -93,7 +95,7 @@ public final class Constants {
             // Home and Max Height Constants
             public static final double kHomePose = 0.0;
             public static final double kMaxHeight = 1000.0;
-            public static final double kCURRENT_THRESHOLD = 15.0;//used for homing
+            public static final double kCURRENT_THRESHOLD = 10.0;//used for homing
 
             // Encoder Constants
             public static final double kTolerance = 1.0;
@@ -140,5 +142,12 @@ public final class Constants {
     }
     public static class fieldPoses {
         public static final Pose2d reefPose = new Pose2d(new Translation2d(5.034, 5.317), Rotation2d.fromDegrees(117));
+    }
+    public static class poseConstants{
+        public static final double xOffsetHPStation = Units.inchesToMeters(17.5) ;
+        public static final double yOffsetHPStation = Units.inchesToMeters(7.5) ;
+        public static final double xOffsetReef = Units.inchesToMeters(13.5) ;
+        public static final double yOffsetReef = Units.inchesToMeters(7.5) ;
+        
     }
 }

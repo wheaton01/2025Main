@@ -220,9 +220,9 @@ public class RobotContainer {
                 .onTrue(new SequentialCommandGroup(new ParallelCommandGroup(
                         new setCHaptics(m_controllerHaptics, 0.8).withTimeout(1.2),
                         new InstantCommand(sClimber::disableSafety),
-                        new InstantCommand(sClimber::deployClimber),
+                        new InstantCommand(sClimber::deployClimber)),                        
                         new WaitCommand(1.0),
-                        new InstantCommand(sClimber::dropRamp))
+                        new InstantCommand(sClimber::dropRamp)
                         ));
 
         m_operatorController.povDown().onTrue(new InstantCommand(sClimber::climb)).onFalse(new InstantCommand(sClimber::zeroClimb));

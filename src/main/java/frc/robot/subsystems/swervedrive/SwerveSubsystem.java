@@ -769,7 +769,7 @@ public class SwerveSubsystem extends SubsystemBase
 // }
 
 
-  public Pose2d getNearestReefAprilTagPose(double xOffset, double zOffset) { 
+  public Pose2d getNearestReefAprilTagPose() { 
     int[] blueReefTags = {17, 18, 19, 20, 21, 22}; // Blue reef tags
     int[] redReefTags = {6, 7, 8, 9, 10, 11};     // Red reef tags
 
@@ -794,20 +794,7 @@ public class SwerveSubsystem extends SubsystemBase
         return null; // No valid AprilTags found
     }
 
-    // Extract tag rotation (heading in radians)
-    double tagAngle = nearestTagPose.getRotation().getRadians();
-
-    // Compute field-relative offsets
-    double fieldOffsetX = xOffset * Math.cos(tagAngle) - zOffset * Math.sin(tagAngle);
-    double fieldOffsetY = xOffset * Math.sin(tagAngle) + zOffset * Math.cos(tagAngle);
-
-    // Compute new target pose
-    Pose2d offsetTagPose = new Pose2d(
-        nearestTagPose.getTranslation().plus(new Translation2d(fieldOffsetX, fieldOffsetY)),
-        nearestTagPose.getRotation() // Keep the same orientation as the tag
-    );
-
-    return offsetTagPose;
+    return nearestTagPose;
 }
 private Pose2d targetPose = new Pose2d(); // Store the latest pose to drive to
 
