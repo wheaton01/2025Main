@@ -35,7 +35,7 @@ public class sClimber extends SubsystemBase {
   SparkMax climberMotor;
 
   public sClimber() {
-    //climberMotor = new SparkMax(climberConstants.kMotorID,MotorType.kBrushless);
+    climberMotor = new SparkMax(climberConstants.kMotorID,MotorType.kBrushless);
     sClimb =       new Solenoid(1,PneumaticsModuleType.CTREPCM, Constants.robotConstants.climberConstants.kClimb2ID);  
     sdeployClimb = new Solenoid(1,PneumaticsModuleType.CTREPCM, Constants.robotConstants.climberConstants.kClimb1ID);    
     sdropRamp =    new Solenoid(1,PneumaticsModuleType.CTREPCM, Constants.robotConstants.climberConstants.kRamp1ID);    
@@ -49,7 +49,6 @@ public class sClimber extends SubsystemBase {
   }
   public void deployClimber(){
     if (enableClimber) {
-
     sdeployClimb.set(true);
     }
   } 
@@ -61,15 +60,17 @@ public class sClimber extends SubsystemBase {
   }
   public void climb(){
     if (enableClimber) {
-
-    sClimb.set(true);
-  }
+      climberMotor.set(1.0);
+   }
   }  
   public void unClimb(){
     if (enableClimber) {
-      sClimb.set(false);
+      climberMotor.set(-1.0);
     }
   } 
+  public void zeroClimb(){
+    climberMotor.set(0);
+  }
   public void disableSafety(){
     enableClimber = true;
   }

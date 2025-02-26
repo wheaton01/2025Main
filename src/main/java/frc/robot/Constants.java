@@ -49,7 +49,7 @@ public final class Constants {
         
         // Intake Sensor ID and Threshold
         public static int kIntakeSensorID = 0;          // TODO : CORRECT ANALOG ID
-        public static double kintakeSensorThreshold = 1800.0;
+        public static double kintakeSensorThreshold = 2300.0;
 
         //==================================================================================
         // Climber Constants
@@ -57,7 +57,7 @@ public final class Constants {
         public static class climberConstants {
             public static final int kClimb2ID = 6;
             public static final int kClimb1ID = 4;
-            public static final int kRamp1ID = 3;
+            public static final int kRamp1ID = 5;
             public static final int kMotorID = 18;    
         }
 
@@ -81,18 +81,19 @@ public final class Constants {
 
             // PID Zone and Threshold Constants
             public static double kIZone = 5.0;
-            public static double kdownSpeed = -0.3;
+            public static double kdownSpeed = -0.5;
             public static double kPIDThreshold = 2.0;
 
             // Elevator Height Constants
-            public static final double kL4Height = 1000.0;
-            public static final double kL3Height = 750.0; 
+            public static final double kL4Height = 950.0;
+            public static final double kL3Height = 650.0; 
             public static final double kL2Height = 450.0; 
             public static final double kL1Height = 0.0;
 
             // Home and Max Height Constants
             public static final double kHomePose = 0.0;
-            public static final double kMaxHeight = 1200.0;
+            public static final double kMaxHeight = 1000.0;
+            public static final double kCURRENT_THRESHOLD = 15.0;//used for homing
 
             // Encoder Constants
             public static final double kTolerance = 1.0;

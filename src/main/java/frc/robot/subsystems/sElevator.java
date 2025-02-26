@@ -28,6 +28,9 @@ import edu.wpi.first.math.controller.PIDController;
 
 public class sElevator extends SubsystemBase {
     
+    private static final int CURRENT_SPIKE_FILTER_CYCLES = 5; // Adjust as needed
+    private int motor1CurrentSpikeCount = 0;
+    private int motor2CurrentSpikeCount = 0;
     private PIDController mElevatorUpPid;
     private PIDController mElevatorUpPid2;
     private PIDController mElevatorDownPid;
@@ -36,6 +39,10 @@ public class sElevator extends SubsystemBase {
     @SuppressWarnings("unused")
     private boolean tuningMode = false;
     private boolean bDownFlag = false;
+    private boolean homingMode = false;
+    private boolean motor1Homed = false;
+    private boolean motor2Homed = false;
+    private boolean startedHoming = false;
     double mELevatorSetpoint;
     RelativeEncoder mElevatorEncoder;
     RelativeEncoder mElevatorEncoder2;
@@ -45,7 +52,9 @@ public class sElevator extends SubsystemBase {
         mElevator1 = new SparkMax(robotConstants.kelevatorSparkID1, SparkMax.MotorType.kBrushless);
         mElevator2 = new SparkMax(robotConstants.kelevatorSparkID2, SparkMax.MotorType.kBrushless);
         mElevatorEncoder = mElevator1.getEncoder();
-        mElevatorEncoder2 = mElevator2.getEncoder();        
+        mElevatorEncoder2 = mElevator2.getEncoder();  
+        mElevatorEncoder.setPosition(0);
+        mElevatorEncoder2.setPosition(0);
 
         
         // mElevatorEncoder = new Encoder(elevatorConstants.kEncoderA, elevatorConstants.kEncoderB);
@@ -92,9 +101,7 @@ public class sElevator extends SubsystemBase {
             SmartDashboard.putNumber("Elevator Position 1 ", position);
             SmartDashboard.putNumber("Elevator Setpoint 1 ", mElevatorUpPid.getSetpoint());
     
-            double output = 0.0; // Motor power output
-            double output2 = 0.0;
-    
+            double output = 0.0; // Motor power output    
             // ╔════════════════════════════╗
             // ║     Elevator Control       ║
             // ╚════════════════════════════╝
@@ -103,43 +110,33 @@ public class sElevator extends SubsystemBase {
                 output = mElevatorUpPid.calculate(position) + elevatorConstants.kFeedForward;
             } else {
                 // ─── Descending ───
-                output = elevatorConstants.kdownSpeed + elevatorConstants.kFeedForwardDown;
+                output = elevatorConstants.kdownSpeed + elevatorConstants.kFeedForward;
     
                 // Stop the descent when near the setpoint
                 boolean atSetpoint = Math.abs(mElevatorUpPid.getSetpoint() - position) < elevatorConstants.kPIDThreshold
                                      || (position - mElevatorUpPid.getSetpoint()) < 0;
     
-                if (atSetpoint) { 
+                 if (atSetpoint) { 
                     output = elevatorConstants.kFeedForward; // Hold position
                     bDownFlag = false; // Reset flag when target is reached
-                }
-            }
-            if (!bDownFlag && elevatorConstants.btwoMotorMode) {
-                // ─── Ascending ───
-                output2 = mElevatorUpPid2.calculate(position2) + elevatorConstants.kFeedForward;
-            } else {
-                // ─── Descending ───
-                output2 = elevatorConstants.kdownSpeed + elevatorConstants.kFeedForwardDown;
-    
-                // Stop the descent when near the setpoint
-                boolean atSetpoint2 = Math.abs(mElevatorUpPid2.getSetpoint() - position2) < elevatorConstants.kPIDThreshold
-                                     || (position2 - mElevatorUpPid2.getSetpoint()) < 0;
-    
-                if (atSetpoint2) { 
-                    output2 = elevatorConstants.kFeedForward; // Hold position
-                    bDownFlag = false; // Reset flag when target is reached
-                }
-            }
+                    }
 
+                }
+  
                 SmartDashboard.putNumber("elevator Pose",mElevatorEncoder.getPosition());
-            
-    
+                SmartDashboard.putBoolean("Homing mode",homingMode);
+                SmartDashboard.putNumber("motorCurrent1", mElevator1.getOutputCurrent());
+                SmartDashboard.putNumber("motorCurrent2", mElevator2.getOutputCurrent());
+
             // ╔════════════════════════════╗
             // ║   Apply Motor Output       ║
             // ╚════════════════════════════╝
+            if (!startedHoming) {
             mElevator1.set(output);
-            if(elevatorConstants.btwoMotorMode){
-                mElevator2.set(output2);
+            mElevator2.set(output);
+            }
+            if(homingMode&&!bDownFlag){
+                homingMode();
             }
         }
     }
@@ -153,8 +150,17 @@ public class sElevator extends SubsystemBase {
             if (height != mElevatorUpPid.getSetpoint()){
             // Store the setpoint in both up/down PID controllers
             if (height > getHeight()) {
+                homingMode = false;
                 bDownFlag = false;
+                startedHoming = false;
             }else {
+                if (height ==0){
+                    homingMode = true;
+                    motor1Homed = false;
+                    motor2Homed = false;
+                }else{
+                    homingMode= false;
+                }
                 bDownFlag = true;
             }
             mElevatorUpPid.setSetpoint(height);
@@ -162,6 +168,7 @@ public class sElevator extends SubsystemBase {
         } else {
             SmartDashboard.putString(getSubsystem(), "Requested Height > MAX HEIGHT");
         }
+
      }
     }
 
@@ -201,7 +208,43 @@ public class sElevator extends SubsystemBase {
     public void setTuningMode(boolean isEnabled) {
         tuningMode = isEnabled;
     }
-}
+    private void homingMode() {
+        startedHoming = true;
+        if (!motor1Homed) {
+            mElevator1.set(0.1);
+            if (mElevator1.getOutputCurrent() > elevatorConstants.kCURRENT_THRESHOLD) {
+                motor1CurrentSpikeCount++;
+                if (motor1CurrentSpikeCount >= CURRENT_SPIKE_FILTER_CYCLES) {
+                    mElevator1.set(0);
+                    mElevatorEncoder.setPosition(0);
+                    motor1Homed = true;
+                }
+            } else {
+                motor1CurrentSpikeCount = 0; // Reset if current drops below threshold
+            }
+        }
+    
+        if (!motor2Homed) {
+            mElevator2.set(0.1);
+            if (mElevator2.getOutputCurrent() > elevatorConstants.kCURRENT_THRESHOLD) {
+                motor2CurrentSpikeCount++;
+                if (motor2CurrentSpikeCount >= CURRENT_SPIKE_FILTER_CYCLES) {
+                    mElevator2.set(0);
+                    mElevatorEncoder2.setPosition(0);
+                    motor2Homed = true;
+                }
+            } else {
+                motor2CurrentSpikeCount = 0; // Reset if current drops below threshold
+            }
+        }
+    
+        if (motor1Homed && motor2Homed) {
+            startedHoming =false;
+            homingMode = false;
+            bDownFlag = false;
+        }
+    }
+    }
 
 
 
