@@ -49,7 +49,7 @@ public final class Constants {
         
         // Intake Sensor ID and Threshold
         public static int kIntakeSensorID = 0;          // TODO : CORRECT ANALOG ID
-        public static double kintakeSensorThreshold = 1800.0;
+        public static double kintakeSensorThreshold = 2300.0;
 
         //==================================================================================
         // Climber Constants
@@ -58,9 +58,7 @@ public final class Constants {
             public static final int kClimb2ID = 6;
             public static final int kClimb1ID = 4;
             public static final int kRamp1ID = 5;
-            public static final int kwinchMotorID = 18;   
-            public static double kmaxClimb = 200.0;
-            public static double kminClimb = 0.0; 
+            public static final int kMotorID = 18;    
         }
 
         //==================================================================================
@@ -83,18 +81,19 @@ public final class Constants {
 
             // PID Zone and Threshold Constants
             public static double kIZone = 5.0;
-            public static double kdownSpeed = -0.3;
+            public static double kdownSpeed = -0.5;
             public static double kPIDThreshold = 2.0;
 
             // Elevator Height Constants
-            public static final double kL4Height = 1000.0;
-            public static final double kL3Height = 750.0; 
+            public static final double kL4Height = 950.0;
+            public static final double kL3Height = 650.0; 
             public static final double kL2Height = 450.0; 
             public static final double kL1Height = 0.0;
 
             // Home and Max Height Constants
             public static final double kHomePose = 0.0;
-            public static final double kMaxHeight = 1200.0;
+            public static final double kMaxHeight = 1000.0;
+            public static final double kCURRENT_THRESHOLD = 15.0;//used for homing
 
             // Encoder Constants
             public static final double kTolerance = 1.0;
@@ -133,8 +132,7 @@ public final class Constants {
         public static final double kalignSpeed = 0.4;
         public static final double MAX_SPEED = 5.09;
         public static double kforwardOffsetDistance = 1.460; // Distance for drive-to-pose
-        public static double ksideOffsetDistance = 0.165;     // Distance between robot center and AprilTag
-        public static double kHPForwardOffsetDistance = 1.460; // Distance for drive-to-pose
+        public static double sideOffsetDistance = 0.165;     // Distance between robot center and AprilTag
 
         // Tolerance Constants for Position and Rotation
         public static final double POSITION_TOLERANCE = 0.5;  // Tolerance for position accuracy

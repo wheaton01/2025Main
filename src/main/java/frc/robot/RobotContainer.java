@@ -31,6 +31,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 /* 
@@ -191,7 +193,7 @@ public class RobotContainer {
         // Bind right bumper to drive to nearest AprilTag pose with a special mode
         //createDriveToPoseButtonTrigger(m_driverController.rightBumper(), true);
         createDriveToPoseButtonTrigger(m_driverController.x(), true);
-        //m_driverController.b().whileTrue(new driveToPose(swerveSubsystem,fieldPoses.reefPose));
+        m_driverController.b().whileTrue(new driveToPose(swerveSubsystem,fieldPoses.reefPose));
     }
 
     /* 
@@ -215,16 +217,19 @@ public class RobotContainer {
         // ----------------------- Climber Commands ----------------------- //
         new Trigger(() -> m_operatorController.rightStick().getAsBoolean() &&
                 m_operatorController.leftStick().getAsBoolean())
-                .onTrue(new ParallelCommandGroup(
+                .onTrue(new SequentialCommandGroup(new ParallelCommandGroup(
                         new setCHaptics(m_controllerHaptics, 0.8).withTimeout(1.2),
-                        new InstantCommand(sClimber::disableSafety)).withTimeout(.8));
+                        new InstantCommand(sClimber::disableSafety),
+                        new InstantCommand(sClimber::deployClimber),
+                        new WaitCommand(1.0),
+                        new InstantCommand(sClimber::dropRamp))
+                        ));
 
-        // m_operatorController.povDown().onTrue(new InstantCommand(sClimber::climb));
-        // m_operatorController.povUp().onTrue(new InstantCommand(sClimber::unClimb));
-        // m_operatorController.povLeft().onTrue(new InstantCommand(sClimber::stowClimber));
-        // m_operatorController.povRight().onTrue(new InstantCommand(sClimber::deployClimber));
-        m_operatorController.povDown().onTrue(new InstantCommand(sClimber::dropRamp));
-        sClimber.setDefaultCommand(new setClimber(sClimber,()-> MathUtil.applyDeadband(m_operatorController.getLeftY(),.2)));
+        m_operatorController.povDown().onTrue(new InstantCommand(sClimber::climb)).onFalse(new InstantCommand(sClimber::zeroClimb));
+        m_operatorController.povUp().onTrue(new InstantCommand(sClimber::unClimb)).onFalse(new InstantCommand(sClimber::zeroClimb));
+        m_operatorController.povLeft().onTrue(new InstantCommand(sClimber::stowClimber));
+        m_operatorController.povRight().onTrue(new InstantCommand(sClimber::deployClimber));
+        // m_operatorController.start().onTrue(new InstantCommand(sClimber::dropRamp));
     
         // --------------------------- Intake Controls --------------------------- //
     

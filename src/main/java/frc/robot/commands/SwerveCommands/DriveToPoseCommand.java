@@ -95,10 +95,10 @@ public class DriveToPoseCommand extends Command {
 
   private Pose2d getNearestReefTagPose() {
     if (leftTriggerSupplier.getAsDouble() > rightTriggerSupplier.getAsDouble()) {
-      return swerveSubsystem.getNearestReefAprilTagPose(-swerveConstants.ksideOffsetDistance, swerveConstants.kforwardOffsetDistance); // Offset left
+      return swerveSubsystem.getNearestReefAprilTagPose(-swerveConstants.sideOffsetDistance, swerveConstants.kforwardOffsetDistance); // Offset left
     }
     if (leftTriggerSupplier.getAsDouble() <= rightTriggerSupplier.getAsDouble()) {
-      return swerveSubsystem.getNearestReefAprilTagPose(swerveConstants.ksideOffsetDistance, swerveConstants.kforwardOffsetDistance); // Offset right
+      return swerveSubsystem.getNearestReefAprilTagPose(swerveConstants.sideOffsetDistance, swerveConstants.kforwardOffsetDistance); // Offset right
     }
 
     // Default case: Center robot to tag
@@ -106,7 +106,7 @@ public class DriveToPoseCommand extends Command {
   }
 
   private Pose2d getHPStation() {
-    return swerveSubsystem.getNearestHumanPlayerTagPose(0, swerveConstants.kHPForwardOffsetDistance);
+    return swerveSubsystem.getNearestHumanPlayerTagPose();
   }
 
   @Override
