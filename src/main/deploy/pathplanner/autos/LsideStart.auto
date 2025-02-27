@@ -32,6 +32,12 @@
                 "data": {
                   "name": "setL4Pose"
                 }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "autoDriveToPoseCommand"
+                }
               }
             ]
           }
@@ -64,12 +70,6 @@
                 "data": {
                   "pathName": "P1toHF"
                 }
-              },
-              {
-                "type": "wait",
-                "data": {
-                  "waitTime": 0.25
-                }
               }
             ]
           }
@@ -78,12 +78,6 @@
           "type": "parallel",
           "data": {
             "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "setL2Pose"
-                }
-              },
               {
                 "type": "path",
                 "data": {
@@ -102,12 +96,6 @@
                 "data": {
                   "name": "placeL4"
                 }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "autoDriveToPoseCommand"
-                }
               }
             ]
           }
@@ -119,18 +107,6 @@
           }
         },
         {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.25
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.125
-          }
-        },
-        {
           "type": "parallel",
           "data": {
             "commands": [
@@ -138,12 +114,6 @@
                 "type": "path",
                 "data": {
                   "pathName": "P2toHF3"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "setAutoIntake"
                 }
               }
             ]
@@ -153,12 +123,6 @@
           "type": "parallel",
           "data": {
             "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "setL2Pose"
-                }
-              },
               {
                 "type": "path",
                 "data": {
@@ -176,12 +140,6 @@
                 "type": "named",
                 "data": {
                   "name": "placeL4"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "autoDriveToPoseCommand"
                 }
               }
             ]
@@ -201,12 +159,6 @@
                 "type": "parallel",
                 "data": {
                   "commands": [
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "setAutoIntake"
-                      }
-                    },
                     {
                       "type": "path",
                       "data": {
