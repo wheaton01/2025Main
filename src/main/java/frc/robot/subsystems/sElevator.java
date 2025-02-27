@@ -89,6 +89,7 @@ public class sElevator extends SubsystemBase {
         // ╚════════════════════════════╝
         SmartDashboard.putNumber("elevator Pose",getHeight());
         SmartDashboard.putNumber("elevator Pose2",getHeight2());
+
         if (!elevatorConstants.btestMode) {
             SmartDashboard.putBoolean("Down Flag ", bDownFlag);
     
@@ -172,12 +173,12 @@ public class sElevator extends SubsystemBase {
      }
     }
 
-    public void setElevatorOffset(double offset){
-        if (elevatorConstants.kHomePose-offset>0 && elevatorConstants.kMaxHeight+offset<elevatorConstants.kMaxHeight){
-        mElevatorUpPid.setSetpoint(offset+mELevatorSetpoint);
-        }
+    // public void setElevatorOffset(double offset){
+    //     if (elevatorConstants.kHomePose-offset>0 && elevatorConstants.kMaxHeight+offset<elevatorConstants.kMaxHeight){
+    //     mElevatorUpPid.setSetpoint(offset+mELevatorSetpoint);
+    //     }
  
-    }
+    // }
     DoubleSupplier speed;
     //this looks way more complicated than it is. 
     //it just is a command to manually move the elevator and so we can run this as two separate motors instead of one being a follower
@@ -198,10 +199,10 @@ public class sElevator extends SubsystemBase {
     }
 
     public double getHeight() {
-        return mElevatorEncoder.getPosition()*elevatorConstants.kElevatorConversionFac;
+        return mElevatorEncoder.getPosition()*elevatorConstants.kElevatorConversionFac+getoperatorOffset();
     }
     public double getHeight2() {
-        return mElevatorEncoder2.getPosition()*elevatorConstants.kElevatorConversionFac;
+        return mElevatorEncoder2.getPosition()*elevatorConstants.kElevatorConversionFac+getoperatorOffset();
     }
 
     // Toggle tuning mode on/off
@@ -244,12 +245,17 @@ public class sElevator extends SubsystemBase {
             bDownFlag = false;
         }
     }
-    public double operatorOffset(double heightOffset)
+    double operatorOffset;
+    public double getoperatorOffset()
+    {
+        return operatorOffset;
+    }
+    public void setoperatorOffset(double heightOffset)
     {
         if (Math.abs(heightOffset)>.1){
-            return heightOffset*10;
-        }
-            return 0;
+            operatorOffset = heightOffset*80;
+        }else{operatorOffset = 0;}
+        
     }
     }
 

@@ -83,6 +83,8 @@ public class RobotContainer {
     ║                                RobotContainer Constructor                                ║
     ╚══════════════════════════════════════════════════════════════════════════════════════════╝
     */
+    public setElevatorOffset opeartorOffset ;
+
     private final SendableChooser<Command> autoChooser = new SendableChooser<>();
 
     public RobotContainer() {
@@ -109,6 +111,7 @@ public class RobotContainer {
     ╚════════════════════════════════════════════════════════════════════════════════════════════╝
     */
     private void setupCommands() {
+       opeartorOffset = new setElevatorOffset(sElevator,()-> m_operatorController.getLeftY());
         // sElevator.setDefaultCommand(new SetManualElevator(
         //         sElevator,
         //         () -> 1.0 * MathUtil.applyDeadband(m_operatorController.getLeftY(), 0.2) 
@@ -221,15 +224,18 @@ public class RobotContainer {
         new Trigger(() -> m_operatorController.rightStick().getAsBoolean() &&
                 m_operatorController.leftStick().getAsBoolean())
                 .onTrue(new SequentialCommandGroup(new ParallelCommandGroup(
-                        new setCHaptics(m_controllerHaptics, 0.8).withTimeout(1.2),
+                        new setCHaptics(m_controllerHaptics, 0.8).withTimeout(.75),
                         new InstantCommand(sClimber::disableSafety),
-                        new InstantCommand(sClimber::deployClimber)),                        
-                        new WaitCommand(1.0),
-                        new InstantCommand(sClimber::dropRamp)
-                        ));
+                        new InstantCommand(sClimber::dropRamp)),
+                        new InstantCommand(sClimber::deployClimber))                        
+                        );
 
-        m_operatorController.povDown().onTrue(new InstantCommand(sClimber::climb)).onFalse(new InstantCommand(sClimber::zeroClimb));
-        m_operatorController.povUp().onTrue(new InstantCommand(sClimber::unClimb)).onFalse(new InstantCommand(sClimber::zeroClimb));
+        m_operatorController.povDown().onTrue(new ParallelCommandGroup(new InstantCommand(sClimber::climb),
+                                                                       new InstantCommand(sClimber::stowClimber)))
+                                                                       .onFalse(new InstantCommand(sClimber::zeroClimb));
+        m_operatorController.povUp().onTrue(new ParallelCommandGroup(new InstantCommand(sClimber::unClimb),
+                                                                     new InstantCommand(sClimber::deployClimber)))
+                                                                     .onFalse(new InstantCommand(sClimber::zeroClimb));
         m_operatorController.povLeft().onTrue(new InstantCommand(sClimber::stowClimber));
         m_operatorController.povRight().onTrue(new InstantCommand(sClimber::deployClimber));
         // m_operatorController.start().onTrue(new InstantCommand(sClimber::dropRamp));
@@ -252,7 +258,7 @@ public class RobotContainer {
                                 new InstantCommand(sEndAffector::setPlace),
                                 new setCHaptics(m_controllerHaptics, 0.2))
                                 ).onFalse(new InstantCommand(sEndAffector::setZero)); // Haptic feedback when motors are on
-            }
+        }
 
     /* 
     ╔════════════════════════════════════════════════════════════════════════════════════════════╗
@@ -260,6 +266,7 @@ public class RobotContainer {
     ╚════════════════════════════════════════════════════════════════════════════════════════════╝
     */
     public void setDefaultCommands() {
+        sElevator.setDefaultCommand(opeartorOffset);
         // if (elevatorConstants.btestMode) {
         //     sElevator.setDefaultCommand(sElevator.setElevator(() -> MathUtil.applyDeadband(m_operatorController.getLeftY(), .1)));
         // }
@@ -324,7 +331,7 @@ public class RobotContainer {
                 new setElevatorPose(sElevator, elevatorConstants.kHomePose)
         )); 
         NamedCommands.registerCommand("placeL4", new SequentialCommandGroup(
-                new setElevatorPose(sElevator, elevatorConstants.kL4Height),
+                new setElevatorPose(sElevator, elevatorConstants.kL4Height).withTimeout(2.0),
                 new InstantCommand(sSlider::setExtend),
                 new WaitCommand(.5),
                 new InstantCommand(sEndAffector::setPlace),

@@ -29,13 +29,14 @@ public class setElevatorOffset extends Command {
     @Override
     public void execute() {
         offset =  offsetSupplier.getAsDouble();
-        m_elevator.setElevatorOffset(100*offset);
+        m_elevator.setoperatorOffset(offset);
         //double speed = m_speedSupplier.getAsDouble(); // Get joystick value
         //m_elevator.setManualMotors(speed);
     }
 
     @Override
     public void end(boolean interrupted) {
+        m_elevator.setoperatorOffset(0);
     }
 
     @Override
