@@ -159,22 +159,24 @@ public class RobotContainer {
     public void driverControls() {
         
         // Set default drive command
+
         swerveSubsystem.setDefaultCommand(
                 swerveSubsystem.driveCommand(
                         () -> MathUtil.applyDeadband(-m_driverController.getLeftY(), 0.1),
                         () -> MathUtil.applyDeadband(-m_driverController.getLeftX(), 0.1),
-                        () -> MathUtil.applyDeadband(-m_driverController.getRightX(), 0.1)
+                        () -> MathUtil.applyDeadband(-m_driverController.getRightX(), 0.1),
+                        () -> MathUtil.applyDeadband(-m_driverController.getRightY(), 0.1)
+                        
                 )
         );
-        // swerveSubsystem.setDefaultCommand(
-        //         swerveSubsystem.driveCommand(
-        //                 () -> MathUtil.applyDeadband(-m_driverController.getLeftY(), 0.1),
-        //                 () -> MathUtil.applyDeadband(-m_driverController.getLeftX(), 0.1),
-        //                 () -> MathUtil.applyDeadband(-m_driverController.getRightX(), 0.1),
-        //                 () -> MathUtil.applyDeadband(-m_driverController.getRightY(), 0.1)
-                        
-        //         )
-        // );
+        m_driverController.leftBumper()
+                 .whileTrue(
+                         swerveSubsystem.driveCommand(
+            () -> MathUtil.applyDeadband(-m_driverController.getLeftY(), 0.1)*.5,
+            () -> MathUtil.applyDeadband(-m_driverController.getLeftX(), 0.1)*.5,
+            () -> MathUtil.applyDeadband(-m_driverController.getRightX(), 0.1)*.7)
+                 );
+
         //sElevator.setDefaultCommand(sElevator.setElevator(() -> MathUtil.applyDeadband(m_operatorController.getLeftY(), .1)));
         
         m_driverController.a().onTrue(new InstantCommand(swerveSubsystem::zeroGyro));

@@ -83,13 +83,13 @@ public final class Constants {
 
             // PID Zone and Threshold Constants
             public static double kIZone = 5.0;
-            public static double kdownSpeed = -0.5;
+            public static double kdownSpeed = -0.7;
             public static double kPIDThreshold = 2.0;
 
             // Elevator Height Constants
             public static final double kL4Height = 950.0;
-            public static final double kL3Height = 650.0; 
-            public static final double kL2Height = 450.0; 
+            public static final double kL3Height = 630.0; 
+            public static final double kL2Height = 430.0; 
             public static final double kL1Height = 0.0;
 
             // Home and Max Height Constants
@@ -144,7 +144,7 @@ public final class Constants {
         public static final Pose2d reefPose = new Pose2d(new Translation2d(5.034, 5.317), Rotation2d.fromDegrees(117));
     }
     public static class poseConstants{
-        public static final double xOffsetHPStation = Units.inchesToMeters(17.5) ;
+        public static final double xOffsetHPStation = Units.inchesToMeters(13.5) ;
         public static final double yOffsetHPStation = Units.inchesToMeters(7.5) ;
         public static final double xOffsetReef = Units.inchesToMeters(13.5) ;
         public static final double yOffsetReef = Units.inchesToMeters(7.5) ;

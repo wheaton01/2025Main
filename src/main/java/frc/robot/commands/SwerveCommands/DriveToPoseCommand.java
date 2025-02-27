@@ -58,8 +58,13 @@ public class DriveToPoseCommand extends Command {
     if(!bhumanPlayerStation){
     targetPose = swerveSubsystem.getNearestReefAprilTagPose();
     SmartDashboard.putString("DistToReefTag", targetPose.getX() + " " + targetPose.getY());
+    if(rightTriggerSupplier.getAsDouble()<.2){
+    adjustedPose = calculateOffsetPose(targetPose,poseConstants.xOffsetReef,-poseConstants.yOffsetReef);
+    }
+    if(leftTriggerSupplier.getAsDouble()<.2){
     adjustedPose = calculateOffsetPose(targetPose,poseConstants.xOffsetReef,poseConstants.yOffsetReef);
     }
+  }
 
     if (bhumanPlayerStation) {
       targetPose = getHPStation();
@@ -70,14 +75,6 @@ public class DriveToPoseCommand extends Command {
     if (targetPose == null) {
       return;
     }
-
-    // Get dynamic offset values from the controller inputs
-    // double xOffset = xOffsetSupplier.getAsDouble();
-    // double yOffset = yOffsetSupplier.getAsDouble();
-    // double rotationOffset = rotationOffsetSupplier.getAsDouble();
-
-    // Adjust the target pose based on the dynamic offsets
-
 
     swerveSubsystem.setTargetPose(adjustedPose);
 
