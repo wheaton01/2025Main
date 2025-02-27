@@ -121,7 +121,7 @@ public final class Constants {
             public static final double kBallIntakeSpeed = -1.0;
             public static final double kPlaceSpeed = 1.0;
             public static final double kIntakeSensorThreshold = 0.0;
-            public static final double kIntakeTime = 0.1;
+            public static final double kIntakeTime = 0.0;
             public static final double kL4PlaceTime = 0.25;  // Delay for intake retraction
             public static final double kPlaceTime = 0.25;    // Delay for intake stop after placement
         }

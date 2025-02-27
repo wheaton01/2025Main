@@ -32,12 +32,6 @@
                 "data": {
                   "name": "setL4Pose"
                 }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "autoDriveToPoseCommand"
-                }
               }
             ]
           }
@@ -62,25 +56,19 @@
           }
         },
         {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.25
-          }
-        },
-        {
           "type": "deadline",
           "data": {
             "commands": [
               {
-                "type": "named",
-                "data": {
-                  "name": "setAutoIntake"
-                }
-              },
-              {
                 "type": "path",
                 "data": {
                   "pathName": "P1toHF"
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 0.25
                 }
               }
             ]

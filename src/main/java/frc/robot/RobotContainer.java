@@ -20,7 +20,10 @@ import frc.robot.subsystems.sSlider;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 
 import java.io.File;
+import java.time.Instant;
 import java.util.function.DoubleSupplier;
+
+import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Compressor;
@@ -91,6 +94,7 @@ public class RobotContainer {
         sElevator = new sElevator();
         m_controllerHaptics = new sControllerHaptics(m_driverController, m_operatorController);
         sIntake = new sIntake();
+        registerNamedCommands();
 
         swerveSubsystem = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
                 "neo"));
@@ -314,5 +318,23 @@ public class RobotContainer {
                 HPStation,
                 false
         ));
+    }
+    private void registerNamedCommands() {
+        NamedCommands.registerCommand("setHomePose", new SequentialCommandGroup(
+                new InstantCommand(sSlider::setRetract),
+                new setElevatorPose(sElevator, elevatorConstants.kHomePose)
+        )); 
+        NamedCommands.registerCommand("placeL4", new SequentialCommandGroup(
+                new setElevatorPose(sElevator, elevatorConstants.kL4Height),
+                new InstantCommand(sSlider::setExtend),
+                new WaitCommand(.5),
+                new InstantCommand(sEndAffector::setPlace),
+                new InstantCommand(sIntake::setCoralPlaceMode),
+                new WaitCommand(.5),
+                new InstantCommand(sIntake::setFeedIntake),
+                new InstantCommand(sEndAffector::setZero),
+                new InstantCommand(sSlider::setRetract)
+        ));
+
     }
 }
