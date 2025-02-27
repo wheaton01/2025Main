@@ -174,15 +174,12 @@ public class RobotContainer {
                          swerveSubsystem.driveCommand(
             () -> MathUtil.applyDeadband(-m_driverController.getLeftY(), 0.1)*.5,
             () -> MathUtil.applyDeadband(-m_driverController.getLeftX(), 0.1)*.5,
-            () -> MathUtil.applyDeadband(-m_driverController.getRightX(), 0.1)*.7)
-                 );
+            () -> MathUtil.applyDeadband(-m_driverController.getRightX(), 0.1)*.7));
 
         //sElevator.setDefaultCommand(sElevator.setElevator(() -> MathUtil.applyDeadband(m_operatorController.getLeftY(), .1)));
-        
         m_driverController.a().onTrue(new InstantCommand(swerveSubsystem::zeroGyro));
         m_driverController.start().onTrue(new InstantCommand(swerveSubsystem::zeroGyroWithAlliance));
         //Driver Non Driving Controls
-
         m_driverController.rightBumper().onTrue(new ParallelCommandGroup(new InstantCommand(sIntake::setFeedIntake),
                                                                          new InstantCommand(sEndAffector::setPlace),
                                                                          new InstantCommand(sIntake::setCoralPlaceMode)))

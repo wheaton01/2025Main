@@ -244,6 +244,13 @@ public class sElevator extends SubsystemBase {
             bDownFlag = false;
         }
     }
+    public double operatorOffset(double heightOffset)
+    {
+        if (Math.abs(heightOffset)>.1){
+            return heightOffset*10;
+        }
+            return 0;
+    }
     }
 
 
