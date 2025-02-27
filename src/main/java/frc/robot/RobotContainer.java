@@ -332,7 +332,8 @@ public class RobotContainer {
                 new WaitCommand(.5),
                 new InstantCommand(sIntake::setFeedIntake),
                 new InstantCommand(sEndAffector::setZero),
-                new InstantCommand(sSlider::setRetract)
+                new InstantCommand(sSlider::setRetract),
+                new WaitCommand(.5)
         ));
 
     }
