@@ -2,6 +2,8 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.VictorSPXControlMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+
+import dev.doglog.DogLog;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -42,8 +44,8 @@ state manager 3 = zero mode
   public void periodic() {
     boolean coralDetected = getCoralSensor();
 
-    doglog.log("INTAKE STATE MANAGER", stateManager);
-    doglog.log("CORAL DETECTED", coralDetected);
+    DogLog.log("INTAKE STATE MANAGER", stateManager);
+    DogLog.log("CORAL DETECTED", coralDetected);
 
     // Keep the intake running if coral is detected OR if the extra intake phase is still running
     if (stateManager == 1) {
@@ -61,6 +63,7 @@ state manager 3 = zero mode
     if(!bHasCoral && stateManager == 3){
       stateManager = 1;
     }
+    
 
     // Update coral detection for the next loop
   }
