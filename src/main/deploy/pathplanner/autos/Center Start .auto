@@ -27,6 +27,24 @@
           "data": {
             "pathName": "CS to HF1"
           }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "HF1 to CS2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "placeL4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "setHomePose"
+          }
         }
       ]
     }

@@ -3,8 +3,9 @@
   "robotLength": 0.889,
   "holonomicMode": true,
   "pathFolders": [
+    "CenterStart",
     "LSIDESTART",
-    "CenterStart"
+    "New Folder"
   ],
   "autoFolders": [],
   "defaultMaxVel": 4.602,
