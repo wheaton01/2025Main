@@ -186,11 +186,11 @@ public class RobotContainer {
         m_driverController.start().onTrue(new InstantCommand(swerveSubsystem::zeroGyroWithAlliance));
         //Driver Non Driving Controls
         m_driverController.rightBumper().onTrue(new ParallelCommandGroup(new InstantCommand(sIntake::setFeedIntake),
-                                                                         new InstantCommand(sEndAffector::setPlace),
-                                                                         new InstantCommand(sIntake::setCoralPlaceMode)))
+                                                                         new InstantCommand(sEndAffector::setPlace)
+                                                                        ))
                                           .onFalse(new ParallelCommandGroup(new InstantCommand(sIntake::setZero),
-                                          new InstantCommand(sEndAffector::setZero),
-                                          new InstantCommand(sIntake::setIntakeMode)).withTimeout(0));        
+                                          new InstantCommand(sEndAffector::setZero)
+                                          ).withTimeout(0));        
         // Create DriveToPoseCommand based on trigger inputs
         createDriveToPoseTrigger(m_driverController::getRightTriggerAxis, false);
         createDriveToPoseTrigger(m_driverController::getLeftTriggerAxis, false);

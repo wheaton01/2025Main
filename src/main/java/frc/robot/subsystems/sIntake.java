@@ -25,58 +25,43 @@ public class sIntake extends SubsystemBase {
   private final AnalogInput aIntakeSensor;
   private final VictorSPX mIntake;
   private final Timer intakeTimer = new Timer();
-  private boolean coralDetectedLastCycle = false;
   private boolean extraIntakeActive = false;
   private boolean coralPlaceMode = false;
+  private boolean bHasCoral = false;
+  private double stateManager;
   /** Creates a new sIntake. */
   public sIntake() {
       mIntake = new VictorSPX(robotConstants.kintakeSparkID);
       aIntakeSensor = new AnalogInput(robotConstants.kIntakeSensorID);
   }
-
+/*state manager 1 = intake mode
+state manager 2 = feed mode
+state manager 3 = zero mode 
+*/
   @Override
   public void periodic() {
     boolean coralDetected = getCoralSensor();
 
-    // Log sensor values for debugging
-    SmartDashboard.putNumber("Intake Sensor Value", aIntakeSensor.getValue());
-    SmartDashboard.putBoolean("Intake Mode", getIntakeMode());
-    SmartDashboard.putBoolean("Coral Detected", coralDetected);
-    SmartDashboard.putBoolean("Extra Intake Active", extraIntakeActive);
-    SmartDashboard.putNumber("Intake Timer", intakeTimer.get());
 
-    // If a new coral is detected, reset and start the timer
-    if (!coralPlaceMode){
-    if (coralDetected && !coralDetectedLastCycle) {
-        intakeTimer.reset(); // Ensures a fresh start every time a new coral is detected
-        intakeTimer.start();
-        extraIntakeActive = false; // Normal intake process
-    }
-
-    // If the coral is no longer detected but was previously, start the extra intake phase
-    if (!coralDetected && coralDetectedLastCycle) {
-        intakeTimer.reset();
-        intakeTimer.start();
-        extraIntakeActive = true;
-    }
 
     // Keep the intake running if coral is detected OR if the extra intake phase is still running
-    if (coralDetected || (extraIntakeActive && intakeTimer.get() < intakeConstants.kIntakeTime)) {
-        setIntakeMode();
-    } else {
-        setZero();
-        if (extraIntakeActive && intakeTimer.get() >= 0.5) {
-            intakeTimer.stop();
-            extraIntakeActive = false;
-        }
-      }
+    if (stateManager == 1) {
+      setMotorSpeed(intakeConstants.kIdleIntakeSpeed);
+    } else if (stateManager == 2) {
+      setMotorSpeed(intakeConstants.kPlaceSpeed);
+      bHasCoral = false;
+    } else if (stateManager == 3) {
+      setMotorSpeed(0);
     }
-    if (coralPlaceMode){
-      mIntake.set(VictorSPXControlMode.PercentOutput, 1.0);
+    if (coralDetected && stateManager != 2) {
+      stateManager = 3;
+      bHasCoral = true;
+    }
+    if(!bHasCoral && stateManager == 3){
+      stateManager = 1;
     }
 
     // Update coral detection for the next loop
-    coralDetectedLastCycle = coralDetected;
   }
 
   /**
@@ -90,22 +75,24 @@ public class sIntake extends SubsystemBase {
 
   /** Stops the intake motor. */
   public void setZero() {
-    mIntake.set(VictorSPXControlMode.PercentOutput, 0);
+    stateManager = 3;
+  }
+  public void setMotorSpeed(double speed){
+    mIntake.set(VictorSPXControlMode.PercentOutput, speed);
   }
 
   /** Sets intake to idle speed. */
   public void setIntakeMode() {
-    mIntake.set(VictorSPXControlMode.PercentOutput, intakeConstants.kIdleIntakeSpeed);
-    coralPlaceMode = false;
-
+    stateManager = 1;
   }
   public void hardResetIntake(){
-    coralPlaceMode = false;
+  stateManager = 1;
+  bHasCoral = false;
   }
 
   /** Runs intake at feeding speed. */
   public void setFeedIntake() {
-    mIntake.set(VictorSPXControlMode.PercentOutput, intakeConstants.kIntakeSpeed);
+  stateManager = 2;
   }
 
   /**
@@ -121,9 +108,8 @@ public class sIntake extends SubsystemBase {
    * @return true if the sensor value is below the threshold (coral is present).
    */
   public boolean getCoralSensor() {
-    return aIntakeSensor.getValue() < robotConstants.kintakeSensorThreshold;
+    return aIntakeSensor.getValue() > robotConstants.kintakeSensorThreshold;
   }
   public void setCoralPlaceMode(){
-    coralPlaceMode = true;
   }
 }

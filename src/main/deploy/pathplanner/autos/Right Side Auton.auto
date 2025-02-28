@@ -1,0 +1,91 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "RS1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "placeL4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "setHomePose"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "RS1 to HF"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.5
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "HF1 to RS2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "placeL4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "setHomePose"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "RS2 to HF2"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.5
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "HF2 to RS3"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "placeL4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "setHomePose"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}
