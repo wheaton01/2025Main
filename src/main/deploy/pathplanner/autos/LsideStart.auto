@@ -13,12 +13,6 @@
                 "data": {
                   "pathName": "Example Path"
                 }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "setL3Pose"
-                }
               }
             ]
           }
@@ -31,12 +25,6 @@
                 "type": "named",
                 "data": {
                   "name": "setL4Pose"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "autoDriveToPoseCommand"
                 }
               }
             ]
@@ -62,7 +50,7 @@
           }
         },
         {
-          "type": "deadline",
+          "type": "sequential",
           "data": {
             "commands": [
               {
@@ -75,7 +63,7 @@
           }
         },
         {
-          "type": "parallel",
+          "type": "sequential",
           "data": {
             "commands": [
               {

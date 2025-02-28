@@ -348,7 +348,7 @@ public class Vision
              new Translation3d(Units.inchesToMeters(0.0),
                                Units.inchesToMeters(0.0),
                                Units.inchesToMeters(31.6)),
-             VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1));
+             VecBuilder.fill(.5, .4, .8), VecBuilder.fill(0.5, 0.5, 1));
 
     /**
      * Latency alert to use when high latency is detected.

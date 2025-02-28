@@ -23,6 +23,7 @@ import java.io.File;
 import java.time.Instant;
 import java.util.function.DoubleSupplier;
 
+import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.math.MathUtil;
@@ -71,13 +72,12 @@ public class RobotContainer {
     setElevatorOffset setElevatorOffset;
     Compressor compressor = new Compressor(1, PneumaticsModuleType.CTREPCM);
 
-
     private final CommandXboxController m_driverController = new CommandXboxController(
             OperatorConstants.kDriverControllerPort);
 
     public final CommandXboxController m_operatorController = new CommandXboxController(
             OperatorConstants.kOperatorControllerPort);
-
+         private final SendableChooser<Command> autoChooser;
     /* 
     ╔══════════════════════════════════════════════════════════════════════════════════════════╗
     ║                                RobotContainer Constructor                                ║
@@ -85,10 +85,7 @@ public class RobotContainer {
     */
     public setElevatorOffset opeartorOffset ;
 
-    private final SendableChooser<Command> autoChooser = new SendableChooser<>();
-
     public RobotContainer() {
-        SmartDashboard.putData("SELECT AUTON", autoChooser);   
 
         sSlider = new sSlider();
         sEndAffector = new sEndAffector();
@@ -98,10 +95,15 @@ public class RobotContainer {
         sIntake = new sIntake();
         registerNamedCommands();
 
+
         swerveSubsystem = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
                 "neo"));
         setupCommands();
         configureBindings();
+        autoChooser = AutoBuilder.buildAutoChooser("LsideStart");
+
+        SmartDashboard.putData("Auto Chooser", autoChooser);
+
         getAutonomousCommand();
     }
 
@@ -241,12 +243,12 @@ public class RobotContainer {
         // m_operatorController.start().onTrue(new InstantCommand(sClimber::dropRamp));
     
         // --------------------------- Intake Controls --------------------------- //
-    
+        m_operatorController.rightStick().onTrue(new InstantCommand(sIntake::hardResetIntake));
         // **Left Bumper**: Deploy intake only (no motor action) -> No haptic feedback when motors are off
         m_operatorController.leftBumper()
                 .onTrue(new InstantCommand(sSlider::setExtend))
                 .onFalse(new InstantCommand(sSlider::setRetract)); // No haptics here since motors are off
-                
+
         // **Left Trigger (≥ 0.2)**: Deploy & run **intake forward, place motor in reverse**
         m_operatorController.leftTrigger(0.2)
                 .whileTrue(new ParallelCommandGroup(

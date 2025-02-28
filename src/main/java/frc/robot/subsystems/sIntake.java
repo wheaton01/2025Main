@@ -72,7 +72,7 @@ public class sIntake extends SubsystemBase {
       }
     }
     if (coralPlaceMode){
-      mIntake.set(VictorSPXControlMode.Velocity, 1.0);
+      mIntake.set(VictorSPXControlMode.PercentOutput, 1.0);
     }
 
     // Update coral detection for the next loop
@@ -84,6 +84,7 @@ public class sIntake extends SubsystemBase {
    * @param speed The speed (between -1.0 and 1.0)
    */
   public void setIntake(double speed) {
+    
     mIntake.set(VictorSPXControlMode.PercentOutput, speed);
   }
 
@@ -97,6 +98,9 @@ public class sIntake extends SubsystemBase {
     mIntake.set(VictorSPXControlMode.PercentOutput, intakeConstants.kIdleIntakeSpeed);
     coralPlaceMode = false;
 
+  }
+  public void hardResetIntake(){
+    coralPlaceMode = false;
   }
 
   /** Runs intake at feeding speed. */
