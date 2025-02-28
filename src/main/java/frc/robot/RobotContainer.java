@@ -67,7 +67,7 @@ public class RobotContainer {
     setIntake defaultIntake, intakeBall;
     setClimber defaultClimber;
     sControllerHaptics m_controllerHaptics;
-    setElevatorPose setL4Pose, setL3Pose, setL2Pose, setL1Pose, setHomePose;
+    setElevatorPose setL4Pose, setL3Pose, setL2Pose, setL1Pose, setHomePose, setProcessorPose;
     DriveToPoseCommand autoDriveToPoseCommand;
     setElevatorOffset setElevatorOffset;
     Compressor compressor = new Compressor(1, PneumaticsModuleType.CTREPCM);
@@ -128,6 +128,7 @@ public class RobotContainer {
         setL2Pose = new setElevatorPose(sElevator, elevatorConstants.kL2Height);
         setL1Pose = new setElevatorPose(sElevator, elevatorConstants.kL1Height);
         setHomePose = new setElevatorPose(sElevator, elevatorConstants.kHomePose);
+        setProcessorPose = new setElevatorPose(sElevator, elevatorConstants.kProcessorhHeight);
 
         //setElevatorOffset = new setElevatorOffset(sElevator, () -> MathUtil.applyDeadband(m_operatorController.getLeftY(), .1));
 
@@ -167,19 +168,19 @@ public class RobotContainer {
 
         swerveSubsystem.setDefaultCommand(
                 swerveSubsystem.driveCommand(
-                        () -> MathUtil.applyDeadband(-m_driverController.getLeftY(), 0.1),
-                        () -> MathUtil.applyDeadband(-m_driverController.getLeftX(), 0.1),
-                        () -> MathUtil.applyDeadband(-m_driverController.getRightX(), 0.1),
-                        () -> MathUtil.applyDeadband(-m_driverController.getRightY(), 0.1)
+                        () -> MathUtil.applyDeadband(m_driverController.getLeftY(), 0.1),
+                        () -> MathUtil.applyDeadband(m_driverController.getLeftX(), 0.1),
+                        () -> MathUtil.applyDeadband(m_driverController.getRightX(), 0.1),
+                        () -> MathUtil.applyDeadband(m_driverController.getRightY(), 0.1)
                         
                 )
         );
         m_driverController.leftBumper()
                  .whileTrue(
                          swerveSubsystem.driveCommand(
-            () -> MathUtil.applyDeadband(-m_driverController.getLeftY(), 0.1)*.5,
-            () -> MathUtil.applyDeadband(-m_driverController.getLeftX(), 0.1)*.5,
-            () -> MathUtil.applyDeadband(-m_driverController.getRightX(), 0.1)*.7));
+            () -> MathUtil.applyDeadband(m_driverController.getLeftY(), 0.1)*.5,
+            () -> MathUtil.applyDeadband(m_driverController.getLeftX(), 0.1)*.5,
+            () -> MathUtil.applyDeadband(m_driverController.getRightX(), 0.1)*.7));
 
         //sElevator.setDefaultCommand(sElevator.setElevator(() -> MathUtil.applyDeadband(m_operatorController.getLeftY(), .1)));
         m_driverController.a().onTrue(new InstantCommand(swerveSubsystem::zeroGyro));
@@ -217,6 +218,7 @@ public class RobotContainer {
         m_operatorController.b().onTrue(setL3Pose);
         m_operatorController.x().onTrue(setL2Pose);
         m_operatorController.a().onTrue(setHomePose);
+        m_operatorController.y().onTrue(setProcessorPose);
         // m_operatorController.a().and(m_operatorController.b().
         // and(m_operatorController.x().
         // and(m_operatorController.y().
@@ -255,13 +257,13 @@ public class RobotContainer {
                         new InstantCommand(sEndAffector::setBallIntake),
                         new setCHaptics(m_controllerHaptics, 0.2))
                         ).onFalse(new InstantCommand(sEndAffector::setZero)); // Haptic feedback when motors are on
-        m_operatorController.rightTrigger(0.2)
-                        .whileTrue(new ParallelCommandGroup(
-                                new InstantCommand(sEndAffector::setPlace),
-                                new setCHaptics(m_controllerHaptics, 0.2))
-                                ).onFalse(new ParallelCommandGroup(new InstantCommand(sEndAffector::setZero),
-                                                                        new InstantCommand(sIntake::hardResetIntake)
-                                )); // Haptic feedback when motors are on
+        // m_operatorController.rightTrigger(0.2)
+        //                 .whileTrue(new ParallelCommandGroup(
+        //                         new InstantCommand(sEndAffector::setPlace),
+        //                         new setCHaptics(m_controllerHaptics, 0.2))
+        //                         ).onFalse(new ParallelCommandGroup(new InstantCommand(sEndAffector::setZero),
+        //                                                                 new InstantCommand(sIntake::hardResetIntake)
+        //                         )); // Haptic feedback when motors are on
         }
 
     /* 

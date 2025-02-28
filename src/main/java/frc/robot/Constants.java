@@ -92,6 +92,9 @@ public final class Constants {
             public static final double kL2Height = 430.0; 
             public static final double kL1Height = 0.0;
 
+            public static double kProcessorhHeight = 120;
+
+
             // Home and Max Height Constants
             public static final double kHomePose = 0.0;
             public static final double kMaxHeight = 1000.0;

@@ -253,7 +253,7 @@ public class sElevator extends SubsystemBase {
     public void setoperatorOffset(double heightOffset)
     {
         if (Math.abs(heightOffset)>.1){
-            operatorOffset = heightOffset*80;
+            operatorOffset = heightOffset*70;
         }else{operatorOffset = 0;}
         
     }
