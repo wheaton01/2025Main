@@ -42,7 +42,8 @@ state manager 3 = zero mode
   public void periodic() {
     boolean coralDetected = getCoralSensor();
 
-
+    doglog.log("INTAKE STATE MANAGER", stateManager);
+    doglog.log("CORAL DETECTED", coralDetected);
 
     // Keep the intake running if coral is detected OR if the extra intake phase is still running
     if (stateManager == 1) {
