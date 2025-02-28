@@ -178,9 +178,9 @@ public class RobotContainer {
         m_driverController.leftBumper()
                  .whileTrue(
                          swerveSubsystem.driveCommand(
-            () -> MathUtil.applyDeadband(m_driverController.getLeftY(), 0.1)*.5,
-            () -> MathUtil.applyDeadband(m_driverController.getLeftX(), 0.1)*.5,
-            () -> MathUtil.applyDeadband(m_driverController.getRightX(), 0.1)*.7));
+            () -> MathUtil.applyDeadband(m_driverController.getLeftY(), 0.1)*.35,
+            () -> MathUtil.applyDeadband(m_driverController.getLeftX(), 0.1)*.35,
+            () -> MathUtil.applyDeadband(m_driverController.getRightX(), 0.1)*.6));
 
         //sElevator.setDefaultCommand(sElevator.setElevator(() -> MathUtil.applyDeadband(m_operatorController.getLeftY(), .1)));
         m_driverController.a().onTrue(new InstantCommand(swerveSubsystem::zeroGyro));
@@ -250,6 +250,7 @@ public class RobotContainer {
         m_operatorController.leftBumper()
                 .onTrue(new InstantCommand(sSlider::setExtend))
                 .onFalse(new InstantCommand(sSlider::setRetract)); // No haptics here since motors are off
+        m_operatorController.leftStick().onTrue(opeartorOffset);
 
         // **Left Trigger (≥ 0.2)**: Deploy & run **intake forward, place motor in reverse**
         m_operatorController.leftTrigger(0.2)
@@ -349,6 +350,8 @@ public class RobotContainer {
                 new InstantCommand(sSlider::setRetract),
                 new WaitCommand(.5)
         ));
-
+    }
+    public void runTeleopStartupCommands() {
+        new setElevatorPose(sElevator, elevatorConstants.kHomePose).schedule();
     }
 }

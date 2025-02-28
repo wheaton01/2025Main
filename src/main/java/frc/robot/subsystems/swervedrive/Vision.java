@@ -102,6 +102,7 @@ public class Vision
 
       openSimCameraViews();
     }
+    
   }
 
   /**
@@ -170,6 +171,7 @@ public class Vision
    */
   public Optional<EstimatedRobotPose> getEstimatedGlobalPose(Cameras camera)
   {
+    
     Optional<EstimatedRobotPose> poseEst = camera.getEstimatedGlobalPose();
     if (Robot.isSimulation())
     {
@@ -617,6 +619,15 @@ public class Vision
         }
       }
     }
+    public int getNumberOfTargets() {
+      PhotonPipelineResult result = camera.getLatestResult();
+
+      // Retrieve list of targets
+      List<PhotonTrackedTarget> targets = result.getTargets();
+
+      // Return the number of targets detected
+      return targets.size();
+  }
 
 
   }
