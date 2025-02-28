@@ -55,6 +55,7 @@ public class sEndAffector extends SubsystemBase {
 
   public void setZero(){
     mPlace.set(VictorSPXControlMode.PercentOutput,0);
+    
   }
 
 

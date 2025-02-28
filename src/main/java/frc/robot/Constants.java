@@ -51,7 +51,7 @@ public final class Constants {
         
         // Intake Sensor ID and Threshold
         public static int kIntakeSensorID = 0;          // TODO : CORRECT ANALOG ID
-        public static double kintakeSensorThreshold = 1400.0;
+        public static double kintakeSensorThreshold = 2000.0;
 
         //==================================================================================
         // Climber Constants

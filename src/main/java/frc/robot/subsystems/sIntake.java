@@ -30,7 +30,7 @@ public class sIntake extends SubsystemBase {
   private boolean extraIntakeActive = false;
   private boolean coralPlaceMode = false;
   private boolean bHasCoral = false;
-  private double stateManager;
+  private double stateManager =1;
   /** Creates a new sIntake. */
   public sIntake() {
       mIntake = new VictorSPX(robotConstants.kintakeSparkID);
@@ -44,8 +44,9 @@ state manager 3 = zero mode
   public void periodic() {
     boolean coralDetected = getCoralSensor();
 
-    DogLog.log("INTAKE STATE MANAGER", stateManager);
-    DogLog.log("CORAL DETECTED", coralDetected);
+    SmartDashboard.putNumber("INTAKE STATE MANAGER", stateManager);
+    SmartDashboard.putBoolean("CORAL DETECTED", coralDetected);
+    SmartDashboard.putNumber("Inake Sensor Val", aIntakeSensor.getValue());
 
     // Keep the intake running if coral is detected OR if the extra intake phase is still running
     if (stateManager == 1) {
@@ -63,7 +64,7 @@ state manager 3 = zero mode
     if(!bHasCoral && stateManager == 3){
       stateManager = 1;
     }
-    
+
 
     // Update coral detection for the next loop
   }

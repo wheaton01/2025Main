@@ -259,7 +259,9 @@ public class RobotContainer {
                         .whileTrue(new ParallelCommandGroup(
                                 new InstantCommand(sEndAffector::setPlace),
                                 new setCHaptics(m_controllerHaptics, 0.2))
-                                ).onFalse(new InstantCommand(sEndAffector::setZero)); // Haptic feedback when motors are on
+                                ).onFalse(new ParallelCommandGroup(new InstantCommand(sEndAffector::setZero),
+                                                                        new InstantCommand(sIntake::hardResetIntake)
+                                )); // Haptic feedback when motors are on
         }
 
     /* 
@@ -330,7 +332,8 @@ public class RobotContainer {
     private void registerNamedCommands() {
         NamedCommands.registerCommand("setHomePose", new SequentialCommandGroup(
                 new InstantCommand(sSlider::setRetract),
-                new setElevatorPose(sElevator, elevatorConstants.kHomePose)
+                new setElevatorPose(sElevator, elevatorConstants.kHomePose),
+                new InstantCommand(sIntake::hardResetIntake)
         )); 
         NamedCommands.registerCommand("placeL4", new SequentialCommandGroup(
                 new setElevatorPose(sElevator, elevatorConstants.kL4Height).withTimeout(2.0),
