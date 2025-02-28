@@ -149,6 +149,7 @@ public class Vision
       Optional<EstimatedRobotPose> poseEst = getEstimatedGlobalPose(camera);
       if (poseEst.isPresent())
       {
+        
         var pose = poseEst.get();
         //SmartDashboard.putData("POSEFOUND",poseEst.get());
         DogLog.log("POSEFOUND", pose.estimatedPose.toPose2d());
@@ -156,7 +157,9 @@ public class Vision
                                          pose.timestampSeconds,
                                          camera.curStdDevs);
       }
+      
     }
+    
 
   }
 
@@ -285,6 +288,17 @@ public class Vision
   {
     return visionSim;
   }
+  public int getNumberOfTargets() {
+    Optional<PhotonPipelineResult> optionalResult = Cameras.LIMELIGHT.getLatestResult();
+
+    // Check if there's a result available
+    if (optionalResult.isPresent()) {
+        return optionalResult.get().getTargets().size();
+    } else {
+        return 0; // No targets detected
+    }
+}
+
 
   /**
    * Open up the photon vision camera streams on the localhost, assumes running photon vision on localhost.
@@ -333,6 +347,7 @@ public class Vision
         poses.add(targetPose);
       }
     }
+    
 
     field2d.getObject("tracked targets").setPoses(poses);
   }
@@ -495,6 +510,7 @@ public class Vision
       return resultsList.isEmpty() ? Optional.empty() : Optional.of(resultsList.get(0));
     }
 
+
     /**
      * Get the estimated robot pose. Updates the current robot pose estimation, standard deviations, and flushes the
      * cache of results.
@@ -619,17 +635,10 @@ public class Vision
         }
       }
     }
-    public int getNumberOfTargets() {
-      PhotonPipelineResult result = camera.getLatestResult();
-
-      // Retrieve list of targets
-      List<PhotonTrackedTarget> targets = result.getTargets();
-
-      // Return the number of targets detected
-      return targets.size();
-  }
 
 
+
+  
   }
 
 }
