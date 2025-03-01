@@ -147,9 +147,9 @@ public final class Constants {
         public static final Pose2d reefPose = new Pose2d(new Translation2d(5.034, 5.317), Rotation2d.fromDegrees(117));
     }
     public static class poseConstants{
-        public static final double xOffsetHPStation = Units.inchesToMeters(13.5) ;
+        public static final double xOffsetHPStation = Units.inchesToMeters(12.0) ;
         public static final double yOffsetHPStation = Units.inchesToMeters(7.5) ;
-        public static final double xOffsetReef = Units.inchesToMeters(13.5) ;
+        public static final double xOffsetReef = Units.inchesToMeters(12.0) ;
         public static final double yOffsetReef = Units.inchesToMeters(7.5) ;
         
     }
