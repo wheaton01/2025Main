@@ -72,7 +72,7 @@ public class SwerveSubsystem extends SubsystemBase
   /**
    * Enable vision odometry updates while driving.
    */
-  private final boolean             visionDriveTest     = false;
+  private final boolean             visionDriveTest     = true;
   /**
    * PhotonVision class to keep an accurate odometry.
    */
@@ -147,9 +147,9 @@ public class SwerveSubsystem extends SubsystemBase
     if (visionDriveTest)
     {
       swerveDrive.updateOdometry();
-      // if(vision.getnumber){
+      if(vision.getNumberOfTargets()>1){
       vision.updatePoseEstimation(swerveDrive);
-     // }
+      }
     }
   }
 
@@ -926,6 +926,7 @@ public Pose2d getNearestHumanPlayerTagPose() {
   public Pose2d getRobotPose() {
     return swerveDrive.getPose();
 }
+
   
 
 }
