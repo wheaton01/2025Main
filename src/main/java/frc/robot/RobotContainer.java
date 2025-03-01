@@ -2,6 +2,7 @@ package frc.robot;
 
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.fieldPoses;
+import frc.robot.Constants.robotConstants;
 import frc.robot.Constants.swerveConstants;
 import frc.robot.Constants.robotConstants.elevatorConstants;
 import frc.robot.commands.setCHaptics;
@@ -38,6 +39,7 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 /* 
 ╔══════════════════════════════════════════════════════════════════════════════════════╗
@@ -265,6 +267,8 @@ public class RobotContainer {
         //                         ).onFalse(new ParallelCommandGroup(new InstantCommand(sEndAffector::setZero),
         //                                                                 new InstantCommand(sIntake::hardResetIntake)
         //                         )); // Haptic feedback when motors are on
+        RobotModeTriggers.teleop().onTrue(new InstantCommand(sIntake::hardResetIntake));
+        RobotModeTriggers.teleop().onTrue(setHomePose);
         }
 
     /* 
@@ -351,7 +355,5 @@ public class RobotContainer {
                 new WaitCommand(.5)
         ));
     }
-    public void runTeleopStartupCommands() {
-        new setElevatorPose(sElevator, elevatorConstants.kHomePose).schedule();
-    }
+
 }

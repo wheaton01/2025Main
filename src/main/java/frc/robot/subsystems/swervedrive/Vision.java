@@ -149,7 +149,6 @@ public class Vision
       Optional<EstimatedRobotPose> poseEst = getEstimatedGlobalPose(camera);
       if (poseEst.isPresent())
       {
-        
         var pose = poseEst.get();
         //SmartDashboard.putData("POSEFOUND",poseEst.get());
         DogLog.log("POSEFOUND", pose.estimatedPose.toPose2d());
