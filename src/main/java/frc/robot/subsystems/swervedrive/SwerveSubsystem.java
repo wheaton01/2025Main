@@ -422,13 +422,24 @@ public class SwerveSubsystem extends SubsystemBase
   {
     return run(() -> {
       // Make the robot move
+      if(isRedAlliance()){
       swerveDrive.drive(SwerveMath.scaleTranslation(new Translation2d(
                             translationX.getAsDouble() * swerveDrive.getMaximumChassisVelocity(),
                             translationY.getAsDouble() * swerveDrive.getMaximumChassisVelocity()), 0.8),
                         Math.pow(angularRotationX.getAsDouble(), 3) * swerveDrive.getMaximumChassisAngularVelocity(),
                         true,
                         false);
-    });
+          }
+      if(!isRedAlliance()){
+      swerveDrive.drive(SwerveMath.scaleTranslation(new Translation2d(
+                            -translationX.getAsDouble() * swerveDrive.getMaximumChassisVelocity(),
+                            -translationY.getAsDouble() * swerveDrive.getMaximumChassisVelocity()), 0.8),
+                        Math.pow(-angularRotationX.getAsDouble(), 3) * swerveDrive.getMaximumChassisAngularVelocity(),
+                        true,
+                        false);
+      }
+    }
+    );
   }
 
   /**
@@ -450,13 +461,25 @@ public class SwerveSubsystem extends SubsystemBase
                                                                                  translationY.getAsDouble()), 0.8);
 
       // Make the robot move
-      driveFieldOriented(swerveDrive.swerveController.getTargetSpeeds(scaledInputs.getX(), scaledInputs.getY(),
-                                                                      headingX.getAsDouble(),
-                                                                      headingY.getAsDouble(),
-                                                                      swerveDrive.getOdometryHeading().getRadians(),
-                                                                      swerveDrive.getMaximumChassisVelocity()));
-    });
+      if (!isRedAlliance()) {
+        driveFieldOriented(swerveDrive.swerveController.getTargetSpeeds(scaledInputs.getX(), scaledInputs.getY(),
+        headingX.getAsDouble(),
+      headingY.getAsDouble(),
+      swerveDrive.getOdometryHeading().getRadians(),
+      swerveDrive.getMaximumChassisVelocity()));
+    }
+    if (isRedAlliance()) {
+      driveFieldOriented(swerveDrive.swerveController.getTargetSpeeds(-scaledInputs.getX(), -scaledInputs.getY(),
+      -headingX.getAsDouble(),
+    -headingY.getAsDouble(),
+    swerveDrive.getOdometryHeading().getRadians(),
+    swerveDrive.getMaximumChassisVelocity()));
   }
+  });
+}
+      
+
+  
 
   /**
    * The primary method for controlling the drivebase.  Takes a {@link Translation2d} and a rotation rate, and
