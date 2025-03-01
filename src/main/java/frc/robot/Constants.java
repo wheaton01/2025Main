@@ -71,15 +71,15 @@ public final class Constants {
             public static boolean btwoMotorMode = false;
 
             // PID Constants for Upward and Downward Movement
-            public static double kP_down = 0.0035;  // Slightly higher P for more correction towards target
+            public static double kP_down = 0.003;  // Slightly higher P for more correction towards target
             public static double kI_down = 0.0002;  // Small increase in I to help with steady-state error
             public static double kD_down = 0.00003; // Keep D low to avoid jerky motion
             
             public static double kFeedForwardDown = 0.12;  // Slight increase for better gravity compensation
             public static final double kFeedForward = 0.0750; // Tuned in 2/20
-            public static double kP_up = 0.03;
+            public static double kP_up = 0.025;
             public static double kI =    0.00015;
-            public static double kD =    0.00005;
+            public static double kD =    0.0005 ;
 
             // PID Zone and Threshold Constants
             public static double kIZone = 5.0;
@@ -147,10 +147,10 @@ public final class Constants {
         public static final Pose2d reefPose = new Pose2d(new Translation2d(5.034, 5.317), Rotation2d.fromDegrees(117));
     }
     public static class poseConstants{
-        public static final double xOffsetHPStation = Units.inchesToMeters(13.5) ;
+        public static final double xOffsetHPStation = Units.inchesToMeters(17.0) ;
         public static final double yOffsetHPStation = Units.inchesToMeters(7.5) ;
-        public static final double xOffsetReef = Units.inchesToMeters(13.5) ;
-        public static final double yOffsetReef = Units.inchesToMeters(7.5) ;
+        public static final double xOffsetReef = Units.inchesToMeters(17.0) ;
+        public static final double yOffsetReef = Units.inchesToMeters(6.5) ;
         
     }
 }
