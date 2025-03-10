@@ -5,6 +5,7 @@ import frc.robot.Constants.fieldPoses;
 import frc.robot.Constants.robotConstants;
 import frc.robot.Constants.swerveConstants;
 import frc.robot.Constants.robotConstants.elevatorConstants;
+import frc.robot.commands.SwerveCommands.aprilTagSwerve;
 import frc.robot.commands.setCHaptics;
 import frc.robot.commands.climberCommands.setClimber;
 import frc.robot.commands.elevatorCommands.setElevatorOffset;
@@ -177,12 +178,18 @@ public class RobotContainer {
                         
                 )
         );
-        m_driverController.leftBumper()
-                 .whileTrue(
-                         swerveSubsystem.driveCommand(
-            () -> MathUtil.applyDeadband(-m_driverController.getLeftY(), 0.1)*.35,
-            () -> MathUtil.applyDeadband(-m_driverController.getLeftX(), 0.1)*.35,
-            () -> MathUtil.applyDeadband(-m_driverController.getRightX(), 0.1)*.75));
+        // m_driverController.leftBumper()
+        //          .whileTrue(
+        //                  swerveSubsystem.driveCommand(
+        //     () -> MathUtil.applyDeadband(-m_driverController.getLeftY(), 0.1)*.35,
+        //     () -> MathUtil.applyDeadband(-m_driverController.getLeftX(), 0.1)*.35,
+        //     () -> MathUtil.applyDeadband(-m_driverController.getRightX(), 0.1)*.75));
+        m_driverController.leftTrigger(.2).whileTrue(new aprilTagSwerve(swerveSubsystem,
+                        ()->-m_driverController.getLeftX(),()->-m_driverController.getLeftY(),()->m_driverController.getRightX(),
+                        ()->false,m_driverController,m_operatorController,fieldPoses.lSidePose));
+        m_driverController.rightTrigger(.2).whileTrue(new aprilTagSwerve(swerveSubsystem,
+                        ()->-m_driverController.getLeftX(),()->-m_driverController.getLeftY(),()->m_driverController.getRightX(),
+                        ()->false,m_driverController,m_operatorController,fieldPoses.rSidePose));
 
         //sElevator.setDefaultCommand(sElevator.setElevator(() -> MathUtil.applyDeadband(m_operatorController.getLeftY(), .1)));
         m_driverController.a().onTrue(new InstantCommand(swerveSubsystem::zeroGyro));

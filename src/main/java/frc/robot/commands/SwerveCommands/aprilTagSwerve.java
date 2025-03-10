@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants;
 import frc.robot.limelight;
 import frc.robot.subsystems.swervedrive.ApriltagRelativeRobotPose;
@@ -28,12 +29,12 @@ public class aprilTagSwerve extends Command {
   BooleanSupplier driveMode;
 SwerveSubsystem swerve;
 SwerveController controller;
-XboxController driverXbox, opXbox;
+CommandXboxController driverXbox, opXbox;
 PIDController thetaController;
 ApriltagRelativeRobotPose apriltagRelativeRobotPose;
 
 public aprilTagSwerve(SwerveSubsystem swerve, DoubleSupplier vX, DoubleSupplier vY, DoubleSupplier omega,
-BooleanSupplier driveMode, XboxController driverXbox, XboxController opXbox,ApriltagRelativeRobotPose apriltagRelativeRobotPose)
+BooleanSupplier driveMode, CommandXboxController driverXbox, CommandXboxController opXbox,ApriltagRelativeRobotPose apriltagRelativeRobotPose)
 
 {
 this.driverXbox = driverXbox;
