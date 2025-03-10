@@ -40,7 +40,7 @@ import org.photonvision.simulation.VisionSystemSim;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
-import dev.doglog.DogLog;
+//import dev.doglog.DogLog;
 import swervelib.SwerveDrive;
 import swervelib.telemetry.SwerveDriveTelemetry;
 
@@ -151,7 +151,7 @@ public class Vision
       {
         var pose = poseEst.get();
         //SmartDashboard.putData("POSEFOUND",poseEst.get());
-        DogLog.log("POSEFOUND", pose.estimatedPose.toPose2d());
+       // DogLog.log("POSEFOUND", pose.estimatedPose.toPose2d());
         swerveDrive.addVisionMeasurement(pose.estimatedPose.toPose2d(),
                                          pose.timestampSeconds,
                                          camera.curStdDevs);

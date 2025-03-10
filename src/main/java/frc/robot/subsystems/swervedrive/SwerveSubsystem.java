@@ -19,9 +19,10 @@ import com.pathplanner.lib.util.DriveFeedforwards;
 import com.pathplanner.lib.util.swerve.SwerveSetpoint;
 import com.pathplanner.lib.util.swerve.SwerveSetpointGenerator;
 
-import dev.doglog.DogLog;
+//import dev.doglog.DogLog;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -77,6 +78,8 @@ public class SwerveSubsystem extends SubsystemBase
    * PhotonVision class to keep an accurate odometry.
    */
   private Vision vision;
+  PhotonTrackedTarget target;
+  private ApriltagRelativeRobotPose lSidePose, rSidePose, cPose;
 
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
@@ -114,10 +117,18 @@ public class SwerveSubsystem extends SubsystemBase
       swerveDrive.stopOdometryThread();
     }
     //setStart();
-    setupPathPlanner();
-  }
-
-  /**
+    setupPoses();
+        setupPathPlanner();
+      }
+    
+      private void setupPoses() {
+        // TODO Auto-generated method stub
+        lSidePose = new ApriltagRelativeRobotPose(1.0, 2.0, 3.0);        
+        rSidePose = new ApriltagRelativeRobotPose(0.0, 0.0, 0.0);   
+        cPose =     new ApriltagRelativeRobotPose(0.0, 0.0, 0.0);
+      }
+    
+      /**
    * Construct the swerve drive.
    *
    * @param driveCfg      SwerveDriveConfiguration for the swerve.
@@ -279,7 +290,7 @@ public class SwerveSubsystem extends SubsystemBase
         swerveDrive.getMaximumChassisAngularVelocity(), Units.degreesToRadians(720));
 
 // Since AutoBuilder is configured, we can use it to build pathfinding commands
-    DogLog.log(getName(), pose);
+    //DogLog.log(getName(), pose);
     
     return AutoBuilder.pathfindToPose(
         pose,
@@ -907,6 +918,28 @@ public Pose2d getNearestHumanPlayerTagPose() {
     
   public Pose2d getRobotPose() {
     return swerveDrive.getPose();
+}
+
+PIDController XdeltaPID = new PIDController(0.1, 0, 0);
+PIDController YdeltaPID = new PIDController(0.1, 0, 0);
+PIDController thetaPID = new PIDController(0.05, 0, 0);
+
+public void setApriltagDrive(ApriltagRelativeRobotPose pose) {
+    // Set the target pose
+
+    XdeltaPID.setSetpoint((pose.getTpitch()));
+    YdeltaPID.setSetpoint((pose.getTyaw()));
+    thetaPID.setSetpoint((pose.getTA()));
+
+}
+public void apriltagDrive(double xTranslate,double yTranslate,double thetaTranslate){
+ target = result.getBestTarget();
+ 
+  swerveDrive.drive(     new Translation2d(XdeltaPID.calculate(target.getArea)+xTranslate+.1,YdeltaPID.calculate(target.getYaw)),
+  thetaPID.calculate(target.getYaw()+thetaTranslate),
+  false,
+  false);
+
 }
 
   
