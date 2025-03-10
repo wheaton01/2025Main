@@ -24,6 +24,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
+import frc.robot.subsystems.swervedrive.ApriltagRelativeRobotPose;
 
 public final class Constants {
 
@@ -145,6 +146,9 @@ public final class Constants {
     }
     public static class fieldPoses {
         public static final Pose2d reefPose = new Pose2d(new Translation2d(5.034, 5.317), Rotation2d.fromDegrees(117));
+        ApriltagRelativeRobotPose lSidePose = new ApriltagRelativeRobotPose(0.0, 0.0, 0.0);
+        ApriltagRelativeRobotPose rSidePose = new ApriltagRelativeRobotPose(0.0, 0.0, 0.0);
+        ApriltagRelativeRobotPose centerPose = new ApriltagRelativeRobotPose(0.0, 0.0, 0.0);
     }
     public static class poseConstants{
         public static final double xOffsetHPStation = Units.inchesToMeters(12.0) ;

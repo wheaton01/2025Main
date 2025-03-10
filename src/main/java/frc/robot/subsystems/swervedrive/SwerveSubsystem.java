@@ -923,9 +923,10 @@ public Pose2d getNearestHumanPlayerTagPose() {
 PIDController XdeltaPID = new PIDController(0.1, 0, 0);
 PIDController YdeltaPID = new PIDController(0.1, 0, 0);
 PIDController thetaPID = new PIDController(0.05, 0, 0);
-
+ApriltagRelativeRobotPose currentPose;
 public void setApriltagDrive(ApriltagRelativeRobotPose pose) {
     // Set the target pose
+    currentPose = pose;
 
     XdeltaPID.setSetpoint((pose.getTpitch()));
     YdeltaPID.setSetpoint((pose.getTyaw()));
@@ -935,11 +936,24 @@ public void setApriltagDrive(ApriltagRelativeRobotPose pose) {
 public void apriltagDrive(double xTranslate,double yTranslate,double thetaTranslate){
  target = result.getBestTarget();
  
-  swerveDrive.drive(     new Translation2d(XdeltaPID.calculate(target.getArea)+xTranslate+.1,YdeltaPID.calculate(target.getYaw)),
+  swerveDrive.drive(     new Translation2d(XdeltaPID.calculate(target.getArea)+xTranslate+.1,YdeltaPID.calculate(target.getYaw)+yTranslate),
   thetaPID.calculate(target.getYaw()+thetaTranslate),
   false,
   false);
 
+}
+public double getDistanceToTarget() {
+  // Calculate the difference in X and Y coordinates
+  double deltaX = target.getX() - currentPose.getTyaw();
+  double deltaY = target.getY() - currentPose.getTpitch();
+
+  // Calculate the Euclidean distance (straight-line distance)
+  return Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+}
+// Method to scale the distance
+public double scaleDistance(double distance) {
+  // Apply linear scaling
+  return Math.max(0, Math.min(100, 100 - ((distance - 1.0) / (15.0 - 1.0)) * 100));
 }
 
   
