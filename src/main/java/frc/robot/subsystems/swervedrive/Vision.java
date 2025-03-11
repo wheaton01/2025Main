@@ -364,6 +364,18 @@ public class Vision
              new Translation3d(Units.inchesToMeters(0.0),
                                Units.inchesToMeters(0.0),
                                Units.inchesToMeters(31.6)),
+             VecBuilder.fill(1.5, 1, .8), VecBuilder.fill(0.5, 0.5, 1)),
+    rightCam("rightCam",
+             new Rotation3d(0, Math.toRadians(0.0), Math.toRadians(0)),
+             new Translation3d(Units.inchesToMeters(0.0),
+                               Units.inchesToMeters(0.0),
+                               Units.inchesToMeters(31.6)),
+             VecBuilder.fill(1.5, 1, .8), VecBuilder.fill(0.5, 0.5, 1)),
+    leftCam("leftCam",
+             new Rotation3d(0, Math.toRadians(0.0), Math.toRadians(0)),
+             new Translation3d(Units.inchesToMeters(0.0),
+                               Units.inchesToMeters(0.0),
+                               Units.inchesToMeters(31.6)),
              VecBuilder.fill(1.5, 1, .8), VecBuilder.fill(0.5, 0.5, 1));
 
     /**
@@ -639,5 +651,36 @@ public class Vision
 
   
   }
+
+  public PhotonPipelineResult getBestCameraResult() {
+    PhotonPipelineResult bestResult = null;
+
+    // Iterate through cameras to find the best result
+    for (Cameras camera : Cameras.values()) {
+        PhotonPipelineResult result = camera.getLatestResult().orElse(null); // Assuming getLatestResult returns an Optional
+        if (result.hasTargets()) {
+            // Check for best result based on confidence or distance
+            if (bestResult == null || result.getBestTarget().getPoseAmbiguity() < bestResult.getBestTarget().getPoseAmbiguity()) {
+                bestResult = result;
+            }
+        }
+    }
+
+    return bestResult;
+}
+// Get the latest result from Limelight
+public PhotonPipelineResult getLimelightResult() {
+  return Cameras.LIMELIGHT.getLatestResult().orElse(null);
+}
+
+// Get the latest result from Right Camera
+public PhotonPipelineResult getRightCamResult() {
+  return Cameras.leftCam.getLatestResult().orElse(null);
+}
+
+// Get the latest result from Left Camera
+public PhotonPipelineResult getLeftCamResult() {
+  return Cameras.rightCam.getLatestResult().orElse(null);
+}
 
 }

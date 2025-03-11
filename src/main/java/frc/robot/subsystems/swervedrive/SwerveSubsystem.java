@@ -22,12 +22,14 @@ import com.pathplanner.lib.util.swerve.SwerveSetpointGenerator;
 //import dev.doglog.DogLog;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -53,6 +55,8 @@ import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import org.json.simple.parser.ParseException;
 import org.photonvision.targeting.PhotonPipelineResult;
+import org.photonvision.targeting.PhotonTrackedTarget;
+
 import swervelib.SwerveController;
 import swervelib.SwerveDrive;
 import swervelib.SwerveDriveTest;
@@ -919,33 +923,82 @@ public Pose2d getNearestHumanPlayerTagPose() {
   public Pose2d getRobotPose() {
     return swerveDrive.getPose();
 }
-
 PIDController XdeltaPID = new PIDController(0.1, 0, 0);
 PIDController YdeltaPID = new PIDController(0.1, 0, 0);
 PIDController thetaPID = new PIDController(0.05, 0, 0);
 ApriltagRelativeRobotPose currentPose;
-public void setApriltagDrive(ApriltagRelativeRobotPose pose) {
-    // Set the target pose
-    currentPose = pose;
 
-    XdeltaPID.setSetpoint((pose.getTpitch()));
-    YdeltaPID.setSetpoint((pose.getTyaw()));
-    thetaPID.setSetpoint((pose.getTA()));
+// Desired scoring offset (robot should be 1 meter in front of the tag)
+private static final double DESIRED_X_OFFSET = -1.0; // Adjust based on scoring needs
+private static final double DESIRED_Y_OFFSET = 0.0; // Centered left/right
+private static final double DESIRED_THETA_OFFSET = 0.0; // Face the tag directly
 
+public void setApriltagDrive() {
+    Optional<Pose3d> tagPoseOptional = getAprilTagRobotRelativePose();
+
+    if (tagPoseOptional.isEmpty()) {
+        return; // No target detected
+    }
+
+    Pose3d tagPose = tagPoseOptional.get();
+
+    // Compute desired position relative to the tag
+    double desiredX = tagPose.getX() + DESIRED_X_OFFSET;
+    double desiredY = tagPose.getY() + DESIRED_Y_OFFSET;
+    double desiredTheta = tagPose.getRotation().getZ() + DESIRED_THETA_OFFSET;
+
+    // Set PID setpoints to the adjusted desired pose
+    XdeltaPID.setSetpoint(desiredX);
+    YdeltaPID.setSetpoint(desiredY);
+    thetaPID.setSetpoint(desiredTheta);
 }
-public void apriltagDrive(double xTranslate,double yTranslate,double thetaTranslate){
- target = result.getBestTarget();
- 
-  swerveDrive.drive(     new Translation2d(XdeltaPID.calculate(target.getArea)+xTranslate+.1,YdeltaPID.calculate(target.getYaw)+yTranslate),
-  thetaPID.calculate(target.getYaw()+thetaTranslate),
-  false,
-  false);
 
+public Optional<Pose3d> getAprilTagRobotRelativePose() {
+    PhotonPipelineResult result = vision.getLatestResult();
+
+    if (!result.hasTargets()) {
+        return Optional.empty();
+    }
+
+    PhotonTrackedTarget bestTarget = result.getBestTarget();
+
+    // Get the robot-relative pose of the AprilTag
+    Transform3d tagToCamera = bestTarget.getBestCameraToTarget();
+    Pose3d cameraPose = vision.get(); // Get camera pose relative to the robot
+
+    // Convert the AprilTag pose to robot-relative coordinates
+    Pose3d tagPoseRobotRelative = cameraPose.transformBy(tagToCamera);
+
+    return Optional.of(tagPoseRobotRelative);
 }
+
+public void apriltagDrive() {
+    Optional<Pose3d> tagPoseOptional = getAprilTagRobotRelativePose();
+
+    if (tagPoseOptional.isEmpty()) {
+        return; // No tag detected, don't drive
+    }
+
+    Pose3d tagPose = tagPoseOptional.get();
+
+    // Compute PID outputs
+    double xOutput = XdeltaPID.calculate(tagPose.getX());
+    double yOutput = YdeltaPID.calculate(tagPose.getY());
+    double thetaOutput = thetaPID.calculate(MathUtil.angleModulus(tagPose.getRotation().getZ()));
+
+    swerveDrive.drive(
+        new Translation2d(xOutput, yOutput),
+        thetaOutput,
+        false, 
+        false
+    );
+}
+
+
 public double getDistanceToTarget() {
   // Calculate the difference in X and Y coordinates
-  double deltaX = target.getX() - currentPose.getTyaw();
-  double deltaY = target.getY() - currentPose.getTpitch();
+  double deltaX = target.getPitch() - currentPose.getTyaw();
+  double deltaY = target.getYaw() - currentPose.getTpitch();
 
   // Calculate the Euclidean distance (straight-line distance)
   return Math.sqrt(deltaX * deltaX + deltaY * deltaY);
