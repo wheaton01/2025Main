@@ -954,7 +954,7 @@ public void setApriltagDrive() {
 }
 
 public Optional<Pose3d> getAprilTagRobotRelativePose() {
-    PhotonPipelineResult result = vision.getLatestResult();
+    PhotonPipelineResult result = vision.getLeftCamResult();
 
     if (!result.hasTargets()) {
         return Optional.empty();
@@ -964,7 +964,7 @@ public Optional<Pose3d> getAprilTagRobotRelativePose() {
 
     // Get the robot-relative pose of the AprilTag
     Transform3d tagToCamera = bestTarget.getBestCameraToTarget();
-    Pose3d cameraPose = vision.get(); // Get camera pose relative to the robot
+    Pose3d cameraPose = Constants.poseConstants.leftCamPose; // Get camera pose relative to the robot
 
     // Convert the AprilTag pose to robot-relative coordinates
     Pose3d tagPoseRobotRelative = cameraPose.transformBy(tagToCamera);
@@ -972,7 +972,7 @@ public Optional<Pose3d> getAprilTagRobotRelativePose() {
     return Optional.of(tagPoseRobotRelative);
 }
 
-public void apriltagDrive() {
+public void apriltagDrive(double xValue, double yValue, double thetaValue) {
     Optional<Pose3d> tagPoseOptional = getAprilTagRobotRelativePose();
 
     if (tagPoseOptional.isEmpty()) {
@@ -982,13 +982,13 @@ public void apriltagDrive() {
     Pose3d tagPose = tagPoseOptional.get();
 
     // Compute PID outputs
-    double xOutput = XdeltaPID.calculate(tagPose.getX());
-    double yOutput = YdeltaPID.calculate(tagPose.getY());
+    double xOutput = XdeltaPID.calculate(tagPose.getX()+yValue);
+    double yOutput = YdeltaPID.calculate(tagPose.getY()+xValue);
     double thetaOutput = thetaPID.calculate(MathUtil.angleModulus(tagPose.getRotation().getZ()));
 
     swerveDrive.drive(
-        new Translation2d(xOutput, yOutput),
-        thetaOutput,
+        new Translation2d(xOutput+.1, yOutput),
+        thetaOutput+thetaValue,
         false, 
         false
     );

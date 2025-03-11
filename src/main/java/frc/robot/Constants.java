@@ -19,9 +19,13 @@ package frc.robot;
 ╚══════════════════════════════════════════════════════════════════════════════════════╝
 */
 
+import static edu.wpi.first.units.Units.Newton;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import frc.robot.subsystems.swervedrive.ApriltagRelativeRobotPose;
@@ -155,6 +159,24 @@ public final class Constants {
         public static final double yOffsetHPStation = Units.inchesToMeters(7.5) ;
         public static final double xOffsetReef = Units.inchesToMeters(12.0) ;
         public static final double yOffsetReef = Units.inchesToMeters(7.5) ;
+
+        //vision Constants
+
+        public static Pose3d leftCamPose = new Pose3d(Units.inchesToMeters(8.0),
+                                                      Units.inchesToMeters(3.0),
+                                                      Units.inchesToMeters(3.0),
+                                                      new Rotation3d(
+                                                      Units.degreesToRadians(0.0),
+                                                      Units.degreesToRadians(0.0),
+                                                      Units.degreesToRadians(-30.0)));
+        public static Pose3d rightCamPose = new Pose3d(Units.inchesToMeters(8.0),
+                                                      Units.inchesToMeters(-3.0),
+                                                      Units.inchesToMeters(3.0),
+                                                      new Rotation3d(
+                                                      Units.degreesToRadians(0.0),
+                                                      Units.degreesToRadians(0.0),
+                                                      Units.degreesToRadians(30.0)));        
+        public static Pose3d centerCamPose = new Pose3d();
         
     }
 }
