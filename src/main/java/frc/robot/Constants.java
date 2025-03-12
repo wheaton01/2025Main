@@ -157,8 +157,6 @@ public final class Constants {
     public static class poseConstants{
         public static final double xOffsetHPStation = Units.inchesToMeters(12.0) ;
         public static final double yOffsetHPStation = Units.inchesToMeters(7.5) ;
-        public static final double xOffsetReef = Units.inchesToMeters(12.0) ;
-        public static final double yOffsetReef = Units.inchesToMeters(7.5) ;
 
         //vision Constants
         public static final int ilCameraID = 0;//camera ID for the left camera
@@ -177,8 +175,11 @@ public final class Constants {
                                                       new Rotation3d(
                                                       Units.degreesToRadians(0.0),
                                                       Units.degreesToRadians(0.0),
-                                                      Units.degreesToRadians(30.0)));        
+                                                      Units.degreesToRadians(30.0)));       
         public static Pose3d centerCamPose = new Pose3d();
+        
+        public static final double xOffsetReef = Units.inchesToMeters(12.0) ;
+        public static final double yOffsetReef = Units.inchesToMeters(7.5) ;
         
     }
 }

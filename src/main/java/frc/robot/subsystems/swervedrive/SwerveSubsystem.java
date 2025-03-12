@@ -44,6 +44,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants;
+import frc.robot.Constants.poseConstants;
 import frc.robot.Constants.swerveConstants;
 import frc.robot.subsystems.swervedrive.Vision.Cameras;
 import java.io.File;
@@ -931,20 +932,26 @@ PIDController thetaPID = new PIDController(0.05, 0, 0);
 ApriltagRelativeRobotPose currentPose;
 
 // Desired scoring offset (robot should be 1 meter in front of the tag)
-private static final double DESIRED_X_OFFSET = -1.0; // Adjust based on scoring needs
-private static final double DESIRED_Y_OFFSET = 0.0; // Centered left/right
-private static final double DESIRED_THETA_OFFSET = 0.0; // Face the tag directly
+private  double DESIRED_X_OFFSET = 0.0; // Adjust based on scoring needs
+private   double DESIRED_Y_OFFSET = 0.0; // Centered left/right
+private   double DESIRED_THETA_OFFSET = 0.0; // Face the tag directly
 // Removed duplicate method
+Pose3d cameraPose ; // Get camera pose relative to the robot
+
 
 public Optional<Pose3d> getAprilTagRobotRelativePose(int cameraID) {
   if (cameraID == 0) {
      result = vision.getLeftCamResult();
+     cameraPose = poseConstants.leftCamPose;
       //return getAprilTagRobotRelativePose(cameraID);
   } else if (cameraID == 1) {
        result = vision.getRightCamResult();
+       cameraPose = poseConstants.rightCamPose;
+ 
       //return getAprilTagRobotRelativePose(cameraID);
   } else if (cameraID == 2) {
        result = vision.getCenterCamResult();
+       cameraPose = poseConstants.centerCamPose;
       //return getAprilTagRobotRelativePose(cameraID);
   } else {
       return Optional.empty();  // Invalid camera ID
@@ -955,19 +962,19 @@ public Optional<Pose3d> getAprilTagRobotRelativePose(int cameraID) {
     }
 
     PhotonTrackedTarget bestTarget = result.getBestTarget();
-
+    
     // Get the robot-relative pose of the AprilTag
     Transform3d tagToCamera = bestTarget.getBestCameraToTarget();
-    Pose3d cameraPose = Constants.poseConstants.leftCamPose; // Get camera pose relative to the robot
 
     // Convert the AprilTag pose to robot-relative coordinates
     Pose3d tagPoseRobotRelative = cameraPose.transformBy(tagToCamera);
 
     return Optional.of(tagPoseRobotRelative);
 }
-public void setApriltagDrive(int cameraID) {
+public void setApriltagDrive(int cameraID, double xOffset,double yOffset) {
   Optional<Pose3d> tagPoseOptional = getAprilTagRobotRelativePose(cameraID);
-
+    DESIRED_X_OFFSET = xOffset;
+    DESIRED_Y_OFFSET = yOffset;
   if (tagPoseOptional.isEmpty()) {
       return; // No target detected
   }

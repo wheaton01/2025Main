@@ -15,9 +15,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants;
+import frc.robot.Constants.poseConstants;
 import frc.robot.subsystems.swervedrive.ApriltagRelativeRobotPose;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import swervelib.SwerveController;
+import swervelib.SwerveDrive;
 
 public class aprilTagSwerve extends Command {
   /** Creates a new aprilTagSwerve. */
@@ -53,7 +55,18 @@ addRequirements(swerve);
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    swerve.setApriltagDrive(cameraID);
+    if(cameraID == 0)
+    {
+    swerve.setApriltagDrive(cameraID, poseConstants.xOffsetReef, -poseConstants.yOffsetReef);
+    }
+    else if(cameraID == 1)
+    {
+      swerve.setApriltagDrive(cameraID, poseConstants.xOffsetReef, poseConstants.yOffsetReef);
+
+    }else if(cameraID == 2)
+    {
+      swerve.setApriltagDrive(cameraID, 0.0, poseConstants.yOffsetReef);
+    }
   }
 
   // Called every time the scheduler runs while the command is scheduled.
