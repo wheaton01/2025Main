@@ -53,7 +53,7 @@ addRequirements(swerve);
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    swerve.setApriltagDrive();
+    swerve.setApriltagDrive(cameraID);
   }
 
   // Called every time the scheduler runs while the command is scheduled.

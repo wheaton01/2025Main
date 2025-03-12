@@ -83,6 +83,8 @@ public class SwerveSubsystem extends SubsystemBase
    */
   private Vision vision;
   PhotonTrackedTarget target;
+  public  PhotonPipelineResult result = new PhotonPipelineResult();
+
   private ApriltagRelativeRobotPose lSidePose, rSidePose, cPose;
 
   /**
@@ -932,19 +934,18 @@ ApriltagRelativeRobotPose currentPose;
 private static final double DESIRED_X_OFFSET = -1.0; // Adjust based on scoring needs
 private static final double DESIRED_Y_OFFSET = 0.0; // Centered left/right
 private static final double DESIRED_THETA_OFFSET = 0.0; // Face the tag directly
-
 // Removed duplicate method
 
 public Optional<Pose3d> getAprilTagRobotRelativePose(int cameraID) {
   if (cameraID == 0) {
-      PhotonPipelineResult result = vision.getLeftCamResult();
-      return getAprilTagRobotRelativePose(result);
+     result = vision.getLeftCamResult();
+      //return getAprilTagRobotRelativePose(cameraID);
   } else if (cameraID == 1) {
-      PhotonPipelineResult result = vision.getRightCamResult();
-      return getAprilTagRobotRelativePose(result);
+       result = vision.getRightCamResult();
+      //return getAprilTagRobotRelativePose(cameraID);
   } else if (cameraID == 2) {
-      PhotonPipelineResult result = vision.getCenterCamResult();
-      return getAprilTagRobotRelativePose(result);
+       result = vision.getCenterCamResult();
+      //return getAprilTagRobotRelativePose(cameraID);
   } else {
       return Optional.empty();  // Invalid camera ID
   }
@@ -984,62 +985,6 @@ public void setApriltagDrive(int cameraID) {
   thetaPID.setSetpoint(desiredTheta);
 }
 
-public Optional<Pose3d> getleftAprilTagRobotRelativePose() {
-  PhotonPipelineResult result = vision.getLeftCamResult();
-
-  if (!result.hasTargets()) {
-      return Optional.empty();
-  }
-
-  PhotonTrackedTarget bestTarget = result.getBestTarget();
-
-  // Get the robot-relative pose of the AprilTag
-  Transform3d tagToCamera = bestTarget.getBestCameraToTarget();
-  Pose3d cameraPose = Constants.poseConstants.leftCamPose; // Get camera pose relative to the robot
-
-  // Convert the AprilTag pose to robot-relative coordinates
-  Pose3d tagPoseRobotRelative = cameraPose.transformBy(tagToCamera);
-
-  return Optional.of(tagPoseRobotRelative);
-}
-public void setrightApriltagDrive() {
-  Optional<Pose3d> tagPoseOptional = getAprilTagRobotRelativePose();
-
-  if (tagPoseOptional.isEmpty()) {
-      return; // No target detected
-  }
-
-  Pose3d tagPose = tagPoseOptional.get();
-
-  // Compute desired position relative to the tag
-  double desiredX = tagPose.getX() + DESIRED_X_OFFSET;
-  double desiredY = tagPose.getY() + DESIRED_Y_OFFSET;
-  double desiredTheta = tagPose.getRotation().getZ() + DESIRED_THETA_OFFSET;
-
-  // Set PID setpoints to the adjusted desired pose
-  XdeltaPID.setSetpoint(desiredX);
-  YdeltaPID.setSetpoint(desiredY);
-  thetaPID.setSetpoint(desiredTheta);
-}
-
-public Optional<Pose3d> getcenterAprilTagRobotRelativePose() {
-  PhotonPipelineResult result = vision.getLeftCamResult();
-
-  if (!result.hasTargets()) {
-      return Optional.empty();
-  }
-
-  PhotonTrackedTarget bestTarget = result.getBestTarget();
-
-  // Get the robot-relative pose of the AprilTag
-  Transform3d tagToCamera = bestTarget.getBestCameraToTarget();
-  Pose3d cameraPose = Constants.poseConstants.leftCamPose; // Get camera pose relative to the robot
-
-  // Convert the AprilTag pose to robot-relative coordinates
-  Pose3d tagPoseRobotRelative = cameraPose.transformBy(tagToCamera);
-
-  return Optional.of(tagPoseRobotRelative);
-}
 
 public void apriltagDrive(double xValue, double yValue, double thetaValue, int cameraID) {
   

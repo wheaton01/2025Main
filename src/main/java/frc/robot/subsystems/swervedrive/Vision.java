@@ -669,7 +669,7 @@ public class Vision
     return bestResult;
 }
 // Get the latest result from Limelight
-public PhotonPipelineResult getLimelightResult() {
+public PhotonPipelineResult getCenterCamResult() {
   return Cameras.LIMELIGHT.getLatestResult().orElse(null);
 }
 
