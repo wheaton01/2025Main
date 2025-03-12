@@ -933,28 +933,21 @@ private static final double DESIRED_X_OFFSET = -1.0; // Adjust based on scoring 
 private static final double DESIRED_Y_OFFSET = 0.0; // Centered left/right
 private static final double DESIRED_THETA_OFFSET = 0.0; // Face the tag directly
 
-public void setApriltagDrive() {
-    Optional<Pose3d> tagPoseOptional = getAprilTagRobotRelativePose();
+// Removed duplicate method
 
-    if (tagPoseOptional.isEmpty()) {
-        return; // No target detected
-    }
-
-    Pose3d tagPose = tagPoseOptional.get();
-
-    // Compute desired position relative to the tag
-    double desiredX = tagPose.getX() + DESIRED_X_OFFSET;
-    double desiredY = tagPose.getY() + DESIRED_Y_OFFSET;
-    double desiredTheta = tagPose.getRotation().getZ() + DESIRED_THETA_OFFSET;
-
-    // Set PID setpoints to the adjusted desired pose
-    XdeltaPID.setSetpoint(desiredX);
-    YdeltaPID.setSetpoint(desiredY);
-    thetaPID.setSetpoint(desiredTheta);
-}
-
-public Optional<Pose3d> getAprilTagRobotRelativePose() {
-    PhotonPipelineResult result = vision.getLeftCamResult();
+public Optional<Pose3d> getAprilTagRobotRelativePose(int cameraID) {
+  if (cameraID == 0) {
+      PhotonPipelineResult result = vision.getLeftCamResult();
+      return getAprilTagRobotRelativePose(result);
+  } else if (cameraID == 1) {
+      PhotonPipelineResult result = vision.getRightCamResult();
+      return getAprilTagRobotRelativePose(result);
+  } else if (cameraID == 2) {
+      PhotonPipelineResult result = vision.getCenterCamResult();
+      return getAprilTagRobotRelativePose(result);
+  } else {
+      return Optional.empty();  // Invalid camera ID
+  }
 
     if (!result.hasTargets()) {
         return Optional.empty();
@@ -971,9 +964,86 @@ public Optional<Pose3d> getAprilTagRobotRelativePose() {
 
     return Optional.of(tagPoseRobotRelative);
 }
+public void setApriltagDrive(int cameraID) {
+  Optional<Pose3d> tagPoseOptional = getAprilTagRobotRelativePose(cameraID);
 
-public void apriltagDrive(double xValue, double yValue, double thetaValue) {
-    Optional<Pose3d> tagPoseOptional = getAprilTagRobotRelativePose();
+  if (tagPoseOptional.isEmpty()) {
+      return; // No target detected
+  }
+
+  Pose3d tagPose = tagPoseOptional.get();
+
+  // Compute desired position relative to the tag
+  double desiredX = tagPose.getX() + DESIRED_X_OFFSET;
+  double desiredY = tagPose.getY() + DESIRED_Y_OFFSET;
+  double desiredTheta = tagPose.getRotation().getZ() + DESIRED_THETA_OFFSET;
+
+  // Set PID setpoints to the adjusted desired pose
+  XdeltaPID.setSetpoint(desiredX);
+  YdeltaPID.setSetpoint(desiredY);
+  thetaPID.setSetpoint(desiredTheta);
+}
+
+public Optional<Pose3d> getleftAprilTagRobotRelativePose() {
+  PhotonPipelineResult result = vision.getLeftCamResult();
+
+  if (!result.hasTargets()) {
+      return Optional.empty();
+  }
+
+  PhotonTrackedTarget bestTarget = result.getBestTarget();
+
+  // Get the robot-relative pose of the AprilTag
+  Transform3d tagToCamera = bestTarget.getBestCameraToTarget();
+  Pose3d cameraPose = Constants.poseConstants.leftCamPose; // Get camera pose relative to the robot
+
+  // Convert the AprilTag pose to robot-relative coordinates
+  Pose3d tagPoseRobotRelative = cameraPose.transformBy(tagToCamera);
+
+  return Optional.of(tagPoseRobotRelative);
+}
+public void setrightApriltagDrive() {
+  Optional<Pose3d> tagPoseOptional = getAprilTagRobotRelativePose();
+
+  if (tagPoseOptional.isEmpty()) {
+      return; // No target detected
+  }
+
+  Pose3d tagPose = tagPoseOptional.get();
+
+  // Compute desired position relative to the tag
+  double desiredX = tagPose.getX() + DESIRED_X_OFFSET;
+  double desiredY = tagPose.getY() + DESIRED_Y_OFFSET;
+  double desiredTheta = tagPose.getRotation().getZ() + DESIRED_THETA_OFFSET;
+
+  // Set PID setpoints to the adjusted desired pose
+  XdeltaPID.setSetpoint(desiredX);
+  YdeltaPID.setSetpoint(desiredY);
+  thetaPID.setSetpoint(desiredTheta);
+}
+
+public Optional<Pose3d> getcenterAprilTagRobotRelativePose() {
+  PhotonPipelineResult result = vision.getLeftCamResult();
+
+  if (!result.hasTargets()) {
+      return Optional.empty();
+  }
+
+  PhotonTrackedTarget bestTarget = result.getBestTarget();
+
+  // Get the robot-relative pose of the AprilTag
+  Transform3d tagToCamera = bestTarget.getBestCameraToTarget();
+  Pose3d cameraPose = Constants.poseConstants.leftCamPose; // Get camera pose relative to the robot
+
+  // Convert the AprilTag pose to robot-relative coordinates
+  Pose3d tagPoseRobotRelative = cameraPose.transformBy(tagToCamera);
+
+  return Optional.of(tagPoseRobotRelative);
+}
+
+public void apriltagDrive(double xValue, double yValue, double thetaValue, int cameraID) {
+  
+    Optional<Pose3d> tagPoseOptional = getAprilTagRobotRelativePose(cameraID);
 
     if (tagPoseOptional.isEmpty()) {
         return; // No tag detected, don't drive

@@ -31,9 +31,9 @@ SwerveController controller;
 CommandXboxController driverXbox, opXbox;
 PIDController thetaController;
 ApriltagRelativeRobotPose apriltagRelativeRobotPose;
-
+int cameraID;
 public aprilTagSwerve(SwerveSubsystem swerve, DoubleSupplier vX, DoubleSupplier vY, DoubleSupplier omega,
-BooleanSupplier driveMode, CommandXboxController driverXbox, CommandXboxController opXbox,ApriltagRelativeRobotPose apriltagRelativeRobotPose)
+BooleanSupplier driveMode, CommandXboxController driverXbox, CommandXboxController opXbox,ApriltagRelativeRobotPose apriltagRelativeRobotPose,int cameraID)
 
 {
 this.driverXbox = driverXbox;
@@ -44,6 +44,7 @@ this.vY = vY;
 this.omega = omega;
 this.driveMode = driveMode;
 this.apriltagRelativeRobotPose = apriltagRelativeRobotPose;
+this.cameraID = cameraID;
 this.controller = swerve.getSwerveController();
 // Use addRequirements() here to declare subsystem dependencies.
 addRequirements(swerve);
@@ -58,7 +59,7 @@ addRequirements(swerve);
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    swerve.apriltagDrive(vX.getAsDouble(),vY.getAsDouble(),omega.getAsDouble());
+    swerve.apriltagDrive(vX.getAsDouble(),vY.getAsDouble(),omega.getAsDouble(), cameraID);
     distToTarget =swerve.getDistanceToTarget();
     driverXbox.setRumble(null,hapticSetpoint = swerve.scaleDistance(distToTarget));
     opXbox.setRumble(null,hapticSetpoint = swerve.scaleDistance(distToTarget));

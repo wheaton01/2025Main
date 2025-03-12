@@ -161,7 +161,9 @@ public final class Constants {
         public static final double yOffsetReef = Units.inchesToMeters(7.5) ;
 
         //vision Constants
-
+        public static final int ilCameraID = 0;//camera ID for the left camera
+        public static final int irCameraID = 1;//camera ID for the right camera
+        public static final int icCameraID = 2;//camera ID for the center camera
         public static Pose3d leftCamPose = new Pose3d(Units.inchesToMeters(8.0),
                                                       Units.inchesToMeters(3.0),
                                                       Units.inchesToMeters(3.0),

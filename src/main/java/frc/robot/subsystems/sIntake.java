@@ -55,7 +55,7 @@ state manager 3 = zero mode
       setMotorSpeed(intakeConstants.kPlaceSpeed);
       bHasCoral = false;
     } else if (stateManager == 3) {
-      setMotorSpeed(0);
+      setMotorSpeed(.05);
     }
     if (coralDetected && stateManager != 2) {
       stateManager = 3;

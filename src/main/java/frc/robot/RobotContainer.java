@@ -30,6 +30,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -66,7 +67,7 @@ public class RobotContainer {
     sElevator sElevator;
     SwerveSubsystem swerveSubsystem;
     sIntake sIntake;
-
+    int cameraID;
     setIntake defaultIntake, intakeBall;
     setClimber defaultClimber;
     sControllerHaptics m_controllerHaptics;
@@ -168,16 +169,21 @@ public class RobotContainer {
     public void driverControls() {
         
         // Set default drive command
+    boolean isRedAlliance = DriverStation.getAlliance().isPresent() &&
+                            DriverStation.getAlliance().get() == DriverStation.Alliance.Red;
 
-        swerveSubsystem.setDefaultCommand(
-                swerveSubsystem.driveCommand(
-                        () -> MathUtil.applyDeadband(-m_driverController.getLeftY(), 0.1),
-                        () -> MathUtil.applyDeadband(-m_driverController.getLeftX(), 0.1),
-                        () -> MathUtil.applyDeadband(-m_driverController.getRightX(), 0.1),
-                        () -> MathUtil.applyDeadband(-m_driverController.getRightY(), 0.1)
-                        
-                )
-        );
+    // Flip controls if on Red Alliance
+    double flipMultiplier = isRedAlliance ? -1.0 : 1.0;
+
+    swerveSubsystem.setDefaultCommand(
+        swerveSubsystem.driveCommand(
+            () -> flipMultiplier * MathUtil.applyDeadband(-m_driverController.getLeftY(), 0.1),
+            () -> flipMultiplier * MathUtil.applyDeadband(-m_driverController.getLeftX(), 0.1),
+            () -> MathUtil.applyDeadband(-m_driverController.getRightX(), 0.1),
+            () -> MathUtil.applyDeadband(-m_driverController.getRightY(), 0.1)
+        )
+    );
+
         // m_driverController.leftBumper()
         //          .whileTrue(
         //                  swerveSubsystem.driveCommand(
@@ -186,10 +192,11 @@ public class RobotContainer {
         //     () -> MathUtil.applyDeadband(-m_driverController.getRightX(), 0.1)*.75));
         m_driverController.leftTrigger(.2).whileTrue(new aprilTagSwerve(swerveSubsystem,
                         ()->-m_driverController.getLeftX(),()->-m_driverController.getLeftY(),()->m_driverController.getRightX(),
-                        ()->false,m_driverController,m_operatorController,fieldPoses.lSidePose));
-        m_driverController.rightTrigger(.2).whileTrue(new aprilTagSwerve(swerveSubsystem,
-                        ()->-m_driverController.getLeftX(),()->-m_driverController.getLeftY(),()->m_driverController.getRightX(),
-                        ()->false,m_driverController,m_operatorController,fieldPoses.rSidePose));
+                        ()->false,m_driverController,m_operatorController,fieldPoses.lSidePose, Constants.poseConstants.ilCameraID));
+
+                m_driverController.rightTrigger(.2).whileTrue(new aprilTagSwerve(swerveSubsystem,
+                                ()->-m_driverController.getLeftX(),()->-m_driverController.getLeftY(),()->m_driverController.getRightX(),
+                                ()->false,m_driverController,m_operatorController,fieldPoses.rSidePose,Constants.poseConstants.irCameraID));
 
         //sElevator.setDefaultCommand(sElevator.setElevator(() -> MathUtil.applyDeadband(m_operatorController.getLeftY(), .1)));
         m_driverController.a().onTrue(new InstantCommand(swerveSubsystem::zeroGyro));
