@@ -78,7 +78,7 @@ public class Vision
    */
   private             Field2d             field2d;
 
-
+  PhotonCamera leftCam;
   /**
    * Constructor for the Vision class.
    *
@@ -89,7 +89,10 @@ public class Vision
   {
     this.currentPose = currentPose;
     this.field2d = field;
+    leftCam = new PhotonCamera("leftCam");
+    
 
+    
     if (Robot.isSimulation())
     {
       visionSim = new VisionSystemSim("Vision");
@@ -288,7 +291,7 @@ public class Vision
     return visionSim;
   }
   public int getNumberOfTargets() {
-    Optional<PhotonPipelineResult> optionalResult = Cameras.LIMELIGHT.getLatestResult();
+    Optional<PhotonPipelineResult> optionalResult = Cameras.leftCam.getLatestResult();
 
     // Check if there's a result available
     if (optionalResult.isPresent()) {
@@ -359,23 +362,23 @@ public class Vision
     /**
      * Left Camera
      */
-    LIMELIGHT("limelight",
-             new Rotation3d(0, Math.toRadians(0.0), Math.toRadians(0)),
-             new Translation3d(Units.inchesToMeters(0.0),
-                               Units.inchesToMeters(0.0),
-                               Units.inchesToMeters(31.6)),
-             VecBuilder.fill(1.5, 1, .8), VecBuilder.fill(0.5, 0.5, 1)),
-    rightCam("rightCam",
-             new Rotation3d(0, Math.toRadians(0.0), Math.toRadians(0)),
-             new Translation3d(Units.inchesToMeters(0.0),
-                               Units.inchesToMeters(0.0),
-                               Units.inchesToMeters(31.6)),
-             VecBuilder.fill(1.5, 1, .8), VecBuilder.fill(0.5, 0.5, 1)),
+    // LIMELIGHT("limelight",
+    //          new Rotation3d(0, Math.toRadians(0.0), Math.toRadians(0)),
+    //          new Translation3d(Units.inchesToMeters(0.0),
+    //                            Units.inchesToMeters(0.0),
+    //                            Units.inchesToMeters(31.6)),
+    //          VecBuilder.fill(1.5, 1, .8), VecBuilder.fill(0.5, 0.5, 1)),
+    // rightCam("rightCam",
+    //          new Rotation3d(0, Math.toRadians(0.0), Math.toRadians(0)),
+    //          new Translation3d(Units.inchesToMeters(0.0),
+    //                            Units.inchesToMeters(0.0),
+    //                            Units.inchesToMeters(31.6)),
+    //          VecBuilder.fill(1.5, 1, .8), VecBuilder.fill(0.5, 0.5, 1)),
     leftCam("leftCam",
              new Rotation3d(0, Math.toRadians(0.0), Math.toRadians(0)),
              new Translation3d(Units.inchesToMeters(0.0),
                                Units.inchesToMeters(0.0),
-                               Units.inchesToMeters(31.6)),
+                               Units.inchesToMeters(5.6)),
              VecBuilder.fill(1.5, 1, .8), VecBuilder.fill(0.5, 0.5, 1));
 
     /**
@@ -670,7 +673,7 @@ public class Vision
 }
 // Get the latest result from Limelight
 public PhotonPipelineResult getCenterCamResult() {
-  return Cameras.LIMELIGHT.getLatestResult().orElse(null);
+  return Cameras.leftCam.getLatestResult().orElse(null);
 }
 
 // Get the latest result from Right Camera
@@ -678,9 +681,18 @@ public PhotonPipelineResult getRightCamResult() {
   return Cameras.leftCam.getLatestResult().orElse(null);
 }
 
-// Get the latest result from Left Camera
 public PhotonPipelineResult getLeftCamResult() {
-  return Cameras.rightCam.getLatestResult().orElse(null);
+  PhotonPipelineResult result = leftCam.getLatestResult();
+  if (result == null) {
+      SmartDashboard.putString("Left Camera Result", "No result available");
+      return null;
+  } else {
+      SmartDashboard.putString("Left Camera Result", "Result available: " + result.toString());
+      return result;
+  }
 }
+
+
+
 
 }

@@ -19,6 +19,7 @@ import com.pathplanner.lib.util.DriveFeedforwards;
 import com.pathplanner.lib.util.swerve.SwerveSetpoint;
 import com.pathplanner.lib.util.swerve.SwerveSetpointGenerator;
 
+import dev.doglog.DogLog;
 //import dev.doglog.DogLog;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
@@ -926,9 +927,9 @@ public Pose2d getNearestHumanPlayerTagPose() {
   public Pose2d getRobotPose() {
     return swerveDrive.getPose();
 }
-PIDController XdeltaPID = new PIDController(0.1, 0, 0);
-PIDController YdeltaPID = new PIDController(0.1, 0, 0);
-PIDController thetaPID = new PIDController(0.05, 0, 0);
+PIDController XdeltaPID = new PIDController(1.0, 0, 0);
+PIDController YdeltaPID = new PIDController(1.0, 0, 0);
+PIDController thetaPID = new PIDController(1.0, 0, 0);
 ApriltagRelativeRobotPose currentPose;
 
 // Desired scoring offset (robot should be 1 meter in front of the tag)
@@ -938,38 +939,51 @@ private   double DESIRED_THETA_OFFSET = 0.0; // Face the tag directly
 // Removed duplicate method
 Pose3d cameraPose ; // Get camera pose relative to the robot
 
-
+private double targetID;
 public Optional<Pose3d> getAprilTagRobotRelativePose(int cameraID) {
   if (cameraID == 0) {
-     result = vision.getLeftCamResult();
-     cameraPose = poseConstants.leftCamPose;
-      //return getAprilTagRobotRelativePose(cameraID);
+      result = vision.getLeftCamResult();
+      cameraPose = poseConstants.leftCamPose;
+      SmartDashboard.putString("AprilTag Detection", "LeftCam");
   } else if (cameraID == 1) {
-       result = vision.getRightCamResult();
-       cameraPose = poseConstants.rightCamPose;
- 
-      //return getAprilTagRobotRelativePose(cameraID);
+      result = vision.getRightCamResult();
+      cameraPose = poseConstants.rightCamPose;
+      SmartDashboard.putString("AprilTag Detection", "RightCam");
   } else if (cameraID == 2) {
-       result = vision.getCenterCamResult();
-       cameraPose = poseConstants.centerCamPose;
-      //return getAprilTagRobotRelativePose(cameraID);
+      result = vision.getCenterCamResult();
+      cameraPose = poseConstants.centerCamPose;
+      SmartDashboard.putString("AprilTag Detection", "CenterCam");
   } else {
+      SmartDashboard.putString("AprilTag Detection", "NO Camera FOUND");
       return Optional.empty();  // Invalid camera ID
   }
 
-    if (!result.hasTargets()) {
-        return Optional.empty();
-    }
+  // 🔍 Print out the result before checking null
+  if (result == null) {
+      SmartDashboard.putString("AprilTag Error", "PhotonPipelineResult is NULL!");
+      return Optional.empty();
+  } else {
+      SmartDashboard.putString("AprilTag Vision", "Result found: " + result.toString());
+  }
 
-    PhotonTrackedTarget bestTarget = result.getBestTarget();
-    
-    // Get the robot-relative pose of the AprilTag
-    Transform3d tagToCamera = bestTarget.getBestCameraToTarget();
+  if (!result.hasTargets()) {
+      SmartDashboard.putString("AprilTag Detection", "NO TAG FOUND");
+      return Optional.empty();
+  }
 
-    // Convert the AprilTag pose to robot-relative coordinates
-    Pose3d tagPoseRobotRelative = cameraPose.transformBy(tagToCamera);
+  PhotonTrackedTarget bestTarget = result.getBestTarget();
+  SmartDashboard.putString("AprilTag Target", bestTarget.toString());
 
-    return Optional.of(tagPoseRobotRelative);
+  // Get the robot-relative pose of the AprilTag
+  Transform3d tagToCamera = bestTarget.getBestCameraToTarget();
+
+  // Convert the AprilTag pose to robot-relative coordinates
+  Pose3d tagPoseRobotRelative = cameraPose.transformBy(tagToCamera);
+
+  // Log the computed pose
+  SmartDashboard.putString("AprilTag Robot Pose", tagPoseRobotRelative.toString());
+
+  return Optional.of(tagPoseRobotRelative);
 }
 public void setApriltagDrive(int cameraID, double xOffset,double yOffset) {
   Optional<Pose3d> tagPoseOptional = getAprilTagRobotRelativePose(cameraID);
@@ -984,7 +998,7 @@ public void setApriltagDrive(int cameraID, double xOffset,double yOffset) {
   // Compute desired position relative to the tag
   double desiredX = tagPose.getX() + DESIRED_X_OFFSET;
   double desiredY = tagPose.getY() + DESIRED_Y_OFFSET;
-  double desiredTheta = tagPose.getRotation().getZ() + DESIRED_THETA_OFFSET;
+  double desiredTheta = tagPose.getRotation().getZ() + Units.degreesToRadians(0);
 
   // Set PID setpoints to the adjusted desired pose
   XdeltaPID.setSetpoint(desiredX);
@@ -994,27 +1008,38 @@ public void setApriltagDrive(int cameraID, double xOffset,double yOffset) {
 
 
 public void apriltagDrive(double xValue, double yValue, double thetaValue, int cameraID) {
-  
-    Optional<Pose3d> tagPoseOptional = getAprilTagRobotRelativePose(cameraID);
+  System.out.println("apriltagDrive Running - X: " + xValue + " Y: " + yValue + " Theta: " + thetaValue);
+  Optional<Pose3d> tagPoseOptional = getAprilTagRobotRelativePose(cameraID);
 
-    if (tagPoseOptional.isEmpty()) {
-        return; // No tag detected, don't drive
-    }
+  if (tagPoseOptional.isEmpty()) {
+     swerveDrive.drive(
+      new Translation2d(-xValue, -yValue),
+      thetaValue,
+      false, 
+      false
+    ); // No target detected, drive with joystick values
+      return; // No tag detected, don't drive
+  }
 
-    Pose3d tagPose = tagPoseOptional.get();
+  Pose3d tagPose = tagPoseOptional.get();
 
-    // Compute PID outputs
-    double xOutput = XdeltaPID.calculate(tagPose.getX()+yValue);
-    double yOutput = YdeltaPID.calculate(tagPose.getY()+xValue);
-    double thetaOutput = thetaPID.calculate(MathUtil.angleModulus(tagPose.getRotation().getZ()));
+  // Compute PID outputs
+  double xOutput = XdeltaPID.calculate(-tagPose.getX() + yValue);
+  double yOutput = YdeltaPID.calculate(-tagPose.getY() + xValue);
+  double thetaOutput = thetaPID.calculate(MathUtil.angleModulus(tagPose.getRotation().getZ()));
+  System.out.println("PID Output - X: " + xOutput + " Y: " + yOutput + " Theta: " + thetaOutput);
+  SmartDashboard.putNumber("X Difference",XdeltaPID.getError());
+  SmartDashboard.putNumber("Y Difference",YdeltaPID.getError());
+  SmartDashboard.putNumber("Theta Difference",thetaPID.getError());
+  swerveDrive.drive(
+    new Translation2d(xOutput,yOutput),
+    thetaValue,
+    false, 
+    false
+  ); 
 
-    swerveDrive.drive(
-        new Translation2d(xOutput+.1, yOutput),
-        thetaOutput+thetaValue,
-        false, 
-        false
-    );
 }
+
 
 
 public double getDistanceToTarget() {

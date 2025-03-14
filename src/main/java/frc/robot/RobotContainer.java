@@ -92,7 +92,7 @@ public class RobotContainer {
     public RobotContainer() {
 
         sSlider = new sSlider();
-        sEndAffector = new sEndAffector();
+        //sEndAffector = new sEndAffector();
         sClimber = new sClimber();
         sElevator = new sElevator();
         m_controllerHaptics = new sControllerHaptics(m_driverController, m_operatorController);
@@ -179,8 +179,7 @@ public class RobotContainer {
         swerveSubsystem.driveCommand(
             () -> flipMultiplier * MathUtil.applyDeadband(-m_driverController.getLeftY(), 0.1),
             () -> flipMultiplier * MathUtil.applyDeadband(-m_driverController.getLeftX(), 0.1),
-            () -> MathUtil.applyDeadband(-m_driverController.getRightX(), 0.1),
-            () -> MathUtil.applyDeadband(-m_driverController.getRightY(), 0.1)
+            () -> MathUtil.applyDeadband(-m_driverController.getRightX(), 0.1)
         )
     );
 
@@ -202,15 +201,15 @@ public class RobotContainer {
         m_driverController.a().onTrue(new InstantCommand(swerveSubsystem::zeroGyro));
         m_driverController.start().onTrue(new InstantCommand(swerveSubsystem::zeroGyroWithAlliance));
         //Driver Non Driving Controls
-        m_driverController.rightBumper().onTrue(new ParallelCommandGroup(new InstantCommand(sIntake::setFeedIntake),
-                                                                         new InstantCommand(sEndAffector::setPlace)
+        m_driverController.rightBumper().onTrue(new ParallelCommandGroup(new InstantCommand(sIntake::setFeedIntake)
+                                                                         
                                                                         ))
-                                          .onFalse(new ParallelCommandGroup(new InstantCommand(sIntake::setZero),
-                                          new InstantCommand(sEndAffector::setZero)
+                                          .onFalse(new ParallelCommandGroup(new InstantCommand(sIntake::setZero)
+                                         
                                           ).withTimeout(0));        
         // Create DriveToPoseCommand based on trigger inputs
-        createDriveToPoseTrigger(m_driverController::getRightTriggerAxis, false);
-        createDriveToPoseTrigger(m_driverController::getLeftTriggerAxis, false);
+        // createDriveToPoseTrigger(m_driverController::getRightTriggerAxis, false);
+        // createDriveToPoseTrigger(m_driverController::getLeftTriggerAxis, false);
         
         // Bind B button to drive to nearest AprilTag pose at center
         //createDriveToPoseButtonTrigger(m_driverController.b(), false);
@@ -271,9 +270,9 @@ public class RobotContainer {
         // **Left Trigger (≥ 0.2)**: Deploy & run **intake forward, place motor in reverse**
         m_operatorController.leftTrigger(0.2)
                 .whileTrue(new ParallelCommandGroup(
-                        new InstantCommand(sEndAffector::setBallIntake),
+                        new InstantCommand(sIntake::setBallIntake),
                         new setCHaptics(m_controllerHaptics, 0.2))
-                        ).onFalse(new InstantCommand(sEndAffector::setZero)); // Haptic feedback when motors are on
+                        ).onFalse(new InstantCommand(sIntake::setZero)); // Haptic feedback when motors are on
         // m_operatorController.rightTrigger(0.2)
         //                 .whileTrue(new ParallelCommandGroup(
         //                         new InstantCommand(sEndAffector::setPlace),
@@ -360,11 +359,11 @@ public class RobotContainer {
                 new setElevatorPose(sElevator, elevatorConstants.kL4Height).withTimeout(2.0),
                 new InstantCommand(sSlider::setExtend),
                 new WaitCommand(.5),
-                new InstantCommand(sEndAffector::setPlace),
+                
                 new InstantCommand(sIntake::setCoralPlaceMode),
                 new WaitCommand(.5),
                 new InstantCommand(sIntake::setFeedIntake),
-                new InstantCommand(sEndAffector::setZero),
+                
                 new InstantCommand(sSlider::setRetract),
                 new WaitCommand(.5)
         ));

@@ -50,8 +50,8 @@ public final class Constants {
         public static final int kelevatorSparkID2 = 11; 
         
         // End Effector Constants (Intake, Placement, Pneumatics)
-        public static final int kintakeSparkID = 13;   
-        public static final int kPlacesparkID = 12;    
+        public static final int kintakeSparkID = 12;   
+        public static final int kPlacesparkID = 13;    
         public static final int kPneuExtendID = 7;       // Pneumatic extend ID
         
         // Intake Sensor ID and Threshold
@@ -178,8 +178,8 @@ public final class Constants {
                                                       Units.degreesToRadians(30.0)));       
         public static Pose3d centerCamPose = new Pose3d();
         
-        public static final double xOffsetReef = Units.inchesToMeters(12.0) ;
-        public static final double yOffsetReef = Units.inchesToMeters(7.5) ;
+        public static final double xOffsetReef = Units.inchesToMeters(0.0) ;
+        public static final double yOffsetReef = Units.inchesToMeters(0.0) ;
         
     }
 }

@@ -73,11 +73,9 @@ addRequirements(swerve);
   @Override
   public void execute() {
     swerve.apriltagDrive(vX.getAsDouble(),vY.getAsDouble(),omega.getAsDouble(), cameraID);
-    distToTarget =swerve.getDistanceToTarget();
-    driverXbox.setRumble(null,hapticSetpoint = swerve.scaleDistance(distToTarget));
-    opXbox.setRumble(null,hapticSetpoint = swerve.scaleDistance(distToTarget));
-    
-
+    // distToTarget =swerve.getDistanceToTarget();
+    // driverXbox.setRumble(null,hapticSetpoint = swerve.scaleDistance(distToTarget));
+    // opXbox.setRumble(null,hapticSetpoint = swerve.scaleDistance(distToTarget));
 }
 
   // Called once the command ends or is interrupted.

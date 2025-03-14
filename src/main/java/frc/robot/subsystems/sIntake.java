@@ -56,6 +56,8 @@ state manager 3 = zero mode
       bHasCoral = false;
     } else if (stateManager == 3) {
       setMotorSpeed(.05);
+    }else if (stateManager == 4) {
+      setMotorSpeed(intakeConstants.kBallIntakeSpeed);
     }
     if (coralDetected && stateManager != 2) {
       stateManager = 3;
@@ -98,6 +100,10 @@ state manager 3 = zero mode
   /** Runs intake at feeding speed. */
   public void setFeedIntake() {
   stateManager = 2;
+  }
+  /** Runs intake at ball intake speed. */
+  public void setBallIntake() {
+    stateManager = 4;
   }
 
   /**
