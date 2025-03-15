@@ -55,7 +55,7 @@ state manager 3 = zero mode
       setMotorSpeed(intakeConstants.kPlaceSpeed);
       bHasCoral = false;
     } else if (stateManager == 3) {
-      setMotorSpeed(.05);
+      setMotorSpeed(.0);
     }else if (stateManager == 4) {
       setMotorSpeed(intakeConstants.kBallIntakeSpeed);
     }
