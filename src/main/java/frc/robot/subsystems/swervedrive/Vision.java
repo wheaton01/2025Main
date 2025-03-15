@@ -677,16 +677,16 @@ public class Vision
 }
 // Get the latest result from Limelight
 public PhotonPipelineResult getCenterCamResult() {
-  return centerCam.getLatestResult().orElse(null);
+  return centerCam.getLatestResult();
 }
 
 // Get the latest result from Right Camera
 public PhotonPipelineResult getRightCamResult() {
-  return rightCam.getLatestResult().orElse(null);
+  return rightCam.getLatestResult();
 }
 
 public PhotonPipelineResult getLeftCamResult() {
-  return leftCam.getLatestResult().orElse(null);
+  return leftCam.getLatestResult();
 }
 
 

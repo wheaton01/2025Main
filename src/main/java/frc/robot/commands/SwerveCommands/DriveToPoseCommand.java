@@ -2,6 +2,7 @@ package frc.robot.commands.SwerveCommands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.poseConstants;
+import frc.robot.Constants.robotConstants;
 import frc.robot.Constants.swerveConstants;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -59,10 +60,10 @@ public class DriveToPoseCommand extends Command {
     targetPose = swerveSubsystem.getNearestReefAprilTagPose();
     SmartDashboard.putString("DistToReefTag", targetPose.getX() + " " + targetPose.getY());
     if(rightTriggerSupplier.getAsDouble()<.2){
-    adjustedPose = calculateOffsetPose(targetPose,poseConstants.xOffsetReef,-poseConstants.yOffsetReef);
+    adjustedPose = calculateOffsetPose(targetPose,swerveConstants.xOffsetReef,-swerveConstants.yOffsetReef);
     }
     if(leftTriggerSupplier.getAsDouble()<.2){
-    adjustedPose = calculateOffsetPose(targetPose,poseConstants.xOffsetReef,poseConstants.yOffsetReef);
+    adjustedPose = calculateOffsetPose(targetPose,swerveConstants.xOffsetReef,swerveConstants.yOffsetReef);
     }
   }
 

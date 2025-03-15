@@ -154,12 +154,12 @@ public final class Constants {
         // Tolerance Constants for Position and Rotation
         public static final double POSITION_TOLERANCE = 0.5;  // Tolerance for position accuracy
         public static final double ROTATION_TOLERANCE = 0.5;  // Tolerance for rotation accuracy
-        public static final PIDController SWERVEX_CONTROLLER = new PIDController(0.5, 0.0, 0.0);
-        public static final PIDController SWERVEY_CONTROLLER = new PIDController(0.5, 0.0, 0.0);
-        public static final PIDController SWERVETHETA_CONTROLLER = new PIDController(0.5, 0.0, 0.0);
+        public static final PIDController SWERVEX_CONTROLLER = new PIDController(0.1, 0.0, 0.0);
+        public static final PIDController SWERVEY_CONTROLLER = new PIDController(0.1, 0.0, 0.0);
+        public static final PIDController SWERVETHETA_CONTROLLER = new PIDController(0.1, 0.0, 0.0);
         
-        public static final double xOffsetReef = Units.inchesToMeters(0.0) ;
-        public static final double yOffsetReef = Units.inchesToMeters(0.0) ;
+        public static final double xOffsetReef = Units.metersToInches(-.5) ;
+        public static final double yOffsetReef = Units.metersToInches(-0.09) ;
     }
     public static class fieldPoses {
         public static final Pose2d reefPose = new Pose2d(new Translation2d(5.034, 5.317), Rotation2d.fromDegrees(117));

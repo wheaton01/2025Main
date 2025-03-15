@@ -943,15 +943,15 @@ private double targetID;
 public Optional<Pose3d> getAprilTagRobotRelativePose(int cameraID) {
   if (cameraID == 0) {
       result = vision.getLeftCamResult();
-      cameraPose = poseConstants.leftCamPose;
+      //cameraPose = swerveConstants.leftCamPose;
       SmartDashboard.putString("AprilTag Detection", "LeftCam");
   } else if (cameraID == 1) {
       result = vision.getRightCamResult();
-      cameraPose = poseConstants.rightCamPose;
+      //cameraPose = swerveConstants.rightCamPose;
       SmartDashboard.putString("AprilTag Detection", "RightCam");
   } else if (cameraID == 2) {
       result = vision.getCenterCamResult();
-      cameraPose = poseConstants.centerCamPose;
+      //cameraPose = swerveConstants.centerCamPose;
       SmartDashboard.putString("AprilTag Detection", "CenterCam");
   } else {
       SmartDashboard.putString("AprilTag Detection", "NO Camera FOUND");
@@ -974,7 +974,9 @@ public Optional<Pose3d> getAprilTagRobotRelativePose(int cameraID) {
   PhotonTrackedTarget bestTarget = result.getBestTarget();
   SmartDashboard.putString("AprilTag Target", bestTarget.toString());
   //I made this code a lil bit more dumb so we can just manually tune it as we really only need to tune it 'once'
-  return Optional.of(bestTarget);
+  Transform3d transform = bestTarget.getBestCameraToTarget();
+  Pose3d pose = new Pose3d(transform.getTranslation(), transform.getRotation());
+  return Optional.of(pose);
 }
 public void setApriltagDrive(int cameraID, double xOffset,double yOffset) {
   Optional<Pose3d> tagPoseOptional = getAprilTagRobotRelativePose(cameraID);
@@ -987,8 +989,8 @@ public void setApriltagDrive(int cameraID, double xOffset,double yOffset) {
   Pose3d tagPose = tagPoseOptional.get();
 
   // Compute desired position relative to the tag
-  double desiredX = Units.metersToInches(tagPose.getX()) + DESIRED_X_OFFSET;
-  double desiredY = Units.metersToInches(tagPose.getY()) + DESIRED_Y_OFFSET;
+  double desiredX = tagPose.getX() + DESIRED_X_OFFSET;
+  double desiredY = tagPose.getY() + DESIRED_Y_OFFSET;
   double desiredTheta = tagPose.getRotation().getZ() + Units.degreesToRadians(0);
 
   // Set PID setpoints to the adjusted desired pose
@@ -1015,8 +1017,8 @@ public void apriltagDrive(double xValue, double yValue, double thetaValue, int c
   Pose3d tagPose = tagPoseOptional.get();
 
   // Compute PID outputs
-  double xOutput = XdeltaPID.calculate(-Units.metersToInches(tagPose.getX())+yValue);
-  double yOutput = YdeltaPID.calculate(-Units.metersToInches(tagPose.getY())+xValue);
+  double xOutput = XdeltaPID.calculate(-tagPose.getX()+yValue);
+  double yOutput = YdeltaPID.calculate(-tagPose.getY()+xValue);
   double thetaOutput = thetaPID.calculate(MathUtil.angleModulus(tagPose.getRotation().getZ()));
   System.out.println("PID Output - X: " + xOutput + " Y: " + yOutput + " Theta: " + thetaOutput);
   SmartDashboard.putNumber("X Difference",XdeltaPID.getError());

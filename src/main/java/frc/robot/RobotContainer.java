@@ -183,19 +183,21 @@ public class RobotContainer {
         )
     );
 
-        // m_driverController.leftBumper()
-        //          .whileTrue(
-        //                  swerveSubsystem.driveCommand(
-        //     () -> MathUtil.applyDeadband(-m_driverController.getLeftY(), 0.1)*.35,
-        //     () -> MathUtil.applyDeadband(-m_driverController.getLeftX(), 0.1)*.35,
-        //     () -> MathUtil.applyDeadband(-m_driverController.getRightX(), 0.1)*.75));
-        m_driverController.leftTrigger(.2).whileTrue(new aprilTagSwerve(swerveSubsystem,
-                        ()->-m_driverController.getLeftX(),()->-m_driverController.getLeftY(),()->m_driverController.getRightX(),
-                        ()->false,m_driverController,m_operatorController,fieldPoses.lSidePose, robotConstants.ilCameraID));
+        m_driverController.leftBumper()
+                 .whileTrue(
+                         swerveSubsystem.driveCommand(
+            () -> MathUtil.applyDeadband(-m_driverController.getLeftY(), 0.1)*.10,
+            () -> MathUtil.applyDeadband(-m_driverController.getLeftX(), 0.1)*.10,
+            () -> MathUtil.applyDeadband(-m_driverController.getRightX(), 0.1)*.350));
 
-        m_driverController.rightTrigger(.2).whileTrue(new aprilTagSwerve(swerveSubsystem,
-                        ()->-m_driverController.getLeftX(),()->-m_driverController.getLeftY(),()->m_driverController.getRightX(),
-                        ()->false,m_driverController,m_operatorController,fieldPoses.rSidePose,robotConstants.irCameraID));
+        //TODO: FIX THIS
+        // m_driverController.leftTrigger(.2).whileTrue(new aprilTagSwerve(swerveSubsystem,
+        //                 ()->-m_driverController.getLeftX(),()->-m_driverController.getLeftY(),()->m_driverController.getRightX(),
+        //                 ()->false,m_driverController,m_operatorController,fieldPoses.lSidePose, robotConstants.ilCameraID));
+
+        // m_driverController.rightTrigger(.2).whileTrue(new aprilTagSwerve(swerveSubsystem,
+        //                 ()->-m_driverController.getLeftX(),()->-m_driverController.getLeftY(),()->m_driverController.getRightX(),
+        //                 ()->false,m_driverController,m_operatorController,fieldPoses.rSidePose,robotConstants.irCameraID));
 
         //sElevator.setDefaultCommand(sElevator.setElevator(() -> MathUtil.applyDeadband(m_operatorController.getLeftY(), .1)));
         m_driverController.a().onTrue(new InstantCommand(swerveSubsystem::zeroGyro));
@@ -217,7 +219,7 @@ public class RobotContainer {
         // Bind right bumper to drive to nearest AprilTag pose with a special mode
         //createDriveToPoseButtonTrigger(m_driverController.rightBumper(), true);
         createDriveToPoseButtonTrigger(m_driverController.x(), true);
-        m_driverController.b().whileTrue(new driveToPose(swerveSubsystem,fieldPoses.reefPose));
+        // m_driverController.b().whileTrue(new driveToPose(swerveSubsystem,fieldPoses.reefPose));
     }
 
     /* 
@@ -229,11 +231,11 @@ public class RobotContainer {
         
         // ------------------------- Preset Pose Commands ------------------------- //
         // m_operatorController.a().onTrue(setL1Pose);
-        m_operatorController.rightBumper().onTrue(setL4Pose);
+        m_operatorController.y().onTrue(setL4Pose);
         m_operatorController.b().onTrue(setL3Pose);
         m_operatorController.x().onTrue(setL2Pose);
         m_operatorController.a().onTrue(setHomePose);
-        m_operatorController.y().onTrue(setProcessorPose);
+        //m_operatorController.y().onTrue(setProcessorPose);
         // m_operatorController.a().and(m_operatorController.b().
         // and(m_operatorController.x().
         // and(m_operatorController.y().
