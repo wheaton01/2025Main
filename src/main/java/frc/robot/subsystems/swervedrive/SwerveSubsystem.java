@@ -927,9 +927,9 @@ public Pose2d getNearestHumanPlayerTagPose() {
   public Pose2d getRobotPose() {
     return swerveDrive.getPose();
 }
-PIDController XdeltaPID = new PIDController(1.0, 0, 0);
-PIDController YdeltaPID = new PIDController(1.0, 0, 0);
-PIDController thetaPID = new PIDController(1.0, 0, 0);
+PIDController XdeltaPID = swerveConstants.SWERVEX_CONTROLLER;
+PIDController YdeltaPID = swerveConstants.SWERVEY_CONTROLLER;
+PIDController thetaPID =  swerveConstants.SWERVETHETA_CONTROLLER;
 ApriltagRelativeRobotPose currentPose;
 
 // Desired scoring offset (robot should be 1 meter in front of the tag)

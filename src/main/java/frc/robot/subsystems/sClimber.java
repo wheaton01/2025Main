@@ -60,12 +60,12 @@ public class sClimber extends SubsystemBase {
   }
   public void climb(){
     if (enableClimber) {
-      climberMotor.set(1.0);
+      climberMotor.set(climberConstants.kClimbSpeed);
    }
   }  
   public void unClimb(){
     if (enableClimber) {
-      climberMotor.set(-1.0);
+      climberMotor.set(-climberConstants.kClimbSpeed);
     }
   } 
   public void zeroClimb(){

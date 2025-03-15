@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants;
 import frc.robot.Constants.poseConstants;
+import frc.robot.Constants.swerveConstants;
 import frc.robot.subsystems.swervedrive.ApriltagRelativeRobotPose;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import swervelib.SwerveController;
@@ -57,15 +58,15 @@ addRequirements(swerve);
   public void initialize() {
     if(cameraID == 0)
     {
-    swerve.setApriltagDrive(cameraID, poseConstants.xOffsetReef, -poseConstants.yOffsetReef);
+    swerve.setApriltagDrive(cameraID, swerveConstants.xOffsetReef, -swerveConstants.yOffsetReef);
     }
     else if(cameraID == 1)
     {
-      swerve.setApriltagDrive(cameraID, poseConstants.xOffsetReef, poseConstants.yOffsetReef);
+      swerve.setApriltagDrive(cameraID, swerveConstants.xOffsetReef, swerveConstants.yOffsetReef);
 
     }else if(cameraID == 2)
     {
-      swerve.setApriltagDrive(cameraID, 0.0, poseConstants.yOffsetReef);
+      swerve.setApriltagDrive(cameraID, 0.0, swerveConstants.yOffsetReef);
     }
   }
 

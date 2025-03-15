@@ -22,6 +22,7 @@ package frc.robot;
 import static edu.wpi.first.units.Units.Newton;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -55,8 +56,13 @@ public final class Constants {
         public static final int kPneuExtendID = 7;       // Pneumatic extend ID
         
         // Intake Sensor ID and Threshold
-        public static int kIntakeSensorID = 0;          // TODO : CORRECT ANALOG ID
+        public static int kIntakeSensorID = 0;        
         public static double kintakeSensorThreshold = 2000.0;
+
+        //vision Constants
+        public static final int ilCameraID = 0;//camera ID for the left camera
+        public static final int irCameraID = 1;//camera ID for the right camera
+        public static final int icCameraID = 2;//camera ID for the center camera
 
         //==================================================================================
         // Climber Constants
@@ -66,6 +72,7 @@ public final class Constants {
             public static final int kClimb1ID = 4;
             public static final int kRamp1ID = 5;
             public static final int kMotorID = 18;    
+            public static final double kClimbSpeed = 1.0;//TODO: maybe invert here
         }
 
         //==================================================================================
@@ -147,6 +154,12 @@ public final class Constants {
         // Tolerance Constants for Position and Rotation
         public static final double POSITION_TOLERANCE = 0.5;  // Tolerance for position accuracy
         public static final double ROTATION_TOLERANCE = 0.5;  // Tolerance for rotation accuracy
+        public static final PIDController SWERVEX_CONTROLLER = new PIDController(0.5, 0.0, 0.0);
+        public static final PIDController SWERVEY_CONTROLLER = new PIDController(0.5, 0.0, 0.0);
+        public static final PIDController SWERVETHETA_CONTROLLER = new PIDController(0.5, 0.0, 0.0);
+        
+        public static final double xOffsetReef = Units.inchesToMeters(0.0) ;
+        public static final double yOffsetReef = Units.inchesToMeters(0.0) ;
     }
     public static class fieldPoses {
         public static final Pose2d reefPose = new Pose2d(new Translation2d(5.034, 5.317), Rotation2d.fromDegrees(117));
@@ -158,28 +171,23 @@ public final class Constants {
         public static final double xOffsetHPStation = Units.inchesToMeters(12.0) ;
         public static final double yOffsetHPStation = Units.inchesToMeters(7.5) ;
 
-        //vision Constants
-        public static final int ilCameraID = 0;//camera ID for the left camera
-        public static final int irCameraID = 1;//camera ID for the right camera
-        public static final int icCameraID = 2;//camera ID for the center camera
-        public static Pose3d leftCamPose = new Pose3d(Units.inchesToMeters(8.0),
-                                                      Units.inchesToMeters(3.0),
-                                                      Units.inchesToMeters(3.0),
-                                                      new Rotation3d(
-                                                      Units.degreesToRadians(0.0),
-                                                      Units.degreesToRadians(0.0),
-                                                      Units.degreesToRadians(-30.0)));
-        public static Pose3d rightCamPose = new Pose3d(Units.inchesToMeters(8.0),
-                                                      Units.inchesToMeters(-3.0),
-                                                      Units.inchesToMeters(3.0),
-                                                      new Rotation3d(
-                                                      Units.degreesToRadians(0.0),
-                                                      Units.degreesToRadians(0.0),
-                                                      Units.degreesToRadians(30.0)));       
-        public static Pose3d centerCamPose = new Pose3d();
-        
-        public static final double xOffsetReef = Units.inchesToMeters(0.0) ;
-        public static final double yOffsetReef = Units.inchesToMeters(0.0) ;
+
+        // public static Pose3d leftCamPose = new Pose3d(Units.inchesToMeters(8.0),
+        //                                               Units.inchesToMeters(3.0),
+        //                                               Units.inchesToMeters(3.0),
+        //                                               new Rotation3d(
+        //                                               Units.degreesToRadians(0.0),
+        //                                               Units.degreesToRadians(0.0),
+        //                                               Units.degreesToRadians(-30.0)));
+        // public static Pose3d rightCamPose = new Pose3d(Units.inchesToMeters(8.0),
+        //                                               Units.inchesToMeters(-3.0),
+        //                                               Units.inchesToMeters(3.0),
+        //                                               new Rotation3d(
+        //                                               Units.degreesToRadians(0.0),
+        //                                               Units.degreesToRadians(0.0),
+        //                                               Units.degreesToRadians(30.0)));       
+        // public static Pose3d centerCamPose = new Pose3d();
+
         
     }
 }

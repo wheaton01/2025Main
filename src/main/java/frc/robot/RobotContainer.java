@@ -191,11 +191,11 @@ public class RobotContainer {
         //     () -> MathUtil.applyDeadband(-m_driverController.getRightX(), 0.1)*.75));
         m_driverController.leftTrigger(.2).whileTrue(new aprilTagSwerve(swerveSubsystem,
                         ()->-m_driverController.getLeftX(),()->-m_driverController.getLeftY(),()->m_driverController.getRightX(),
-                        ()->false,m_driverController,m_operatorController,fieldPoses.lSidePose, Constants.poseConstants.ilCameraID));
+                        ()->false,m_driverController,m_operatorController,fieldPoses.lSidePose, robotConstants.ilCameraID));
 
-                m_driverController.rightTrigger(.2).whileTrue(new aprilTagSwerve(swerveSubsystem,
-                                ()->-m_driverController.getLeftX(),()->-m_driverController.getLeftY(),()->m_driverController.getRightX(),
-                                ()->false,m_driverController,m_operatorController,fieldPoses.rSidePose,Constants.poseConstants.irCameraID));
+        m_driverController.rightTrigger(.2).whileTrue(new aprilTagSwerve(swerveSubsystem,
+                        ()->-m_driverController.getLeftX(),()->-m_driverController.getLeftY(),()->m_driverController.getRightX(),
+                        ()->false,m_driverController,m_operatorController,fieldPoses.rSidePose,robotConstants.irCameraID));
 
         //sElevator.setDefaultCommand(sElevator.setElevator(() -> MathUtil.applyDeadband(m_operatorController.getLeftY(), .1)));
         m_driverController.a().onTrue(new InstantCommand(swerveSubsystem::zeroGyro));
