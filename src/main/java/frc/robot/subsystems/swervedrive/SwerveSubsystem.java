@@ -973,17 +973,8 @@ public Optional<Pose3d> getAprilTagRobotRelativePose(int cameraID) {
 
   PhotonTrackedTarget bestTarget = result.getBestTarget();
   SmartDashboard.putString("AprilTag Target", bestTarget.toString());
-
-  // Get the robot-relative pose of the AprilTag
-  Transform3d tagToCamera = bestTarget.getBestCameraToTarget();
-
-  // Convert the AprilTag pose to robot-relative coordinates
-  Pose3d tagPoseRobotRelative = cameraPose.transformBy(tagToCamera);
-
-  // Log the computed pose
-  SmartDashboard.putString("AprilTag Robot Pose", tagPoseRobotRelative.toString());
-
-  return Optional.of(tagPoseRobotRelative);
+  //I made this code a lil bit more dumb so we can just manually tune it as we really only need to tune it 'once'
+  return Optional.of(bestTarget);
 }
 public void setApriltagDrive(int cameraID, double xOffset,double yOffset) {
   Optional<Pose3d> tagPoseOptional = getAprilTagRobotRelativePose(cameraID);
@@ -996,8 +987,8 @@ public void setApriltagDrive(int cameraID, double xOffset,double yOffset) {
   Pose3d tagPose = tagPoseOptional.get();
 
   // Compute desired position relative to the tag
-  double desiredX = tagPose.getX() + DESIRED_X_OFFSET;
-  double desiredY = tagPose.getY() + DESIRED_Y_OFFSET;
+  double desiredX = Units.metersToInches(tagPose.getX()) + DESIRED_X_OFFSET;
+  double desiredY = Units.metersToInches(tagPose.getY()) + DESIRED_Y_OFFSET;
   double desiredTheta = tagPose.getRotation().getZ() + Units.degreesToRadians(0);
 
   // Set PID setpoints to the adjusted desired pose
@@ -1024,8 +1015,8 @@ public void apriltagDrive(double xValue, double yValue, double thetaValue, int c
   Pose3d tagPose = tagPoseOptional.get();
 
   // Compute PID outputs
-  double xOutput = XdeltaPID.calculate(-tagPose.getX() + yValue);
-  double yOutput = YdeltaPID.calculate(-tagPose.getY() + xValue);
+  double xOutput = XdeltaPID.calculate(-Units.metersToInches(tagPose.getX())+yValue);
+  double yOutput = YdeltaPID.calculate(-Units.metersToInches(tagPose.getY())+xValue);
   double thetaOutput = thetaPID.calculate(MathUtil.angleModulus(tagPose.getRotation().getZ()));
   System.out.println("PID Output - X: " + xOutput + " Y: " + yOutput + " Theta: " + thetaOutput);
   SmartDashboard.putNumber("X Difference",XdeltaPID.getError());
