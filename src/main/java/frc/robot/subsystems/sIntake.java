@@ -48,7 +48,7 @@ state manager 3 = zero mode
     SmartDashboard.putBoolean("CORAL DETECTED", coralDetected);
     SmartDashboard.putNumber("Inake Sensor Val", aIntakeSensor.getValue());
 
-    // Keep the intake running if coral is detected OR if the extra intake phase is still running
+
     if (stateManager == 1) {
       setMotorSpeed(intakeConstants.kIdleIntakeSpeed);
     } else if (stateManager == 2) {
