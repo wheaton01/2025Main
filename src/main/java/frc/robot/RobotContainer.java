@@ -231,10 +231,14 @@ public class RobotContainer {
         
         // ------------------------- Preset Pose Commands ------------------------- //
         // m_operatorController.a().onTrue(setL1Pose);
-        m_operatorController.y().onTrue(setL4Pose);
-        m_operatorController.b().onTrue(setL3Pose);
-        m_operatorController.x().onTrue(setL2Pose);
-        m_operatorController.a().onTrue(setHomePose);
+        m_operatorController.y().onTrue(new SequentialCommandGroup(new ParallelCommandGroup(setL4Pose, new InstantCommand(sSlider::setRetract)),
+                                                new InstantCommand(sSlider::setExtend)));
+        m_operatorController.b().onTrue(new SequentialCommandGroup(new ParallelCommandGroup(setL3Pose, new InstantCommand(sSlider::setRetract)),
+                                                new InstantCommand(sSlider::setExtend)));
+        m_operatorController.x().onTrue(new SequentialCommandGroup(new ParallelCommandGroup(setL2Pose, new InstantCommand(sSlider::setRetract)),
+                                                new InstantCommand(sSlider::setExtend)));
+        m_operatorController.a().onTrue(new SequentialCommandGroup(new ParallelCommandGroup(setHomePose, new InstantCommand(sSlider::setRetract)),
+                                                new InstantCommand(sSlider::setRetract)));
         //m_operatorController.y().onTrue(setProcessorPose);
         // m_operatorController.a().and(m_operatorController.b().
         // and(m_operatorController.x().
