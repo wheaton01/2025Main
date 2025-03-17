@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -47,6 +48,8 @@ public class sElevator extends SubsystemBase {
     RelativeEncoder mElevatorEncoder;
     RelativeEncoder mElevatorEncoder2;
     double position2;
+    boolean atHome;
+    DigitalInput homingSwitch;
     // Constructor
     public sElevator() {
         mElevator1 = new SparkMax(robotConstants.kelevatorSparkID1, SparkMax.MotorType.kBrushless);
@@ -118,9 +121,20 @@ public class sElevator extends SubsystemBase {
                                      || (position - mElevatorUpPid.getSetpoint()) < 0;
     
                  if (atSetpoint) { 
+                    if (!homingMode){
                     output = elevatorConstants.kFeedForward; // Hold position
                     bDownFlag = false; // Reset flag when target is reached
                     }
+                    if(homingMode){
+                        if (!getHomeSW()) {
+                            output = elevatorConstants.kdownSpeed + elevatorConstants.kFeedForward;
+                        }
+                        if (getHomeSW()){
+                            output = elevatorConstants.kFeedForward;
+                            bDownFlag = false;
+                        }
+                    }
+                }
 
                 }
   
@@ -256,6 +270,9 @@ public class sElevator extends SubsystemBase {
             operatorOffset = heightOffset*70;
         }else{operatorOffset = 0;}
         
+    }
+    public boolean getHomeSW(){
+        return homingSwitch.get();
     }
     }
 

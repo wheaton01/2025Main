@@ -239,12 +239,7 @@ public class RobotContainer {
                                                 new InstantCommand(sSlider::setExtend)));
         m_operatorController.a().onTrue(new SequentialCommandGroup(new ParallelCommandGroup(setHomePose, new InstantCommand(sSlider::setRetract)),
                                                 new InstantCommand(sSlider::setRetract)));
-        //m_operatorController.y().onTrue(setProcessorPose);
-        // m_operatorController.a().and(m_operatorController.b().
-        // and(m_operatorController.x().
-        // and(m_operatorController.y().
-        // and(m_operatorController.rightBumper().whileFalse(setElevatorOffset)))));
-        
+
         // ----------------------- Climber Commands ----------------------- //
         new Trigger(() -> m_operatorController.rightStick().getAsBoolean() &&
                 m_operatorController.leftStick().getAsBoolean())
