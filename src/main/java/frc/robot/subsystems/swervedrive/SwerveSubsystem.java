@@ -912,41 +912,34 @@ private double targetID;
 public Optional<Pose3d> getAprilTagRobotRelativePose(int cameraID) {
   if (cameraID == 0) {
       result = vision.getLeftCamResult();
-      //cameraPose = swerveConstants.leftCamPose;
       SmartDashboard.putString("AprilTag Detection", "LeftCam");
   } else if (cameraID == 1) {
       result = vision.getRightCamResult();
-      //cameraPose = swerveConstants.rightCamPose;
       SmartDashboard.putString("AprilTag Detection", "RightCam");
   } else if (cameraID == 2) {
       result = vision.getCenterCamResult();
-      //cameraPose = swerveConstants.centerCamPose;
       SmartDashboard.putString("AprilTag Detection", "CenterCam");
   } else {
       SmartDashboard.putString("AprilTag Detection", "NO Camera FOUND");
-      return Optional.empty();  // Invalid camera ID
-  }
-
-  // 🔍 Print out the result before checking null
-  if (result == null) {
-      SmartDashboard.putString("AprilTag Error", "PhotonPipelineResult is NULL!");
       return Optional.empty();
-  } else {
-      SmartDashboard.putString("AprilTag Vision", "Result found: " + result.toString());
   }
 
-  if (!result.hasTargets()) {
+  if (result == null || !result.hasTargets()) {
       SmartDashboard.putString("AprilTag Detection", "NO TAG FOUND");
       return Optional.empty();
   }
 
   PhotonTrackedTarget bestTarget = result.getBestTarget();
-  SmartDashboard.putString("AprilTag Target", bestTarget.toString());
-  //I made this code a lil bit more dumb so we can just manually tune it as we really only need to tune it 'once'
   Transform3d transform = bestTarget.getBestCameraToTarget();
   Pose3d pose = new Pose3d(transform.getTranslation(), transform.getRotation());
+
+  // Store the last known pose and update timestamp
+  lastKnownTagPose = pose;
+  lastVisionTime = System.currentTimeMillis();
+
   return Optional.of(pose);
 }
+
 public void setApriltagDrive(int cameraID, double xOffset,double yOffset) {
   Optional<Pose3d> tagPoseOptional = getAprilTagRobotRelativePose(cameraID);
     DESIRED_X_OFFSET = xOffset;
@@ -968,38 +961,41 @@ public void setApriltagDrive(int cameraID, double xOffset,double yOffset) {
   thetaPID.setSetpoint(0.0);
 }
 
-
 public void apriltagDrive(double xValue, double yValue, double thetaValue, int cameraID) {
   System.out.println("apriltagDrive Running - X: " + xValue + " Y: " + yValue + " Theta: " + thetaValue);
   Optional<Pose3d> tagPoseOptional = getAprilTagRobotRelativePose(cameraID);
 
-  if (tagPoseOptional.isEmpty()) {
-     swerveDrive.drive(
-      new Translation2d(-xValue, -yValue),
-      thetaValue,
-      false, 
-      false
-    ); // No target detected, drive with joystick values
-      return; // No tag detected, don't drive
+  Pose3d tagPose;
+  if (tagPoseOptional.isPresent()) {
+      tagPose = tagPoseOptional.get();
+  } else {
+      // If vision is lost but within timeout, use last known position
+      if (System.currentTimeMillis() - lastVisionTime < VISION_TIMEOUT && lastKnownTagPose != null) {
+          tagPose = lastKnownTagPose;
+          SmartDashboard.putString("AprilTag Detection", "Using Last Known Pose");
+      } else {
+          // Vision has been lost for too long, fall back to joystick control
+          SmartDashboard.putString("AprilTag Detection", "Vision Lost - Using Manual Control");
+          swerveDrive.drive(new Translation2d(-xValue, -yValue), thetaValue, false, false);
+          return;
+      }
   }
 
-  Pose3d tagPose = tagPoseOptional.get();
-
   // Compute PID outputs
-  double xOutput = XdeltaPID.calculate(tagPose.getX())+yValue;
-  double yOutput = YdeltaPID.calculate(tagPose.getY())+xValue;
-  double thetaOutput = thetaPID.calculate(MathUtil.angleModulus(tagPose.getRotation().getZ())+thetaValue);
-  // System.out.println("PID Output - X: " + xOutput + " Y: " + yOutput + " Theta: " + thetaOutput);
-  SmartDashboard.putNumber("X Difference",XdeltaPID.getError());
-  SmartDashboard.putNumber("Y Difference",YdeltaPID.getError());
-  SmartDashboard.putNumber("Theta Difference",thetaPID.getError());
-  swerveDrive.drive(
-    new Translation2d(-xOutput,-yOutput),
-    thetaOutput,
-    false, 
-    false
-  ); 
+  double xOutput = XdeltaPID.calculate(tagPose.getX()) + yValue;
+  double yOutput = YdeltaPID.calculate(tagPose.getY()) + xValue;
+  double thetaOutput = thetaPID.calculate(MathUtil.angleModulus(tagPose.getRotation().getZ()) + thetaValue);
 
+  SmartDashboard.putNumber("X Difference", XdeltaPID.getError());
+  SmartDashboard.putNumber("Y Difference", YdeltaPID.getError());
+  SmartDashboard.putNumber("Theta Difference", thetaPID.getError());
+
+  swerveDrive.drive(
+      new Translation2d(-xOutput, -yOutput),
+      thetaOutput,
+      false,
+      false
+  );
 }
 
 
