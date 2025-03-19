@@ -83,6 +83,13 @@ public class SwerveSubsystem extends SubsystemBase
   /**
    * PhotonVision class to keep an accurate odometry.
    */
+  // Stores last known valid tag pose
+private Pose3d lastKnownTagPose = null;
+// Timestamp to track when vision was last successful
+private long lastVisionTime = 0;
+// Time (ms) before considering vision lost
+private final long VISION_TIMEOUT = 500;
+
   private Vision vision;
   PhotonTrackedTarget target;
   public  PhotonPipelineResult result = new PhotonPipelineResult();
@@ -166,9 +173,10 @@ public class SwerveSubsystem extends SubsystemBase
     if (visionDriveTest)
     {
       swerveDrive.updateOdometry();
-      if(vision.getNumberOfTargets()>1){
+      // if(vision.getNumberOfTargets()>1){
+      //   vision.updatePoseEstimation(swerveDrive);
+      //   }
       vision.updatePoseEstimation(swerveDrive);
-      }
     }
   }
 
@@ -446,6 +454,18 @@ public class SwerveSubsystem extends SubsystemBase
                             translationY.getAsDouble() * swerveDrive.getMaximumChassisVelocity()), 0.8),
                         Math.pow(angularRotationX.getAsDouble(), 3) * swerveDrive.getMaximumChassisAngularVelocity(),
                         true,
+                        false);
+  });
+  }
+  public Command driveRobotCentCommand(DoubleSupplier translationX, DoubleSupplier translationY, DoubleSupplier angularRotationX)
+  {
+    return run(() -> {
+      // Make the robot move
+      swerveDrive.drive(SwerveMath.scaleTranslation(new Translation2d(
+                            translationX.getAsDouble() * swerveDrive.getMaximumChassisVelocity(),
+                            translationY.getAsDouble() * swerveDrive.getMaximumChassisVelocity()), 0.8),
+                        Math.pow(angularRotationX.getAsDouble(), 3) * swerveDrive.getMaximumChassisAngularVelocity(),
+                        false,
                         false);
   });
   }
@@ -871,58 +891,7 @@ public Pose2d getNearestHumanPlayerTagPose() {
 
   return nearestTagPose; // Return the nearest tag pose, or null if no valid tag is found
 }
-// double[] rawGyro = new double[3];
-// PigeonIMU pigeonIMU = new PigeonIMU(4);
-//     private void setupPoseWithLimelight() {
 
-//     // Get the gyro angular velocities
-//       pigeonIMU.getRawGyro(rawGyro);
-    
-//     // Extract pitch, roll, and yaw velocities
-//       double pitchVelocity = rawGyro[0];  // X-axis (pitch)
-//       double rollVelocity = rawGyro[1];   // Y-axis (roll)
-//       double yawVelocity = rawGyro[2];    // Z-axis (yaw)
-    
-//     // Create the robot's orientation with updated gyro velocities
-//     Orientation3d robotOrientation = new Orientation3d(
-//         swerveDrive.getGyroRotation3d(),
-//         new AngularVelocity3d(
-//             DegreesPerSecond.of(pitchVelocity),
-//             DegreesPerSecond.of(rollVelocity),
-//             DegreesPerSecond.of(yawVelocity)
-//         ));
-//         // Update Limelight with robot orientation for MegaTag2
-//         myLimelight.getSettings()
-//         .withRobotOrientation(robotOrientation)
-//         .save();
-
-//         // Get MegaTag2 pose estimation
-//         Optional<PoseEstimate> visionEstimate = myLimelight.getPoseEstimator(true).getPoseEstimate();
-        
-//         // If a valid pose is found, update the robot’s odometry
-//         visionEstimate.ifPresent(poseEstimate -> {
-//             double timestamp = poseEstimate.timestampSeconds;
-//             Pose2d estimatedPose = poseEstimate.pose.toPose2d();
-//             swerveDrive.addVisionMeasurement(estimatedPose, timestamp);
-//         });
-//     }
-//     private long lastUpdateTime = System.currentTimeMillis();
-
-//     private void updatePoseWithLimelight() {
-//         // Update at a limited frequency (e.g., once every 100ms)
-//         long currentTime = System.currentTimeMillis();
-//         if (currentTime - lastUpdateTime >= 200) {
-//             lastUpdateTime = currentTime;
-            
-//             Optional<PoseEstimate> visionEstimate = myLimelight.getPoseEstimator(true).getPoseEstimate();
-        
-//             visionEstimate.ifPresent(poseEstimate -> {
-//                 double timestamp = poseEstimate.timestampSeconds;
-//                 Pose2d estimatedPose = poseEstimate.pose.toPose2d(); // Convert Limelight pose to WPILib Pose2d
-//                 swerveDrive.addVisionMeasurement(estimatedPose, timestamp); // Update odometry
-//             });
-//         }
-//     }
     
   public Pose2d getRobotPose() {
     return swerveDrive.getPose();
@@ -994,9 +963,9 @@ public void setApriltagDrive(int cameraID, double xOffset,double yOffset) {
   double desiredTheta = tagPose.getRotation().getZ() + Units.degreesToRadians(0);
 
   // Set PID setpoints to the adjusted desired pose
-  XdeltaPID.setSetpoint(desiredX);
-  YdeltaPID.setSetpoint(desiredY);
-  thetaPID.setSetpoint(desiredTheta);
+  XdeltaPID.setSetpoint(DESIRED_X_OFFSET);
+  YdeltaPID.setSetpoint(DESIRED_Y_OFFSET);
+  thetaPID.setSetpoint(0.0);
 }
 
 
@@ -1017,16 +986,16 @@ public void apriltagDrive(double xValue, double yValue, double thetaValue, int c
   Pose3d tagPose = tagPoseOptional.get();
 
   // Compute PID outputs
-  double xOutput = XdeltaPID.calculate(-tagPose.getX()+yValue);
-  double yOutput = YdeltaPID.calculate(-tagPose.getY()+xValue);
-  double thetaOutput = thetaPID.calculate(MathUtil.angleModulus(tagPose.getRotation().getZ()));
-  System.out.println("PID Output - X: " + xOutput + " Y: " + yOutput + " Theta: " + thetaOutput);
+  double xOutput = XdeltaPID.calculate(tagPose.getX())+yValue;
+  double yOutput = YdeltaPID.calculate(tagPose.getY())+xValue;
+  double thetaOutput = thetaPID.calculate(MathUtil.angleModulus(tagPose.getRotation().getZ())+thetaValue);
+  // System.out.println("PID Output - X: " + xOutput + " Y: " + yOutput + " Theta: " + thetaOutput);
   SmartDashboard.putNumber("X Difference",XdeltaPID.getError());
   SmartDashboard.putNumber("Y Difference",YdeltaPID.getError());
   SmartDashboard.putNumber("Theta Difference",thetaPID.getError());
   swerveDrive.drive(
-    new Translation2d(xOutput,yOutput),
-    thetaValue,
+    new Translation2d(-xOutput,-yOutput),
+    thetaOutput,
     false, 
     false
   ); 

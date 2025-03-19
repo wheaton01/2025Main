@@ -58,7 +58,7 @@ public class sElevator extends SubsystemBase {
         mElevatorEncoder2 = mElevator2.getEncoder();  
         mElevatorEncoder.setPosition(0);
         mElevatorEncoder2.setPosition(0);
-
+        homingSwitch = new DigitalInput(robotConstants.elevatorHomingSWID);
         
         // mElevatorEncoder = new Encoder(elevatorConstants.kEncoderA, elevatorConstants.kEncoderB);
         // mElevatorEncoder.setSamplesToAverage(5);
@@ -133,6 +133,8 @@ public class sElevator extends SubsystemBase {
                             output = elevatorConstants.kFeedForward;
                             bDownFlag = false;
                         }
+                        output = elevatorConstants.kFeedForward;
+                        bDownFlag = false;
                     }
                 }
 

@@ -58,6 +58,7 @@ public final class Constants {
         // Intake Sensor ID and Threshold
         public static int kIntakeSensorID = 0;        
         public static double kintakeSensorThreshold = 2000.0;
+        public static int elevatorHomingSWID = 0;
 
         //vision Constants
         public static final int ilCameraID = 0;//camera ID for the left camera
@@ -154,12 +155,12 @@ public final class Constants {
         // Tolerance Constants for Position and Rotation
         public static final double POSITION_TOLERANCE = 0.5;  // Tolerance for position accuracy
         public static final double ROTATION_TOLERANCE = 0.5;  // Tolerance for rotation accuracy
-        public static final PIDController SWERVEX_CONTROLLER = new PIDController(0.1, 0.0, 0.0);
-        public static final PIDController SWERVEY_CONTROLLER = new PIDController(0.1, 0.0, 0.0);
-        public static final PIDController SWERVETHETA_CONTROLLER = new PIDController(0.1, 0.0, 0.0);
+        public static final PIDController SWERVEX_CONTROLLER = new PIDController(1.0, 0.0, 0.0);
+        public static final PIDController SWERVEY_CONTROLLER = new PIDController(1.0, 0.0, 0.0);
+        public static final PIDController SWERVETHETA_CONTROLLER = new PIDController(0.03, 0.0, 0.0);
         
-        public static final double xOffsetReef = Units.metersToInches(-.5) ;
-        public static final double yOffsetReef = Units.metersToInches(-0.09) ;
+        public static final double xOffsetReef = .3 ;
+        public static final double yOffsetReef = 0.25;
     }
     public static class fieldPoses {
         public static final Pose2d reefPose = new Pose2d(new Translation2d(5.034, 5.317), Rotation2d.fromDegrees(117));
@@ -171,23 +172,5 @@ public final class Constants {
         public static final double xOffsetHPStation = Units.inchesToMeters(12.0) ;
         public static final double yOffsetHPStation = Units.inchesToMeters(7.5) ;
 
-
-        // public static Pose3d leftCamPose = new Pose3d(Units.inchesToMeters(8.0),
-        //                                               Units.inchesToMeters(3.0),
-        //                                               Units.inchesToMeters(3.0),
-        //                                               new Rotation3d(
-        //                                               Units.degreesToRadians(0.0),
-        //                                               Units.degreesToRadians(0.0),
-        //                                               Units.degreesToRadians(-30.0)));
-        // public static Pose3d rightCamPose = new Pose3d(Units.inchesToMeters(8.0),
-        //                                               Units.inchesToMeters(-3.0),
-        //                                               Units.inchesToMeters(3.0),
-        //                                               new Rotation3d(
-        //                                               Units.degreesToRadians(0.0),
-        //                                               Units.degreesToRadians(0.0),
-        //                                               Units.degreesToRadians(30.0)));       
-        // public static Pose3d centerCamPose = new Pose3d();
-
-        
     }
 }

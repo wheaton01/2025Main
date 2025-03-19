@@ -185,15 +185,16 @@ public class RobotContainer {
 
         m_driverController.leftBumper()
                  .whileTrue(
-                         swerveSubsystem.driveCommand(
+                         swerveSubsystem.driveRobotCentCommand(
             () -> MathUtil.applyDeadband(-m_driverController.getLeftY(), 0.1)*.10,
             () -> MathUtil.applyDeadband(-m_driverController.getLeftX(), 0.1)*.10,
-            () -> MathUtil.applyDeadband(-m_driverController.getRightX(), 0.1)*.350));
+            () -> MathUtil.applyDeadband(-m_driverController.getRightX(), 0.1)*.350)
+            );
 
         //TODO: FIX THIS
-        // m_driverController.leftTrigger(.2).whileTrue(new aprilTagSwerve(swerveSubsystem,
-        //                 ()->-m_driverController.getLeftX(),()->-m_driverController.getLeftY(),()->m_driverController.getRightX(),
-        //                 ()->false,m_driverController,m_operatorController,fieldPoses.lSidePose, robotConstants.ilCameraID));
+        m_driverController.leftTrigger(.2).whileTrue(new aprilTagSwerve(swerveSubsystem,
+                        ()->-m_driverController.getLeftX(),()->-m_driverController.getLeftY(),()->m_driverController.getRightX(),
+                        ()->false,m_driverController,m_operatorController,fieldPoses.lSidePose, robotConstants.ilCameraID));
 
         // m_driverController.rightTrigger(.2).whileTrue(new aprilTagSwerve(swerveSubsystem,
         //                 ()->-m_driverController.getLeftX(),()->-m_driverController.getLeftY(),()->m_driverController.getRightX(),
@@ -231,14 +232,13 @@ public class RobotContainer {
         
         // ------------------------- Preset Pose Commands ------------------------- //
         // m_operatorController.a().onTrue(setL1Pose);
-        m_operatorController.y().onTrue(new SequentialCommandGroup(new ParallelCommandGroup(setL4Pose, new InstantCommand(sSlider::setRetract)),
+        m_operatorController.y().onTrue(new SequentialCommandGroup(new ParallelCommandGroup(setL4Pose,  new InstantCommand(sSlider::setRetract)),
                                                 new InstantCommand(sSlider::setExtend)));
-        m_operatorController.b().onTrue(new SequentialCommandGroup(new ParallelCommandGroup(setL3Pose, new InstantCommand(sSlider::setRetract)),
+        m_operatorController.b().onTrue(new SequentialCommandGroup(new ParallelCommandGroup(setL3Pose,  new InstantCommand(sSlider::setRetract)),
                                                 new InstantCommand(sSlider::setExtend)));
-        m_operatorController.x().onTrue(new SequentialCommandGroup(new ParallelCommandGroup(setL2Pose, new InstantCommand(sSlider::setRetract)),
+        m_operatorController.x().onTrue(new SequentialCommandGroup(new ParallelCommandGroup(setL2Pose,  new InstantCommand(sSlider::setRetract)),
                                                 new InstantCommand(sSlider::setExtend)));
-        m_operatorController.a().onTrue(new SequentialCommandGroup(new ParallelCommandGroup(setHomePose, new InstantCommand(sSlider::setRetract)),
-                                                new InstantCommand(sSlider::setRetract)));
+        m_operatorController.a().onTrue(new ParallelCommandGroup(setHomePose,new InstantCommand(sSlider::setRetract)));
 
         // ----------------------- Climber Commands ----------------------- //
         new Trigger(() -> m_operatorController.rightStick().getAsBoolean() &&
@@ -271,9 +271,9 @@ public class RobotContainer {
         // **Left Trigger (≥ 0.2)**: Deploy & run **intake forward, place motor in reverse**
         m_operatorController.leftTrigger(0.2)
                 .whileTrue(new ParallelCommandGroup(
-                        new InstantCommand(sIntake::setBallIntake),
-                        new setCHaptics(m_controllerHaptics, 0.2))
-                        ).onFalse(new InstantCommand(sIntake::setZero)); // Haptic feedback when motors are on
+                           new InstantCommand(sIntake::setBallIntake),
+                           new setCHaptics(m_controllerHaptics, 0.2))
+                           ).onFalse(new InstantCommand(sIntake::setZero)); // Haptic feedback when motors are on
         // m_operatorController.rightTrigger(0.2)
         //                 .whileTrue(new ParallelCommandGroup(
         //                         new InstantCommand(sEndAffector::setPlace),
@@ -282,7 +282,7 @@ public class RobotContainer {
         //                                                                 new InstantCommand(sIntake::hardResetIntake)
         //                         )); // Haptic feedback when motors are on
         RobotModeTriggers.teleop().onTrue(new InstantCommand(sIntake::hardResetIntake));
-        RobotModeTriggers.teleop().onTrue(setHomePose);
+        //RobotModeTriggers.teleop().onTrue(setHomePose);//TODO: REIMPLEMENT
         }
 
     /* 
