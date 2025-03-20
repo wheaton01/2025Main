@@ -367,23 +367,23 @@ public class Vision
      * Left Camera
      */
     LIMELIGHT("limelight",
-             new Rotation3d(0, Math.toRadians(0.0), Math.toRadians(0)),
+             new Rotation3d(0, Math.toRadians(0.0), Math.toRadians(-10)),
              new Translation3d(Units.inchesToMeters(0.0),
                                Units.inchesToMeters(0.0),
-                               Units.inchesToMeters(31.6)),
+                               .820),
              VecBuilder.fill(1.5, 1, .8), VecBuilder.fill(0.5, 0.5, 1)),
     rightCam("rightCam",
-             new Rotation3d(0, Math.toRadians(0.0), Math.toRadians(0)),
-             new Translation3d(Units.inchesToMeters(0.0),
-                               Units.inchesToMeters(0.0),
-                               Units.inchesToMeters(31.6)),
+             new Rotation3d(0, Math.toRadians(0.0), Math.toRadians(10)),
+             new Translation3d(0.07,
+                               0.290,
+                               0.180),
              VecBuilder.fill(1.5, 1, .8), VecBuilder.fill(0.5, 0.5, 1)),
     leftCam("leftCam",
-             new Rotation3d(0, Math.toRadians(0.0), Math.toRadians(0)),
-             new Translation3d(Units.inchesToMeters(0.0),
-                               Units.inchesToMeters(0.0),
-                               Units.inchesToMeters(5.6)),
-             VecBuilder.fill(1.5, 1, .8), VecBuilder.fill(0.5, 0.5, 1));
+             new Rotation3d(0, Math.toRadians(0.0), Math.toRadians(10)),
+             new Translation3d(.07,
+                               -.290,
+                               .180),
+             VecBuilder.fill(3.5, 1.5, 1.25), VecBuilder.fill(0.5, 0.5, 1));
 
     /**
      * Latency alert to use when high latency is detected.

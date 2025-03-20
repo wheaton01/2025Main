@@ -976,7 +976,7 @@ public void apriltagDrive(double xValue, double yValue, double thetaValue, int c
       } else {
           // Vision has been lost for too long, fall back to joystick control
           SmartDashboard.putString("AprilTag Detection", "Vision Lost - Using Manual Control");
-          swerveDrive.drive(new Translation2d(-xValue, -yValue), thetaValue, false, false);
+          swerveDrive.drive(new Translation2d(-xValue*.3, -yValue*.3), thetaValue*.3, false, false);
           return;
       }
   }
