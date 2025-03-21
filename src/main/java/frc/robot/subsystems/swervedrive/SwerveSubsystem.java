@@ -964,9 +964,20 @@ public void setApriltagDrive(int cameraID, double xOffset, double yOffset) {
   Pose2d tagFieldPose = tagFieldPose3d.toPose2d(); // Convert Pose3d to Pose2d
 
   // Compute desired scoring position relative to field
-  double desiredX = tagFieldPose.getX() + xOffset;
-  double desiredY = tagFieldPose.getY() + yOffset;
-  double desiredTheta = tagFieldPose.getRotation().getRadians(); 
+// Get tag's field rotation
+Rotation2d tagRotation = tagFieldPose.getRotation();
+
+// Create a translation for the offset (robot-relative)
+Translation2d offsetTranslation = new Translation2d(xOffset, yOffset);
+
+// Rotate the offset into field space
+Translation2d fieldRelativeOffset = offsetTranslation.rotateBy(tagRotation);
+
+// Compute final desired field pose
+double desiredX = tagFieldPose.getX() + fieldRelativeOffset.getX();
+double desiredY = tagFieldPose.getY() + fieldRelativeOffset.getY();
+double desiredTheta = tagFieldPose.getRotation().getRadians();
+
 
   // Store this as the fixed goal
   desiredPose = new Pose2d(desiredX, desiredY, new Rotation2d(desiredTheta));
