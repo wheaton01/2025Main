@@ -73,7 +73,7 @@ public final class Constants {
             public static final int kClimb1ID = 4;
             public static final int kRamp1ID = 5;
             public static final int kMotorID = 18;    
-            public static final double kClimbSpeed = 1.0;//TODO: maybe invert here
+            public static final double kClimbSpeed = -1.0;//Inverted 3/21
         }
 
         //==================================================================================

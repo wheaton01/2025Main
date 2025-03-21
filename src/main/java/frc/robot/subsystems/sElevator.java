@@ -92,7 +92,7 @@ public class sElevator extends SubsystemBase {
         // ╚════════════════════════════╝
         SmartDashboard.putNumber("elevator Pose",getHeight());
         SmartDashboard.putNumber("elevator Pose2",getHeight2());
-
+        SmartDashboard.putBoolean("elevator Home",getHomeSW());
         if (!elevatorConstants.btestMode) {
             SmartDashboard.putBoolean("Down Flag ", bDownFlag);
     
@@ -133,8 +133,8 @@ public class sElevator extends SubsystemBase {
                             output = elevatorConstants.kFeedForward;
                             bDownFlag = false;
                         }
-                        output = elevatorConstants.kFeedForward;
-                        bDownFlag = false;
+                        // output = elevatorConstants.kFeedForward;
+                        // bDownFlag = false;//ELEVATOR TESTING WITHOUT HOMING SWITCH
                     }
                 }
 

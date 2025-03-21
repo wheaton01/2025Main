@@ -73,7 +73,7 @@ addRequirements(swerve);
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    swerve.apriltagDrive(vX.getAsDouble(),vY.getAsDouble(),omega.getAsDouble(), cameraID);
+    swerve.apriltagDrive(vX.getAsDouble(),vY.getAsDouble(),omega.getAsDouble());
     // distToTarget =swerve.getDistanceToTarget();
     // driverXbox.setRumble(null,hapticSetpoint = swerve.scaleDistance(distToTarget));
     // opXbox.setRumble(null,hapticSetpoint = swerve.scaleDistance(distToTarget));
