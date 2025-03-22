@@ -21,6 +21,18 @@
           "data": {
             "name": "setHomePose"
           }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 5.0
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "CSSEOA"
+          }
         }
       ]
     }

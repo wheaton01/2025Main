@@ -358,7 +358,7 @@ public class RobotContainer {
                 m_driverController::getRightTriggerAxis,
                 HPStation,
                 false
-        ));
+        )).onFalse(new InstantCommand(swerveSubsystem::stop).withTimeout(0));
     }
     private void registerNamedCommands() {
         NamedCommands.registerCommand("setHomePose", new SequentialCommandGroup(
