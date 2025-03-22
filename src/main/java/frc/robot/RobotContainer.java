@@ -180,8 +180,7 @@ public class RobotContainer {
             .onFalse(
             new SequentialCommandGroup(
                 new InstantCommand(sIntake::setFeedIntake),
-                new setElevatorOffset(sElevator,()->-.2),
-            new WaitCommand(2.0),
+            new WaitCommand(.5),
                 new InstantCommand(sIntake::setZero),
                 new InstantCommand(sSlider::setRetract), 
                 new InstantCommand(sIntake::hardResetIntake),

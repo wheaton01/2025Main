@@ -103,7 +103,7 @@ state manager 3 = zero mode
   }
   /** Runs intake at ball intake speed. */
   public void setBallIntake() {
-    stateManager = 4;
+    stateManager = 4 ;
   }
 
   /**

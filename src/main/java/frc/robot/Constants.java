@@ -102,7 +102,7 @@ public final class Constants {
             // Elevator Height Constants
             public static final double kL4Height = 950.0;
             public static final double kL3Height = 580.0; 
-            public static final double kL2Height = 390.0; 
+            public static final double kL2Height = 350.0; 
             public static final double kL1Height = 0.0;
 
             public static double kProcessorhHeight = 120;
