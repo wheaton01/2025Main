@@ -203,13 +203,23 @@ public class RobotContainer {
         //sElevator.setDefaultCommand(sElevator.setElevator(() -> MathUtil.applyDeadband(m_operatorController.getLeftY(), .1)));
         m_driverController.a().onTrue(new InstantCommand(swerveSubsystem::zeroGyro));
         m_driverController.start().onTrue(new InstantCommand(swerveSubsystem::zeroGyroWithAlliance));
-        //Driver Non Driving Controls
-        m_driverController.rightBumper().onTrue(new ParallelCommandGroup(new InstantCommand(sIntake::setFeedIntake)
+        //`````````````````````````````````````````````````
+
+        //Driver shooting controls
+
+        m_driverController.rightBumper().onTrue(new SequentialCommandGroup(new InstantCommand(sSlider::setExtend)                                                        
+        )) .onFalse(new SequentialCommandGroup(new setElevatorOffset(sElevator,()->-.3),new InstantCommand(sIntake::setFeedIntake),
+            new WaitCommand(2.0)
+             ,new InstantCommand(sIntake::setZero),new InstantCommand(sSlider::setRetract)
+            ).withTimeout(0));  
+            //backup//
+        // m_driverController.rightBumper().onTrue(new ParallelCommandGroup(new InstantCommand(sIntake::setFeedIntake)
                                                                          
-                                                                        ))
-                                          .onFalse(new ParallelCommandGroup(new InstantCommand(sIntake::setZero)
+        //                                                                 ))
+        //                                   .onFalse(new ParallelCommandGroup(new InstantCommand(sIntake::setZero)
                                          
-                                          ).withTimeout(0));        
+        //                                   ).withTimeout(0));  
+
         // Create DriveToPoseCommand based on trigger inputs
         // createDriveToPoseTrigger(m_driverController::getRightTriggerAxis, false);
         // createDriveToPoseTrigger(m_driverController::getLeftTriggerAxis, false);
@@ -358,14 +368,16 @@ public class RobotContainer {
                 new InstantCommand(sIntake::hardResetIntake)
         )); 
         NamedCommands.registerCommand("placeL4", new SequentialCommandGroup(
+                //setting elevator to L4 height and extending the slider
                 new setElevatorPose(sElevator, elevatorConstants.kL4Height).withTimeout(2.0),
                 new InstantCommand(sSlider::setExtend),
-                new WaitCommand(.5),
-                
-                new InstantCommand(sIntake::setCoralPlaceMode),
-                new WaitCommand(.5),
+                new WaitCommand(1.25),
+                //actually feeding the intake
                 new InstantCommand(sIntake::setFeedIntake),
-                
+                new WaitCommand(.125),
+                new setElevatorOffset(sElevator, ()->-0.5),
+                new WaitCommand(.75),
+                //going back down
                 new InstantCommand(sSlider::setRetract),
                 new WaitCommand(.5)
         ));
