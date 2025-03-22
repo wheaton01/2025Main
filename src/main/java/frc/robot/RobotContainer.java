@@ -214,8 +214,10 @@ public class RobotContainer {
                                                     new WaitCommand(2.0),
                                                     new InstantCommand(sIntake::setZero),
                                                     new InstantCommand(sSlider::setRetract), 
-                                                    new InstantCommand(sIntake::hardResetIntake)
-                                                    ).withTimeout(3.0));  
+                                                    new InstantCommand(sIntake::hardResetIntake),
+                                                    new WaitCommand(.5),
+                                                    setHomePose//TODO: discuss this with the team
+                                                    ).withTimeout(4.0));  
 
         createDriveToPoseButtonTrigger(m_driverController.x(), true);
         // m_driverController.b().whileTrue(new driveToPose(swerveSubsystem,fieldPoses.reefPose));
