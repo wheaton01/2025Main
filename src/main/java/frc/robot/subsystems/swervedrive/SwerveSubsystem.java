@@ -913,19 +913,20 @@ private Pose2d desiredPose;
 
 private int targetID;
 public Optional<Pose3d> getAprilTagRobotRelativePose(int cameraID) {
-  if (cameraID == 0) {
-      result = vision.getLeftCamResult();
-      SmartDashboard.putString("AprilTag Detection", "LeftCam");
-  } else if (cameraID == 1) {
-      result = vision.getRightCamResult();
-      SmartDashboard.putString("AprilTag Detection", "RightCam");
-  } else if (cameraID == 2) {
-      result = vision.getCenterCamResult();
-      SmartDashboard.putString("AprilTag Detection", "CenterCam");
-  } else {
-      SmartDashboard.putString("AprilTag Detection", "NO Camera FOUND");
-      return Optional.empty();
-  }
+  // if (cameraID == 0) {
+  //     result = vision.getLeftCamResult();
+  //     SmartDashboard.putString("AprilTag Detection", "LeftCam");
+  // } else if (cameraID == 1) {
+  //     result = vision.getRightCamResult();
+  //     SmartDashboard.putString("AprilTag Detection", "RightCam");
+  // } else if (cameraID == 2) {
+  //     result = vision.getCenterCamResult();
+  //     SmartDashboard.putString("AprilTag Detection", "CenterCam");
+  // } else {
+  //     SmartDashboard.putString("AprilTag Detection", "NO Camera FOUND");
+  //     return Optional.empty();
+  // }
+  result = vision.getBestCameraResult();
   
 
 
