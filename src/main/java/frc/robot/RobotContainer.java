@@ -168,41 +168,9 @@ public class RobotContainer {
     */
     public void driverControls() {
         
-        // Set default drive command
-    boolean isRedAlliance = DriverStation.getAlliance().isPresent() &&
-                            DriverStation.getAlliance().get() == DriverStation.Alliance.Red;
-
-    // Flip controls if on Red Alliance
-    double flipMultiplier = isRedAlliance ? -1.0 : 1.0;
-
-    swerveSubsystem.setDefaultCommand(
-        swerveSubsystem.driveCommand(
-            () -> flipMultiplier * MathUtil.applyDeadband(-m_driverController.getLeftY(), 0.1),
-            () -> flipMultiplier * MathUtil.applyDeadband(-m_driverController.getLeftX(), 0.1),
-            () -> MathUtil.applyDeadband(-m_driverController.getRightX(), 0.1)
-        )
-    );
-
-        m_driverController.leftBumper()
-                 .whileTrue(
-                         swerveSubsystem.driveRobotCentCommand(
-            () -> MathUtil.applyDeadband(-m_driverController.getLeftY(), 0.1)*.10,
-            () -> MathUtil.applyDeadband(-m_driverController.getLeftX(), 0.1)*.10,
-            () -> MathUtil.applyDeadband(-m_driverController.getRightX(), 0.1)*.350)
-            );
-
-        //TODO: FIX THIS
-        m_driverController.leftTrigger(.2).whileTrue(new aprilTagSwerve(swerveSubsystem,
-                        ()->-m_driverController.getLeftX(),()->-m_driverController.getLeftY(),()->m_driverController.getRightX(),
-                        ()->false,m_driverController,m_operatorController,fieldPoses.lSidePose, robotConstants.ilCameraID));
-
-        // m_driverController.rightTrigger(.2).whileTrue(new aprilTagSwerve(swerveSubsystem,
-        //                 ()->-m_driverController.getLeftX(),()->-m_driverController.getLeftY(),()->m_driverController.getRightX(),
-        //                 ()->false,m_driverController,m_operatorController,fieldPoses.rSidePose,robotConstants.irCameraID));
-
-        //sElevator.setDefaultCommand(sElevator.setElevator(() -> MathUtil.applyDeadband(m_operatorController.getLeftY(), .1)));
-        m_driverController.a().onTrue(new InstantCommand(swerveSubsystem::zeroGyro));
-        m_driverController.start().onTrue(new InstantCommand(swerveSubsystem::zeroGyroWithAlliance));
+        driveControls();
+        //DISABLE VISION
+        m_driverController.start().and(m_driverController.back()).onTrue(new InstantCommand(swerveSubsystem::stopVision));
         //`````````````````````````````````````````````````
         //`````````Driver shooting controls````````````````
         //`````````````````````````````````````````````````
@@ -221,6 +189,43 @@ public class RobotContainer {
 
         createDriveToPoseButtonTrigger(m_driverController.x(), true);
         // m_driverController.b().whileTrue(new driveToPose(swerveSubsystem,fieldPoses.reefPose));
+    }
+    public void driveControls(){
+        // Set default drive command
+        boolean isRedAlliance = DriverStation.getAlliance().isPresent() &&
+        DriverStation.getAlliance().get() == DriverStation.Alliance.Red;
+
+            // Flip controls if on Red Alliance
+            double flipMultiplier = isRedAlliance ? -1.0 : 1.0;
+
+            swerveSubsystem.setDefaultCommand(
+            swerveSubsystem.driveCommand(
+            () -> flipMultiplier * MathUtil.applyDeadband(-m_driverController.getLeftY(), 0.1),
+            () -> flipMultiplier * MathUtil.applyDeadband(-m_driverController.getLeftX(), 0.1),
+            () -> MathUtil.applyDeadband(-m_driverController.getRightX(), 0.1)
+            )
+            );
+
+            m_driverController.leftBumper()
+            .whileTrue(
+                 swerveSubsystem.driveRobotCentCommand(
+            () -> MathUtil.applyDeadband(-m_driverController.getLeftY(), 0.1)*.10,
+            () -> MathUtil.applyDeadband(-m_driverController.getLeftX(), 0.1)*.10,
+            () -> MathUtil.applyDeadband(-m_driverController.getRightX(), 0.1)*.350)
+            );
+
+            //TODO: FIX THIS
+            m_driverController.leftTrigger(.2).whileTrue(new aprilTagSwerve(swerveSubsystem,
+                ()->-m_driverController.getLeftX(),()->-m_driverController.getLeftY(),()->m_driverController.getRightX(),
+                ()->false,m_driverController,m_operatorController,fieldPoses.lSidePose, robotConstants.ilCameraID));
+
+            // m_driverController.rightTrigger(.2).whileTrue(new aprilTagSwerve(swerveSubsystem,
+            //                 ()->-m_driverController.getLeftX(),()->-m_driverController.getLeftY(),()->m_driverController.getRightX(),
+            //                 ()->false,m_driverController,m_operatorController,fieldPoses.rSidePose,robotConstants.irCameraID));
+
+            //sElevator.setDefaultCommand(sElevator.setElevator(() -> MathUtil.applyDeadband(m_operatorController.getLeftY(), .1)));
+            m_driverController.a().onTrue(new InstantCommand(swerveSubsystem::zeroGyro));
+            m_driverController.start().onTrue(new InstantCommand(swerveSubsystem::zeroGyroWithAlliance));
     }
 
     /* 

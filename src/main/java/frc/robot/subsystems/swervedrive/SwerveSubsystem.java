@@ -1042,6 +1042,8 @@ public double scaleDistance(double distance) {
   return Math.max(0, Math.min(100, 100 - ((distance - 1.0) / (15.0 - 1.0)) * 100));
 }
 
-  
+  public void stopVision(){
+    visionDriveTest = false;
+  }
 
 }
