@@ -55,10 +55,10 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 ║       __/\\\/____________\//\\\\\\\\\\\\\/___\//\\\\\\\\\\\\\/___\///\\\\\\\\\/_____ ║
 ║        _\///_______________\/////////////______\/////////////_______\/////////______ ║
 ╚══════════════════════════════════════════════════════════════════════════════════════╝
-╔════════════════════════════════════════════════════════════════════════════════════════════════╗
-║                         RobotContainer Class  ::  This is like our main class                  ║
-║                                                 creates button binds and commands              ║ 
-╚════════════════════════════════════════════════════════════════════════════════════════════════╝
+╔══════════════════════════════════════════════════════════════════════════════════════╗
+║               RobotContainer Class  ::  This is like our main class                  ║
+║                              creates button binds and commands                       ║ 
+╚══════════════════════════════════════════════════════════════════════════════════════╝
 */
 public class RobotContainer {
     sEndAffector sEndAffector;
@@ -204,31 +204,19 @@ public class RobotContainer {
         m_driverController.a().onTrue(new InstantCommand(swerveSubsystem::zeroGyro));
         m_driverController.start().onTrue(new InstantCommand(swerveSubsystem::zeroGyroWithAlliance));
         //`````````````````````````````````````````````````
+        //`````````Driver shooting controls````````````````
+        //`````````````````````````````````````````````````
+        m_driverController.rightBumper().onTrue(new SequentialCommandGroup(
+                                                    new InstantCommand(sSlider::setExtend)))  
+                                        .onFalse(new SequentialCommandGroup(
+                                                    new setElevatorOffset(sElevator,()->-.2),
+                                                    new InstantCommand(sIntake::setFeedIntake),
+                                                    new WaitCommand(2.0),
+                                                    new InstantCommand(sIntake::setZero),
+                                                    new InstantCommand(sSlider::setRetract), 
+                                                    new InstantCommand(sIntake::hardResetIntake)
+                                                    ).withTimeout(3.0));  
 
-        //Driver shooting controls
-
-        m_driverController.rightBumper().onTrue(new SequentialCommandGroup(new InstantCommand(sSlider::setExtend)                                                        
-        )) .onFalse(new SequentialCommandGroup(new setElevatorOffset(sElevator,()->-.3),new InstantCommand(sIntake::setFeedIntake),
-            new WaitCommand(2.0)
-             ,new InstantCommand(sIntake::setZero),new InstantCommand(sSlider::setRetract)
-            ).withTimeout(0));  
-            //backup//
-        // m_driverController.rightBumper().onTrue(new ParallelCommandGroup(new InstantCommand(sIntake::setFeedIntake)
-                                                                         
-        //                                                                 ))
-        //                                   .onFalse(new ParallelCommandGroup(new InstantCommand(sIntake::setZero)
-                                         
-        //                                   ).withTimeout(0));  
-
-        // Create DriveToPoseCommand based on trigger inputs
-        // createDriveToPoseTrigger(m_driverController::getRightTriggerAxis, false);
-        // createDriveToPoseTrigger(m_driverController::getLeftTriggerAxis, false);
-        
-        // Bind B button to drive to nearest AprilTag pose at center
-        //createDriveToPoseButtonTrigger(m_driverController.b(), false);
-
-        // Bind right bumper to drive to nearest AprilTag pose with a special mode
-        //createDriveToPoseButtonTrigger(m_driverController.rightBumper(), true);
         createDriveToPoseButtonTrigger(m_driverController.x(), true);
         // m_driverController.b().whileTrue(new driveToPose(swerveSubsystem,fieldPoses.reefPose));
     }
@@ -242,13 +230,10 @@ public class RobotContainer {
         
         // ------------------------- Preset Pose Commands ------------------------- //
         // m_operatorController.a().onTrue(setL1Pose);
-        m_operatorController.y().onTrue(new SequentialCommandGroup(new ParallelCommandGroup(setL4Pose,  new InstantCommand(sSlider::setRetract)),
-                                                new InstantCommand(sSlider::setExtend)).withTimeout(3.0));
-        m_operatorController.b().onTrue(new SequentialCommandGroup(new ParallelCommandGroup(setL3Pose,  new InstantCommand(sSlider::setRetract)),
-                                                new InstantCommand(sSlider::setExtend)).withTimeout(3.0));
-        m_operatorController.x().onTrue(new SequentialCommandGroup(new ParallelCommandGroup(setL2Pose,  new InstantCommand(sSlider::setRetract)),
-                                                new InstantCommand(sSlider::setExtend)).withTimeout(3.0));
-        m_operatorController.a().onTrue(new ParallelCommandGroup(setHomePose,new InstantCommand(sSlider::setRetract)).withTimeout(3.0));
+        m_operatorController.y().onTrue(setL4Pose.withTimeout(3.0));          
+        m_operatorController.b().onTrue(setL3Pose.withTimeout(3.0));                                               
+        m_operatorController.x().onTrue(setL2Pose.withTimeout(3.0));
+        m_operatorController.a().onTrue(setHomePose.withTimeout(3.0));
         
         // ----------------------- Climber Commands ----------------------- //
         new Trigger(() -> m_operatorController.rightStick().getAsBoolean() &&
@@ -384,3 +369,20 @@ public class RobotContainer {
     }
 
 }
+            //backup//
+        // m_driverController.rightBumper().onTrue(new ParallelCommandGroup(new InstantCommand(sIntake::setFeedIntake)
+                                                                         
+        //                                                                 ))
+        //                                   .onFalse(new ParallelCommandGroup(new InstantCommand(sIntake::setZero)
+                                         
+        //                                   ).withTimeout(0));  
+
+        // Create DriveToPoseCommand based on trigger inputs
+        // createDriveToPoseTrigger(m_driverController::getRightTriggerAxis, false);
+        // createDriveToPoseTrigger(m_driverController::getLeftTriggerAxis, false);
+        
+        // Bind B button to drive to nearest AprilTag pose at center
+        //createDriveToPoseButtonTrigger(m_driverController.b(), false);
+
+        // Bind right bumper to drive to nearest AprilTag pose with a special mode
+        //createDriveToPoseButtonTrigger(m_driverController.rightBumper(), true);
