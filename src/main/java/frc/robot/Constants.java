@@ -111,7 +111,7 @@ public final class Constants {
             // Home and Max Height Constants
             public static final double kHomePose = 0.0;
             public static final double kMaxHeight = 1000.0;
-            public static final double kCURRENT_THRESHOLD = 4.0;//used for homing
+            public static final double kCURRENT_THRESHOLD = 5.0;//used for homing
 
             // Encoder Constants
             public static final double kTolerance = 1.0;

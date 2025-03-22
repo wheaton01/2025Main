@@ -29,7 +29,7 @@ import edu.wpi.first.math.controller.PIDController;
 
 public class sElevator extends SubsystemBase {
     
-    private static final int CURRENT_SPIKE_FILTER_CYCLES = 3; // Adjust as needed
+    private static final int CURRENT_SPIKE_FILTER_CYCLES = 4; // Adjust as needed
     private int motor1CurrentSpikeCount = 0;
     private int motor2CurrentSpikeCount = 0;
     private PIDController mElevatorUpPid;

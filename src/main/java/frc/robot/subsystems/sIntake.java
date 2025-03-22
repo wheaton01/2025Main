@@ -121,6 +121,5 @@ state manager 3 = zero mode
   public boolean getCoralSensor() {
     return aIntakeSensor.getValue() > robotConstants.kintakeSensorThreshold;
   }
-  public void setCoralPlaceMode(){
-  }
+
 }

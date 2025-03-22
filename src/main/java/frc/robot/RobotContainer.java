@@ -174,19 +174,22 @@ public class RobotContainer {
         //`````````````````````````````````````````````````
         //`````````Driver shooting controls````````````````
         //`````````````````````````````````````````````````
-        m_driverController.rightBumper().onTrue(new SequentialCommandGroup(
-                                                    new InstantCommand(sSlider::setExtend)))  
-                                        .onFalse(new SequentialCommandGroup(
-                                                    new setElevatorOffset(sElevator,()->-.2),
-                                                    new InstantCommand(sIntake::setFeedIntake),
-                                                    new WaitCommand(2.0),
-                                                    new InstantCommand(sIntake::setZero),
-                                                    new InstantCommand(sSlider::setRetract), 
-                                                    new InstantCommand(sIntake::hardResetIntake),
-                                                    new WaitCommand(.5),
-                                                    setHomePose//TODO: discuss this with the team
-                                                    ).withTimeout(4.0));  
+        m_driverController.rightBumper().onTrue(
+            new SequentialCommandGroup(
+             new InstantCommand(sSlider::setExtend))) 
+            .onFalse(
+            new SequentialCommandGroup(
+                new InstantCommand(sIntake::setFeedIntake),
+                new setElevatorOffset(sElevator,()->-.2),
+            new WaitCommand(2.0),
+                new InstantCommand(sIntake::setZero),
+                new InstantCommand(sSlider::setRetract), 
+                new InstantCommand(sIntake::hardResetIntake),
+            new WaitCommand(.5)
+            //TODO: discuss this with the team
+            ).withTimeout(4.0));  
 
+           
         createDriveToPoseButtonTrigger(m_driverController.x(), true);
         // m_driverController.b().whileTrue(new driveToPose(swerveSubsystem,fieldPoses.reefPose));
     }
@@ -284,7 +287,7 @@ public class RobotContainer {
         //                                                                 new InstantCommand(sIntake::hardResetIntake)
         //                         )); // Haptic feedback when motors are on
         RobotModeTriggers.teleop().onTrue(new InstantCommand(sIntake::hardResetIntake));
-        RobotModeTriggers.teleop().onTrue(new setElevatorPose(sElevator,elevatorConstants.kProcessorhHeight));//TODO: REIMPLEMENT\\ maybe this crashes code though
+        //RobotModeTriggers.teleop().onTrue(new setElevatorPose(sElevator,elevatorConstants.kProcessorhHeight));//TODO: REIMPLEMENT\\ maybe this crashes code though
         }
 
     /* 
