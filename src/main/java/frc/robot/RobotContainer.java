@@ -233,22 +233,22 @@ public class RobotContainer {
         // ------------------------- Preset Pose Commands ------------------------- //
         // m_operatorController.a().onTrue(setL1Pose);
         m_operatorController.y().onTrue(new SequentialCommandGroup(new ParallelCommandGroup(setL4Pose,  new InstantCommand(sSlider::setRetract)),
-                                                new InstantCommand(sSlider::setExtend)));
+                                                new InstantCommand(sSlider::setExtend)).withTimeout(3.0));
         m_operatorController.b().onTrue(new SequentialCommandGroup(new ParallelCommandGroup(setL3Pose,  new InstantCommand(sSlider::setRetract)),
-                                                new InstantCommand(sSlider::setExtend)));
+                                                new InstantCommand(sSlider::setExtend)).withTimeout(3.0));
         m_operatorController.x().onTrue(new SequentialCommandGroup(new ParallelCommandGroup(setL2Pose,  new InstantCommand(sSlider::setRetract)),
-                                                new InstantCommand(sSlider::setExtend)));
-        m_operatorController.a().onTrue(new ParallelCommandGroup(setHomePose,new InstantCommand(sSlider::setRetract)));
-
+                                                new InstantCommand(sSlider::setExtend)).withTimeout(3.0));
+        m_operatorController.a().onTrue(new ParallelCommandGroup(setHomePose,new InstantCommand(sSlider::setRetract)).withTimeout(3.0));
+        
         // ----------------------- Climber Commands ----------------------- //
         new Trigger(() -> m_operatorController.rightStick().getAsBoolean() &&
-                m_operatorController.leftStick().getAsBoolean())
-                .onTrue(new SequentialCommandGroup(new ParallelCommandGroup(
-                        new setCHaptics(m_controllerHaptics, 0.8).withTimeout(.75),
-                        new InstantCommand(sClimber::disableSafety),
-                        new InstantCommand(sClimber::dropRamp)),
-                        new InstantCommand(sClimber::deployClimber))                        
-                        );
+                          m_operatorController.leftStick().getAsBoolean())
+                                .onTrue(new SequentialCommandGroup(new ParallelCommandGroup(
+                                        new setCHaptics(m_controllerHaptics, 0.8).withTimeout(.75),
+                                        new InstantCommand(sClimber::disableSafety),
+                                        new InstantCommand(sClimber::dropRamp)),
+                                        new InstantCommand(sClimber::deployClimber))                        
+                                        );
 
         m_operatorController.povDown().onTrue(new ParallelCommandGroup(new InstantCommand(sClimber::climb),
                                                                        new InstantCommand(sClimber::stowClimber)))
@@ -271,9 +271,9 @@ public class RobotContainer {
         // **Left Trigger (≥ 0.2)**: Deploy & run **intake forward, place motor in reverse**
         m_operatorController.leftTrigger(0.2)
                 .whileTrue(new ParallelCommandGroup(
-                           new InstantCommand(sIntake::setBallIntake),
-                           new setCHaptics(m_controllerHaptics, 0.2))
-                           ).onFalse(new InstantCommand(sIntake::setZero)); // Haptic feedback when motors are on
+                        new InstantCommand(sIntake::setBallIntake),
+                        new setCHaptics(m_controllerHaptics, 0.2))
+                        ).onFalse(new InstantCommand(sIntake::setZero)); // Haptic feedback when motors are on
         // m_operatorController.rightTrigger(0.2)
         //                 .whileTrue(new ParallelCommandGroup(
         //                         new InstantCommand(sEndAffector::setPlace),
@@ -282,7 +282,7 @@ public class RobotContainer {
         //                                                                 new InstantCommand(sIntake::hardResetIntake)
         //                         )); // Haptic feedback when motors are on
         RobotModeTriggers.teleop().onTrue(new InstantCommand(sIntake::hardResetIntake));
-        //RobotModeTriggers.teleop().onTrue(setHomePose);//TODO: REIMPLEMENT
+        RobotModeTriggers.teleop().onTrue(new setElevatorPose(sElevator,elevatorConstants.kProcessorhHeight));//TODO: REIMPLEMENT\\ maybe this crashes code though
         }
 
     /* 
@@ -352,6 +352,7 @@ public class RobotContainer {
     }
     private void registerNamedCommands() {
         NamedCommands.registerCommand("setHomePose", new SequentialCommandGroup(
+                new setElevatorPose(sElevator, elevatorConstants.kProcessorhHeight),
                 new InstantCommand(sSlider::setRetract),
                 new setElevatorPose(sElevator, elevatorConstants.kHomePose),
                 new InstantCommand(sIntake::hardResetIntake)

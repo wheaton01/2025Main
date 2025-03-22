@@ -88,7 +88,7 @@ public final class Constants {
             public static double kI_down = 0.0002;  // Small increase in I to help with steady-state error
             public static double kD_down = 0.00003; // Keep D low to avoid jerky motion
             
-            public static double kFeedForwardDown = 0.12;  // Slight increase for better gravity compensation
+            public static double kFeedForwardDown = 0.075;  // Slight increase for better gravity compensation
             public static final double kFeedForward = 0.0750; // Tuned in 2/20
             public static double kP_up = 0.03;
             public static double kI =    0.00015;
@@ -111,7 +111,7 @@ public final class Constants {
             // Home and Max Height Constants
             public static final double kHomePose = 0.0;
             public static final double kMaxHeight = 1000.0;
-            public static final double kCURRENT_THRESHOLD = 10.0;//used for homing
+            public static final double kCURRENT_THRESHOLD = 4.0;//used for homing
 
             // Encoder Constants
             public static final double kTolerance = 1.0;

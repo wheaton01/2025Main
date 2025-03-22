@@ -29,7 +29,7 @@ import edu.wpi.first.math.controller.PIDController;
 
 public class sElevator extends SubsystemBase {
     
-    private static final int CURRENT_SPIKE_FILTER_CYCLES = 5; // Adjust as needed
+    private static final int CURRENT_SPIKE_FILTER_CYCLES = 3; // Adjust as needed
     private int motor1CurrentSpikeCount = 0;
     private int motor2CurrentSpikeCount = 0;
     private PIDController mElevatorUpPid;
@@ -228,7 +228,7 @@ public class sElevator extends SubsystemBase {
     private void homingMode() {
         startedHoming = true;
         if (!motor1Homed) {
-            mElevator1.set(0.1);
+            mElevator1.set(0.2);
             if (mElevator1.getOutputCurrent() > elevatorConstants.kCURRENT_THRESHOLD) {
                 motor1CurrentSpikeCount++;
                 if (motor1CurrentSpikeCount >= CURRENT_SPIKE_FILTER_CYCLES) {
@@ -242,7 +242,7 @@ public class sElevator extends SubsystemBase {
         }
     
         if (!motor2Homed) {
-            mElevator2.set(0.1);
+            mElevator2.set(0.2);
             if (mElevator2.getOutputCurrent() > elevatorConstants.kCURRENT_THRESHOLD) {
                 motor2CurrentSpikeCount++;
                 if (motor2CurrentSpikeCount >= CURRENT_SPIKE_FILTER_CYCLES) {
