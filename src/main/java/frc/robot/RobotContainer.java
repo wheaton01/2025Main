@@ -13,6 +13,7 @@ import frc.robot.commands.elevatorCommands.setElevatorPose;
 import frc.robot.commands.intakeCommands.setIntake;
 import frc.robot.commands.SwerveCommands.DriveToPoseCommand;
 import frc.robot.commands.SwerveCommands.driveToPose;
+import frc.robot.commands.autos.AlignToReef;
 import frc.robot.subsystems.sClimber;
 import frc.robot.subsystems.sControllerHaptics;
 import frc.robot.subsystems.sElevator;
@@ -28,6 +29,8 @@ import java.util.function.DoubleSupplier;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -75,6 +78,9 @@ public class RobotContainer {
     DriveToPoseCommand autoDriveToPoseCommand;
     setElevatorOffset setElevatorOffset;
     Compressor compressor = new Compressor(1, PneumaticsModuleType.CTREPCM);
+    private AlignToReef alignmentCommandFactory = null;
+     public static final AprilTagFieldLayout fieldLayout                     = AprilTagFieldLayout.loadField(
+        AprilTagFields.k2025ReefscapeWelded);  /**
 
     private final CommandXboxController m_driverController = new CommandXboxController(
             OperatorConstants.kDriverControllerPort);
@@ -170,6 +176,7 @@ public class RobotContainer {
     public void driverControls() {
         
         driveControls();
+        newVisionControls();
         //DISABLE VISION
         m_driverController.start().and(m_driverController.back()).onTrue(new InstantCommand(swerveSubsystem::stopVision));
         //`````````````````````````````````````````````````
@@ -229,6 +236,21 @@ public class RobotContainer {
             //sElevator.setDefaultCommand(sElevator.setElevator(() -> MathUtil.applyDeadband(m_operatorController.getLeftY(), .1)));
             m_driverController.a().onTrue(new InstantCommand(swerveSubsystem::zeroGyro));
             m_driverController.start().onTrue(new InstantCommand(swerveSubsystem::zeroGyroWithAlliance));
+    }
+    public void newVisionControls(){
+        m_driverController.leftTrigger(.2).whileTrue(
+            alignmentCommandFactory.generateCommand(BranchSide.LEFT)//.finallyDo((boolean interrupted) -> {
+            //     dynamics.gotoLastInputtedScore().onlyIf(() -> !interrupted);
+            // })
+            .withName("Align Left Branch")
+        );
+
+        m_driverController.rightTrigger(.2).whileTrue(
+            alignmentCommandFactory.generateCommand(BranchSide.RIGHT)//.finallyDo((boolean interrupted) -> {
+            //     dynamics.gotoLastInputtedScore().onlyIf(() -> !interrupted);
+            // })
+            .withName("Align Right Branch")
+        );
     }
 
     /* 
@@ -380,6 +402,9 @@ public class RobotContainer {
                 new InstantCommand(sSlider::setRetract),
                 new WaitCommand(.5)
         ));
+    }
+    public static AprilTagFieldLayout getFieldlayout(){
+        return fieldLayout;
     }
 
 }

@@ -1,4 +1,4 @@
-package com.spartronics4915.frc2025.commands.autos;
+package frc.robot.commands.autos;
 
 import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kPathConstraints;
 import static com.spartronics4915.frc2025.Constants.Drive.AutoConstants.kAlignmentAdjustmentTimeout;
@@ -15,12 +15,7 @@ import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.IdealStartingState;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.Waypoint;
-import com.spartronics4915.frc2025.RobotContainer;
-import com.spartronics4915.frc2025.commands.VariableAutos.BranchSide;
-import com.spartronics4915.frc2025.commands.VariableAutos.ReefSide;
-import com.spartronics4915.frc2025.Constants.VisionConstants;
-import com.spartronics4915.frc2025.subsystems.SwerveSubsystem;
-import com.spartronics4915.frc2025.util.AprilTagRegion;
+
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
@@ -35,6 +30,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 
 public class AlignToReef {
     
