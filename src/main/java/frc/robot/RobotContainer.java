@@ -71,7 +71,7 @@ public class RobotContainer {
     setIntake defaultIntake, intakeBall;
     setClimber defaultClimber;
     sControllerHaptics m_controllerHaptics;
-    setElevatorPose setL4Pose, setL3Pose, setL2Pose, setL1Pose, setHomePose, setProcessorPose;
+    setElevatorPose setL4Pose, setL3Pose, setL2Pose, setL1Pose, setHomePose, setProcessorPose, setCoralPose;
     DriveToPoseCommand autoDriveToPoseCommand;
     setElevatorOffset setElevatorOffset;
     Compressor compressor = new Compressor(1, PneumaticsModuleType.CTREPCM);
@@ -133,6 +133,7 @@ public class RobotContainer {
         setL1Pose = new setElevatorPose(sElevator, elevatorConstants.kL1Height);
         setHomePose = new setElevatorPose(sElevator, elevatorConstants.kHomePose);
         setProcessorPose = new setElevatorPose(sElevator, elevatorConstants.kProcessorhHeight);
+        setCoralPose = new setElevatorPose(sElevator, elevatorConstants.kCoralFeedPose);
 
         //setElevatorOffset = new setElevatorOffset(sElevator, () -> MathUtil.applyDeadband(m_operatorController.getLeftY(), .1));
 
@@ -242,7 +243,8 @@ public class RobotContainer {
         m_operatorController.y().onTrue(setL4Pose.withTimeout(3.0));          
         m_operatorController.b().onTrue(setL3Pose.withTimeout(3.0));                                               
         m_operatorController.x().onTrue(setL2Pose.withTimeout(3.0));
-        m_operatorController.a().onTrue(setHomePose.withTimeout(3.0));
+        m_operatorController.a().onTrue(setCoralPose.withTimeout(3.0));
+        m_operatorController.start().onTrue(setHomePose.withTimeout(3.0));
         
         // ----------------------- Climber Commands ----------------------- //
         new Trigger(() -> m_operatorController.rightStick().getAsBoolean() &&
@@ -355,8 +357,11 @@ public class RobotContainer {
         )).onFalse(new InstantCommand(swerveSubsystem::stop).withTimeout(0));
     }
     private void registerNamedCommands() {
+        NamedCommands.registerCommand("initAuto", new SequentialCommandGroup(
+            new setElevatorPose(sElevator, elevatorConstants.kProcessorhHeight),
+            new setElevatorPose(sElevator,elevatorConstants.kHomePose)
+        ));
         NamedCommands.registerCommand("setHomePose", new SequentialCommandGroup(
-                new setElevatorPose(sElevator, elevatorConstants.kProcessorhHeight),
                 new InstantCommand(sSlider::setRetract),
                 new setElevatorPose(sElevator, elevatorConstants.kHomePose),
                 new InstantCommand(sIntake::hardResetIntake)

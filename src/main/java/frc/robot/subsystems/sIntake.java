@@ -59,7 +59,10 @@ state manager 3 = zero mode
     }else if (stateManager == 4) {
       setMotorSpeed(intakeConstants.kBallIntakeSpeed);
     }
-    if (coralDetected && stateManager != 2) {
+    if (coralDetected 
+        && stateManager != 2 
+        && stateManager != 4) //prevents interruption of algae intake
+        {
       stateManager = 3;
       bHasCoral = true;
     }
