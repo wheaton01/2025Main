@@ -1,6 +1,7 @@
-package com.spartronics4915.frc2025.commands.autos;
+package frc.robot.commands.autos;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Seconds;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,185 +22,189 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.commands.VariableAutos.*;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import frc.robot.util.AprilTagRegion;
+import swervelib.SwerveDrive;
 public class AlignToReef {
     
-    private final SwerveSubsystem mSwerve;
+                public  final static Time kAutoAlignPredict = Seconds.of(0.0);
+            
+                private SwerveSubsystem mSwerve;
+            
+                public static ArrayList<Pose2d> blueReefTagPoses = new ArrayList<>();
+                public static ArrayList<Pose2d> redReefTagPoses = new ArrayList<>();
+                public static ArrayList<Pose2d> allReefTagPoses = new ArrayList<>();
+            
+                public boolean isPIDLoopRunning = false;
+            
+            
+                public AlignToReef(SwerveSubsystem swerve, AprilTagFieldLayout field) {
 
-    public static ArrayList<Pose2d> blueReefTagPoses = new ArrayList<>();
-    public static ArrayList<Pose2d> redReefTagPoses = new ArrayList<>();
-    public static ArrayList<Pose2d> allReefTagPoses = new ArrayList<>();
-
-    public boolean isPIDLoopRunning = false;
-
-
-    public AlignToReef(SwerveSubsystem mSwerve, AprilTagFieldLayout field) {
-        this.mSwerve = mSwerve;
-
-        Arrays.stream(AprilTagRegion.kReef.blue()).forEach((i) -> {
-            field.getTagPose(i).ifPresent((p) -> {
-                blueReefTagPoses.add(new Pose2d(
-                    p.getMeasureX(),
-                    p.getMeasureY(),
-                    p.getRotation().toRotation2d()
-                ));
-            });
-        });
-
-        Arrays.stream(AprilTagRegion.kReef.red()).forEach((i) -> {
-            field.getTagPose(i).ifPresent((p) -> {
-                redReefTagPoses.add(new Pose2d(
-                    p.getMeasureX(),
-                    p.getMeasureY(),
-                    p.getRotation().toRotation2d()
-                ));
-            });
-        });
-
-        Arrays.stream(AprilTagRegion.kReef.both()).forEach((i) -> {
-            field.getTagPose(i).ifPresent((p) -> {
-                allReefTagPoses.add(new Pose2d(
-                    p.getMeasureX(),
-                    p.getMeasureY(),
-                    p.getRotation().toRotation2d()
-                ));
-            });
-        });
-    }
-
-    /**
-     * this is an enum that represents if the branch is on the left or right side ofthe field, instead of relative to the tag
-     */
-    public enum FieldBranchSide{
-        LEFT(BranchSide.LEFT),
-        RIGHT(BranchSide.RIGHT);
-
-        public BranchSide branchSide;
-
-        public FieldBranchSide getOpposite(){
-            switch (this){
-                case LEFT: return FieldBranchSide.RIGHT;
-                case RIGHT: return FieldBranchSide.LEFT;
+                    this.mSwerve = swerve;
+            
+                    Arrays.stream(AprilTagRegion.kReef.blue()).forEach((i) -> {
+                        field.getTagPose(i).ifPresent((p) -> {
+                            blueReefTagPoses.add(new Pose2d(
+                                p.getMeasureX(),
+                                p.getMeasureY(),
+                                p.getRotation().toRotation2d()
+                            ));
+                        });
+                    });
+            
+                    Arrays.stream(AprilTagRegion.kReef.red()).forEach((i) -> {
+                        field.getTagPose(i).ifPresent((p) -> {
+                            redReefTagPoses.add(new Pose2d(
+                                p.getMeasureX(),
+                                p.getMeasureY(),
+                                p.getRotation().toRotation2d()
+                            ));
+                        });
+                    });
+            
+                    Arrays.stream(AprilTagRegion.kReef.both()).forEach((i) -> {
+                        field.getTagPose(i).ifPresent((p) -> {
+                            allReefTagPoses.add(new Pose2d(
+                                p.getMeasureX(),
+                                p.getMeasureY(),
+                                p.getRotation().toRotation2d()
+                            ));
+                        });
+                    });
+                }
+            
+                /**
+                 * this is an enum that represents if the branch is on the left or right side ofthe field, instead of relative to the tag
+                 */
+                public enum FieldBranchSide{
+                    LEFT(BranchSide.LEFT),
+                    RIGHT(BranchSide.RIGHT);
+            
+                    public BranchSide branchSide;
+            
+                    public FieldBranchSide getOpposite(){
+                        switch (this){
+                            case LEFT: return FieldBranchSide.RIGHT;
+                            case RIGHT: return FieldBranchSide.LEFT;
+                        }
+                        System.out.println("Error, switch case failed to catch the field branch side");
+                        return this;
+                    }
+            
+                    private FieldBranchSide(BranchSide internal) {
+                        this.branchSide = internal;
+                    }
+                }
+            
+                private final StructPublisher<Pose2d> desiredBranchPublisher = NetworkTableInstance.getDefault().getTable("logging").getStructTopic("desired branch", Pose2d.struct).publish();
+            
+                private PathConstraints pathConstraints = mSwerve.getConstraints();
+        
+            public void changePathConstraints(PathConstraints newPathConstraints){
+                this.pathConstraints = newPathConstraints;
             }
-            System.out.println("Error, switch case failed to catch the field branch side");
-            return this;
-        }
-
-        private FieldBranchSide(BranchSide internal) {
-            this.branchSide = internal;
-        }
-    }
-
-    private final StructPublisher<Pose2d> desiredBranchPublisher = NetworkTableInstance.getDefault().getTable("logging").getStructTopic("desired branch", Pose2d.struct).publish();
-
-    private PathConstraints pathConstraints = kPathConstraints;
-
-    public void changePathConstraints(PathConstraints newPathConstraints){
-        this.pathConstraints = newPathConstraints;
-    }
-
-    public Command generateCommand(FieldBranchSide side) {
-        return Commands.defer(() -> {
-            var branch = getClosestBranch(side, mSwerve);
-            desiredBranchPublisher.accept(branch);
-    
-            return getPathFromWaypoint(getWaypointFromBranch(branch));
-        }, Set.of());
-    }
-
-
-    public Command generateCommand(final ReefSide reefTag, BranchSide side) {
-        return Commands.defer(() -> {
-            var branch = getBranchFromTag(reefTag.getCurrent(), side);
-            desiredBranchPublisher.accept(branch);
-    
-            return getPathFromWaypoint(getWaypointFromBranch(branch));
-        }, Set.of(mSwerve));
-    }
-
-    private Command getPathFromWaypoint(Pose2d waypoint) {
-        List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(
-            new Pose2d(mSwerve.getPose().getTranslation(), getPathVelocityHeading(mSwerve.getFieldVelocity(), waypoint)),
-            waypoint
-        );
-
-        if (waypoints.get(0).anchor().getDistance(waypoints.get(1).anchor()) < 0.01) {
-            return 
-            Commands.sequence(
-                Commands.print("start position PID loop"),
-                PositionPIDCommand.generateCommand(mSwerve, waypoint, kAutoAlignAdjustTimeout),
-                Commands.print("end position PID loop")
-            );
-        }
-
-        PathPlannerPath path = new PathPlannerPath(
-            waypoints, 
-            pathConstraints,
-            new IdealStartingState(getVelocityMagnitude(mSwerve.getFieldVelocity()), mSwerve.getHeading()), 
-            new GoalEndState(0.0, waypoint.getRotation())
-        );
-
-        path.preventFlipping = true;
-
-        return (AutoBuilder.followPath(path).andThen(
-            Commands.print("start position PID loop"),
-            PositionPIDCommand.generateCommand(mSwerve, waypoint, (
-                DriverStation.isAutonomous() ? kAutoAlignAdjustTimeout : kTeleopAlignAdjustTimeout
-            ))
-                .beforeStarting(Commands.runOnce(() -> {isPIDLoopRunning = true;}))
-                .finallyDo(() -> {isPIDLoopRunning = false;}),
-            Commands.print("end position PID loop")
-        )).finallyDo((interupt) -> {
-            if (interupt) { //if this is false then the position pid would've X braked & called the same method
-                mSwerve.drive(new ChassisSpeeds(0,0,0));
+        
+            public Command generateCommand(FieldBranchSide side) {
+                return Commands.defer(() -> {
+                    var branch = getClosestBranch(side, mSwerve);
+                    desiredBranchPublisher.accept(branch);
+            
+                    return getPathFromWaypoint(getWaypointFromBranch(branch));
+                }, Set.of());
             }
-        });
-    }
-    
-
-    /**
-     * 
-     * @param cs field relative chassis speeds
-     * @return
-     */
-    private Rotation2d getPathVelocityHeading(ChassisSpeeds cs, Pose2d target){
-        if (getVelocityMagnitude(cs).in(MetersPerSecond) < 0.25) {
-            var diff = target.minus(mSwerve.getPose()).getTranslation();
-            return (diff.getNorm() < 0.01) ? target.getRotation() : diff.getAngle();//.rotateBy(Rotation2d.k180deg);
-        }
-        return new Rotation2d(cs.vxMetersPerSecond, cs.vyMetersPerSecond);
-    }
-
-    private LinearVelocity getVelocityMagnitude(ChassisSpeeds cs){
-        return MetersPerSecond.of(new Translation2d(cs.vxMetersPerSecond, cs.vyMetersPerSecond).getNorm());
-    }
-
-    /**
-     * 
-     * @return Pathplanner waypoint with direction of travel away from the associated reef side
-     */
-    private Pose2d getWaypointFromBranch(Pose2d branch){
-        return new Pose2d(
-            branch.getTranslation(),
-            branch.getRotation().rotateBy(Rotation2d.k180deg)
-        );
-    }
-
-    /**
-     * 
-     * @return target rotation for the robot when it reaches the final waypoint
-     */
-    private Rotation2d getBranchRotation(SwerveSubsystem swerve){
-        return getClosestReefAprilTag(swerve.getPose()).getRotation().rotateBy(Rotation2d.k180deg);
-    }
-
-    public static Pose2d getClosestBranch(FieldBranchSide fieldSide, SwerveSubsystem swerve){
-        Pose2d swervePose = swerve.predict(kAutoAlignPredict);
+        
+        
+            public Command generateCommand(final ReefSide reefTag, BranchSide side) {
+                return Commands.defer(() -> {
+                    var branch = getBranchFromTag(reefTag.getCurrent(), side);
+                    desiredBranchPublisher.accept(branch);
+            
+                    return getPathFromWaypoint(getWaypointFromBranch(branch));
+                }, Set.of(mSwerve));
+            }
+        
+            private Command getPathFromWaypoint(Pose2d waypoint) {
+                List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(
+                    new Pose2d(mSwerve.getPose().getTranslation(), getPathVelocityHeading(mSwerve.getFieldVelocity(), waypoint)),
+                    waypoint
+                );
+        
+                if (waypoints.get(0).anchor().getDistance(waypoints.get(1).anchor()) < 0.01) {
+                    return 
+                    Commands.sequence(
+                        Commands.print("start position PID loop"),
+                        PositionPIDCommand.generateCommand(mSwerve, waypoint, 2.0),
+                        Commands.print("end position PID loop")
+                    );
+                }
+        
+                PathPlannerPath path = new PathPlannerPath(
+                    waypoints, 
+                    pathConstraints,
+                    new IdealStartingState(getVelocityMagnitude(mSwerve.getFieldVelocity()), mSwerve.getHeading()), 
+                    new GoalEndState(0.0, waypoint.getRotation())
+                );
+        
+                path.preventFlipping = true;
+        
+                return (AutoBuilder.followPath(path).andThen(
+                    Commands.print("start position PID loop"),
+                    PositionPIDCommand.generateCommand(mSwerve, waypoint,  1.5)
+                        .beforeStarting(Commands.runOnce(() -> {isPIDLoopRunning = true;}))
+                        .finallyDo(() -> {isPIDLoopRunning = false;}),
+                    Commands.print("end position PID loop")
+                )).finallyDo((interupt) -> {
+                    if (interupt) { //if this is false then the position pid would've X braked & called the same method
+                        mSwerve.drive(new ChassisSpeeds(0,0,0));
+                    }
+                });
+            }
+            
+        
+            /**
+             * 
+             * @param cs field relative chassis speeds
+             * @return
+             */
+            private Rotation2d getPathVelocityHeading(ChassisSpeeds cs, Pose2d target){
+                if (getVelocityMagnitude(cs).in(MetersPerSecond) < 0.25) {
+                    var diff = target.minus(mSwerve.getPose()).getTranslation();
+                    return (diff.getNorm() < 0.01) ? target.getRotation() : diff.getAngle();//.rotateBy(Rotation2d.k180deg);
+                }
+                return new Rotation2d(cs.vxMetersPerSecond, cs.vyMetersPerSecond);
+            }
+        
+            private LinearVelocity getVelocityMagnitude(ChassisSpeeds cs){
+                return MetersPerSecond.of(new Translation2d(cs.vxMetersPerSecond, cs.vyMetersPerSecond).getNorm());
+            }
+        
+            /**
+             * 
+             * @return Pathplanner waypoint with direction of travel away from the associated reef side
+             */
+            private Pose2d getWaypointFromBranch(Pose2d branch){
+                return new Pose2d(
+                    branch.getTranslation(),
+                    branch.getRotation().rotateBy(Rotation2d.k180deg)
+                );
+            }
+        
+            /**
+             * 
+             * @return target rotation for the robot when it reaches the final waypoint
+             */
+            private Rotation2d getBranchRotation(SwerveSubsystem swerve){
+                return getClosestReefAprilTag(swerve.getPose()).getRotation().rotateBy(Rotation2d.k180deg);
+            }
+        
+            public static Pose2d getClosestBranch(FieldBranchSide fieldSide, SwerveSubsystem swerve){
+                Pose2d swervePose = swerve.predict(kAutoAlignPredict);
         
         Pose2d tag = getClosestReefAprilTag(swervePose);
         

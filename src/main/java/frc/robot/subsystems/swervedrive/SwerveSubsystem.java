@@ -36,6 +36,9 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.BaseUnits;
+import edu.wpi.first.units.TimeUnit;
+import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -89,7 +92,8 @@ public class SwerveSubsystem extends SubsystemBase
   private long lastVisionTime = 0;
   // Time (ms) before considering vision lost
   private final long VISION_TIMEOUT = 500;
-  
+    public static final TimeUnit Seconds = BaseUnits.TimeUnit;
+
     private Vision vision;
     PhotonTrackedTarget target;
     public  PhotonPipelineResult result = new PhotonPipelineResult();
@@ -1046,4 +1050,26 @@ public class SwerveSubsystem extends SubsystemBase
       visionDriveTest = false;
   }
 
+
+      public double getSpeed() {
+        ChassisSpeeds fieldVelocity = getFieldVelocity();
+        return Math.sqrt(fieldVelocity.vxMetersPerSecond * fieldVelocity.vxMetersPerSecond + fieldVelocity.vyMetersPerSecond * fieldVelocity.vyMetersPerSecond);
+    }
+    
+    public PathConstraints getConstraints() {
+      return new PathConstraints(swerveDrive.getMaximumChassisVelocity(), 4.0, swerveDrive.getMaximumChassisAngularVelocity(), Units.degreesToRadians(720));
+    }
+
+        public Pose2d predict(Time inTheFuture){
+        
+        Pose2d currPose = getPose();
+
+        var cs = getFieldVelocity();
+
+        return new Pose2d(
+            currPose.getX() + cs.vxMetersPerSecond * inTheFuture.in(Seconds), 
+            currPose.getY() + cs.vyMetersPerSecond * inTheFuture.in(Seconds), 
+            currPose.getRotation().plus(Rotation2d.fromRadians(cs.omegaRadiansPerSecond * inTheFuture.in(Seconds)))
+        );
+    }
 }
