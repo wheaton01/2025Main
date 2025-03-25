@@ -6,6 +6,7 @@ import frc.robot.Constants.robotConstants;
 import frc.robot.Constants.swerveConstants;
 import frc.robot.Constants.robotConstants.elevatorConstants;
 import frc.robot.commands.SwerveCommands.aprilTagSwerve;
+import frc.robot.commands.VariableAutos.BranchSide;
 import frc.robot.commands.setCHaptics;
 import frc.robot.commands.climberCommands.setClimber;
 import frc.robot.commands.elevatorCommands.setElevatorOffset;
@@ -14,6 +15,7 @@ import frc.robot.commands.intakeCommands.setIntake;
 import frc.robot.commands.SwerveCommands.DriveToPoseCommand;
 import frc.robot.commands.SwerveCommands.driveToPose;
 import frc.robot.commands.autos.AlignToReef;
+import frc.robot.commands.autos.AlignToReef.FieldBranchSide;
 import frc.robot.subsystems.sClimber;
 import frc.robot.subsystems.sControllerHaptics;
 import frc.robot.subsystems.sElevator;
@@ -239,14 +241,14 @@ public class RobotContainer {
     }
     public void newVisionControls(){
         m_driverController.leftTrigger(.2).whileTrue(
-            alignmentCommandFactory.generateCommand(BranchSide.LEFT)//.finallyDo((boolean interrupted) -> {
+            alignmentCommandFactory.generateCommand(FieldBranchSide.LEFT)//.finallyDo((boolean interrupted) -> {
             //     dynamics.gotoLastInputtedScore().onlyIf(() -> !interrupted);
             // })
             .withName("Align Left Branch")
         );
 
         m_driverController.rightTrigger(.2).whileTrue(
-            alignmentCommandFactory.generateCommand(BranchSide.RIGHT)//.finallyDo((boolean interrupted) -> {
+            alignmentCommandFactory.generateCommand(FieldBranchSide.RIGHT)//.finallyDo((boolean interrupted) -> {
             //     dynamics.gotoLastInputtedScore().onlyIf(() -> !interrupted);
             // })
             .withName("Align Right Branch")
