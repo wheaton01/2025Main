@@ -82,7 +82,7 @@ public class RobotContainer {
     Compressor compressor = new Compressor(1, PneumaticsModuleType.CTREPCM);
     private AlignToReef alignmentCommandFactory = null;
      public static final AprilTagFieldLayout fieldLayout                     = AprilTagFieldLayout.loadField(
-        AprilTagFields.k2025ReefscapeWelded);  /**
+        AprilTagFields.k2025ReefscapeWelded);  
 
     private final CommandXboxController m_driverController = new CommandXboxController(
             OperatorConstants.kDriverControllerPort);
@@ -227,9 +227,9 @@ public class RobotContainer {
             );
 
             //TODO: FIX THIS
-            m_driverController.leftTrigger(.2).whileTrue(new aprilTagSwerve(swerveSubsystem,
-                ()->-m_driverController.getLeftX(),()->-m_driverController.getLeftY(),()->m_driverController.getRightX(),
-                ()->false,m_driverController,m_operatorController,fieldPoses.lSidePose, robotConstants.ilCameraID));
+            // m_driverController.leftTrigger(.2).whileTrue(new aprilTagSwerve(swerveSubsystem,
+            //     ()->-m_driverController.getLeftX(),()->-m_driverController.getLeftY(),()->m_driverController.getRightX(),
+            //     ()->false,m_driverController,m_operatorController,fieldPoses.lSidePose, robotConstants.ilCameraID));
 
             // m_driverController.rightTrigger(.2).whileTrue(new aprilTagSwerve(swerveSubsystem,
             //                 ()->-m_driverController.getLeftX(),()->-m_driverController.getLeftY(),()->m_driverController.getRightX(),
