@@ -40,14 +40,15 @@ public class AlignToReef {
                 public static ArrayList<Pose2d> blueReefTagPoses = new ArrayList<>();
                 public static ArrayList<Pose2d> redReefTagPoses = new ArrayList<>();
                 public static ArrayList<Pose2d> allReefTagPoses = new ArrayList<>();
-            
+                public PathConstraints pathConstraints;
                 public boolean isPIDLoopRunning = false;
             
             
                 public AlignToReef(SwerveSubsystem swerve, AprilTagFieldLayout field) {
 
                     this.mSwerve = swerve;
-            
+                    pathConstraints = mSwerve.getConstraints();
+
                     Arrays.stream(AprilTagRegion.kReef.blue()).forEach((i) -> {
                         field.getTagPose(i).ifPresent((p) -> {
                             blueReefTagPoses.add(new Pose2d(
@@ -104,7 +105,6 @@ public class AlignToReef {
             
                 private final StructPublisher<Pose2d> desiredBranchPublisher = NetworkTableInstance.getDefault().getTable("logging").getStructTopic("desired branch", Pose2d.struct).publish();
             
-                private PathConstraints pathConstraints = mSwerve.getConstraints();
         
             public void changePathConstraints(PathConstraints newPathConstraints){
                 this.pathConstraints = newPathConstraints;

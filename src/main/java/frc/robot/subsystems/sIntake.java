@@ -30,6 +30,7 @@ public class sIntake extends SubsystemBase {
   private boolean extraIntakeActive = false;
   private boolean coralPlaceMode = false;
   private boolean bHasCoral = false;
+  private boolean bManual;
   private double stateManager =1;
   /** Creates a new sIntake. */
   public sIntake() {
@@ -48,7 +49,7 @@ state manager 3 = zero mode
     SmartDashboard.putBoolean("CORAL DETECTED", coralDetected);
     SmartDashboard.putNumber("Inake Sensor Val", aIntakeSensor.getValue());
 
-
+    if (!bManual){
     if (stateManager == 1) {
       setMotorSpeed(intakeConstants.kIdleIntakeSpeed);
     } else if (stateManager == 2) {
@@ -69,6 +70,30 @@ state manager 3 = zero mode
     if(!bHasCoral && stateManager == 3){
       stateManager = 1;
     }
+  }
+  if (bManual){
+  if (stateManager == 1) {
+    setMotorSpeed(intakeConstants.kIdleIntakeSpeed*.25);
+  } else if (stateManager == 2) {
+    setMotorSpeed(intakeConstants.kPlaceSpeed*.25);
+    bHasCoral = false;
+  } else if (stateManager == 3) {
+    setMotorSpeed(.0);
+  }else if (stateManager == 4) {
+    setMotorSpeed(intakeConstants.kBallIntakeSpeed*.25);
+  }
+  if (coralDetected 
+      && stateManager != 2 
+      && stateManager != 4) //prevents interruption of algae intake
+      {
+    stateManager = 3;
+    bHasCoral = true;
+  }
+  if(!bHasCoral && stateManager == 3){
+    stateManager = 1;
+  }
+}
+
 
 
     // Update coral detection for the next loop
@@ -86,6 +111,7 @@ state manager 3 = zero mode
   /** Stops the intake motor. */
   public void setZero() {
     stateManager = 3;
+    bManual = false;
   }
   public void setMotorSpeed(double speed){
     mIntake.set(VictorSPXControlMode.PercentOutput, speed);
@@ -98,6 +124,7 @@ state manager 3 = zero mode
   public void hardResetIntake(){
   stateManager = 1;
   bHasCoral = false;
+  bManual = false;
   }
 
   /** Runs intake at feeding speed. */

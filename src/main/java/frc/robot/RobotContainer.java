@@ -80,7 +80,7 @@ public class RobotContainer {
     DriveToPoseCommand autoDriveToPoseCommand;
     setElevatorOffset setElevatorOffset;
     Compressor compressor = new Compressor(1, PneumaticsModuleType.CTREPCM);
-    private AlignToReef alignmentCommandFactory = null;
+    private AlignToReef alignmentCommandFactory;
      public static final AprilTagFieldLayout fieldLayout                     = AprilTagFieldLayout.loadField(
         AprilTagFields.k2025ReefscapeWelded);  
 
@@ -108,8 +108,10 @@ public class RobotContainer {
         registerNamedCommands();
 
 
+
         swerveSubsystem = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
                 "neo"));
+
         setupCommands();
         configureBindings();
         autoChooser = AutoBuilder.buildAutoChooser("LsideStart");
@@ -132,6 +134,8 @@ public class RobotContainer {
         //     ));        // Intake Commands
         // defaultIntake = new setIntake(false, false, 0, 0, sEndAffector);
         defaultClimber = new setClimber(sClimber, false, false);
+        alignmentCommandFactory = new AlignToReef(swerveSubsystem, fieldLayout);
+
         //intakeBall = new setIntake(false, true, 0.0, -1.0, sEndAffector);
 
         // Elevator Commands
@@ -208,13 +212,13 @@ public class RobotContainer {
         DriverStation.getAlliance().get() == DriverStation.Alliance.Red;
 
             // Flip controls if on Red Alliance
-            double flipMultiplier = isRedAlliance ? -1.0 : 1.0;
 
             swerveSubsystem.setDefaultCommand(
             swerveSubsystem.driveCommand(
-            () -> flipMultiplier * MathUtil.applyDeadband(-m_driverController.getLeftY(), 0.1),
-            () -> flipMultiplier * MathUtil.applyDeadband(-m_driverController.getLeftX(), 0.1),
-            () -> MathUtil.applyDeadband(-m_driverController.getRightX(), 0.1)
+            () ->  MathUtil.applyDeadband(-m_driverController.getLeftY(), 0.1),
+            () ->  MathUtil.applyDeadband(-m_driverController.getLeftX(), 0.1),
+            () -> MathUtil.applyDeadband(-m_driverController.getRightX(), 0.1),
+            () -> isRedAlliance
             )
             );
 
@@ -280,10 +284,10 @@ public class RobotContainer {
                                         new InstantCommand(sClimber::deployClimber))                        
                                         );
 
-        m_operatorController.povDown().onTrue(new ParallelCommandGroup(new InstantCommand(sClimber::climb),
+        m_operatorController.povDown().onTrue(new ParallelCommandGroup(new InstantCommand(sClimber::unClimb),
                                                                        new InstantCommand(sClimber::stowClimber)))
                                                                        .onFalse(new InstantCommand(sClimber::zeroClimb));
-        m_operatorController.povUp().onTrue(new ParallelCommandGroup(new InstantCommand(sClimber::unClimb),
+        m_operatorController.povUp().onTrue(new ParallelCommandGroup(new InstantCommand(sClimber::climb),
                                                                      new InstantCommand(sClimber::deployClimber)))
                                                                      .onFalse(new InstantCommand(sClimber::zeroClimb));
         m_operatorController.povLeft().onTrue(new InstantCommand(sClimber::stowClimber));
@@ -304,6 +308,11 @@ public class RobotContainer {
                         new InstantCommand(sIntake::setBallIntake),
                         new setCHaptics(m_controllerHaptics, 0.2))
                         ).onFalse(new InstantCommand(sIntake::setZero)); // Haptic feedback when motors are on
+        m_operatorController.rightTrigger(0.2)
+                        .whileTrue(new ParallelCommandGroup(
+                                new InstantCommand(sIntake::setFeedIntake),
+                                new setCHaptics(m_controllerHaptics, 0.2))
+                                ).onFalse(new InstantCommand(sIntake::setZero)); // Haptic feedback when motors are on
         // m_operatorController.rightTrigger(0.2)
         //                 .whileTrue(new ParallelCommandGroup(
         //                         new InstantCommand(sEndAffector::setPlace),
@@ -382,8 +391,8 @@ public class RobotContainer {
     }
     private void registerNamedCommands() {
         NamedCommands.registerCommand("initAuto", new SequentialCommandGroup(
-            new setElevatorPose(sElevator, elevatorConstants.kProcessorhHeight),
-            new setElevatorPose(sElevator,elevatorConstants.kHomePose)
+            new setElevatorPose(sElevator, elevatorConstants.kProcessorhHeight).withTimeout(.1),
+            new setElevatorPose(sElevator,elevatorConstants.kHomePose).withTimeout(.5)
         ));
         NamedCommands.registerCommand("setHomePose", new SequentialCommandGroup(
                 new InstantCommand(sSlider::setRetract),

@@ -162,9 +162,9 @@ public final class Constants {
         public static final PIDController SWERVEX_CONTROLLER = new PIDController(1.0, 0.0, 0.0);
         public static final PIDController SWERVEY_CONTROLLER = new PIDController(1.0, 0.0, 0.0);
         public static final PIDController SWERVETHETA_CONTROLLER = new PIDController(0.03, 0.0, 0.0);
-        public static final PIDConstants X_CONTROLLER = new     PIDConstants(2.0, 0.0, 0.0);
-        public static final PIDConstants Y_CONTROLLER = new     PIDConstants(2.0, 0.0, 0.0);
-        public static final PIDConstants THETA_CONTROLLER = new PIDConstants(0.3, 0.0, 0.0);
+        public static final PIDConstants X_CONTROLLER = new     PIDConstants(2.2, 0.0, 0.1);
+        public static final PIDConstants Y_CONTROLLER = new     PIDConstants(2.2, 0.0, 0.1);
+        public static final PIDConstants THETA_CONTROLLER = new PIDConstants(0.35, 0.0, 0.0);
         public static final PPHolonomicDriveController kAutoAlignPIDController = new PPHolonomicDriveController(
             X_CONTROLLER, THETA_CONTROLLER);
         public static final double xOffsetReef = .3 ;

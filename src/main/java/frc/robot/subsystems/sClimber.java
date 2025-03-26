@@ -49,13 +49,13 @@ public class sClimber extends SubsystemBase {
   }
   public void deployClimber(){
     if (enableClimber) {
-    sdeployClimb.set(true);
+    //sdeployClimb.set(true);
     }
   } 
   public void stowClimber(){
     if (enableClimber) {
 
-    sdeployClimb.set(false);
+    //sdeployClimb.set(false);
     }
   }
   public void climb(){
