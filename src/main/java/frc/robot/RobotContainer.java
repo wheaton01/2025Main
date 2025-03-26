@@ -256,10 +256,10 @@ public class RobotContainer {
                                         new InstantCommand(sClimber::deployClimber))                        
                                         );
 
-        m_operatorController.povDown().onTrue(new ParallelCommandGroup(new InstantCommand(sClimber::climb),
+        m_operatorController.povDown().onTrue(new ParallelCommandGroup(new InstantCommand(sClimber::unClimb),
                                                                        new InstantCommand(sClimber::stowClimber)))
                                                                        .onFalse(new InstantCommand(sClimber::zeroClimb));
-        m_operatorController.povUp().onTrue(new ParallelCommandGroup(new InstantCommand(sClimber::unClimb),
+        m_operatorController.povUp().onTrue(new ParallelCommandGroup(new InstantCommand(sClimber::climb),
                                                                      new InstantCommand(sClimber::deployClimber)))
                                                                      .onFalse(new InstantCommand(sClimber::zeroClimb));
         m_operatorController.povLeft().onTrue(new InstantCommand(sClimber::stowClimber));
