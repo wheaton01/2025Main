@@ -208,8 +208,6 @@ public class RobotContainer {
     }
     public void driveControls(){
         // Set default drive command
-        boolean isRedAlliance = DriverStation.getAlliance().isPresent() &&
-        DriverStation.getAlliance().get() == DriverStation.Alliance.Red;
 
             // Flip controls if on Red Alliance
 
@@ -217,8 +215,8 @@ public class RobotContainer {
             swerveSubsystem.driveCommand(
             () ->  MathUtil.applyDeadband(-m_driverController.getLeftY(), 0.1),
             () ->  MathUtil.applyDeadband(-m_driverController.getLeftX(), 0.1),
-            () -> MathUtil.applyDeadband(-m_driverController.getRightX(), 0.1),
-            () -> isRedAlliance
+            () -> MathUtil.applyDeadband(-m_driverController.getRightX(), 0.1)
+       
             )
             );
 
@@ -296,18 +294,22 @@ public class RobotContainer {
     
         // --------------------------- Intake Controls --------------------------- //
         m_operatorController.rightStick().onTrue(new InstantCommand(sIntake::hardResetIntake));
-        // **Left Bumper**: Deploy intake only (no motor action) -> No haptic feedback when motors are off
+
         m_operatorController.leftBumper()
-                .onTrue(new InstantCommand(sSlider::setExtend))
-                .onFalse(new InstantCommand(sSlider::setRetract)); // No haptics here since motors are off
+                .onTrue(new ParallelCommandGroup(
+                    new InstantCommand(sIntake::setBallIntake),
+                    new setCHaptics(m_controllerHaptics, 0.2),
+                    new InstantCommand(sSlider::setExtend)))
+                .onFalse(new ParallelCommandGroup(new InstantCommand(sSlider::setRetract),
+                                                  new InstantCommand(sIntake::setZero))); // No haptics here since motors are off
         m_operatorController.leftStick().onTrue(opeartorOffset);
 
         // **Left Trigger (≥ 0.2)**: Deploy & run **intake forward, place motor in reverse**
         m_operatorController.leftTrigger(0.2)
                 .whileTrue(new ParallelCommandGroup(
-                        new InstantCommand(sIntake::setBallIntake),
+                        new InstantCommand(sIntake::setManReverse),
                         new setCHaptics(m_controllerHaptics, 0.2))
-                        ).onFalse(new InstantCommand(sIntake::setZero)); // Haptic feedback when motors are on
+                        ).onFalse(new InstantCommand(sIntake::setManFeed)); // Haptic feedback when motors are on
         m_operatorController.rightTrigger(0.2)
                         .whileTrue(new ParallelCommandGroup(
                                 new InstantCommand(sIntake::setFeedIntake),

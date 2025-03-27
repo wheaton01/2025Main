@@ -155,7 +155,7 @@ public class AlignToReef {
         
                 return (AutoBuilder.followPath(path).andThen(
                     Commands.print("start position PID loop"),
-                    PositionPIDCommand.generateCommand(mSwerve, waypoint,  1.5)
+                    PositionPIDCommand.generateCommand(mSwerve, waypoint,  3.0)
                         .beforeStarting(Commands.runOnce(() -> {isPIDLoopRunning = true;}))
                         .finallyDo(() -> {isPIDLoopRunning = false;}),
                     Commands.print("end position PID loop")

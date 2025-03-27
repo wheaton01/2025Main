@@ -48,21 +48,29 @@ state manager 3 = zero mode
     SmartDashboard.putNumber("INTAKE STATE MANAGER", stateManager);
     SmartDashboard.putBoolean("CORAL DETECTED", coralDetected);
     SmartDashboard.putNumber("Inake Sensor Val", aIntakeSensor.getValue());
-
-    if (!bManual){
     if (stateManager == 1) {
+      
       setMotorSpeed(intakeConstants.kIdleIntakeSpeed);
     } else if (stateManager == 2) {
-      setMotorSpeed(intakeConstants.kPlaceSpeed);
-      bHasCoral = false;
+      if (bManual) {
+        setMotorSpeed(intakeConstants.kPlaceSpeed*.25);
+      } else {
+        setMotorSpeed(intakeConstants.kPlaceSpeed);
+        bHasCoral = false;
+      }
     } else if (stateManager == 3) {
       setMotorSpeed(.0);
     }else if (stateManager == 4) {
-      setMotorSpeed(intakeConstants.kBallIntakeSpeed);
+      if (bManual) {
+        setMotorSpeed(intakeConstants.kBallIntakeSpeed*.25);
+      } else {
+        setMotorSpeed(intakeConstants.kBallIntakeSpeed);
+      }
     }
     if (coralDetected 
         && stateManager != 2 
-        && stateManager != 4) //prevents interruption of algae intake
+        && stateManager != 4
+        && !bManual) //prevents interruption of algae intake
         {
       stateManager = 3;
       bHasCoral = true;
@@ -70,29 +78,7 @@ state manager 3 = zero mode
     if(!bHasCoral && stateManager == 3){
       stateManager = 1;
     }
-  }
-  if (bManual){
-  if (stateManager == 1) {
-    setMotorSpeed(intakeConstants.kIdleIntakeSpeed*.25);
-  } else if (stateManager == 2) {
-    setMotorSpeed(intakeConstants.kPlaceSpeed*.25);
-    bHasCoral = false;
-  } else if (stateManager == 3) {
-    setMotorSpeed(.0);
-  }else if (stateManager == 4) {
-    setMotorSpeed(intakeConstants.kBallIntakeSpeed*.25);
-  }
-  if (coralDetected 
-      && stateManager != 2 
-      && stateManager != 4) //prevents interruption of algae intake
-      {
-    stateManager = 3;
-    bHasCoral = true;
-  }
-  if(!bHasCoral && stateManager == 3){
-    stateManager = 1;
-  }
-}
+  
 
 
 
@@ -120,6 +106,7 @@ state manager 3 = zero mode
   /** Sets intake to idle speed. */
   public void setIntakeMode() {
     stateManager = 1;
+    bManual = false;
   }
   public void hardResetIntake(){
   stateManager = 1;
@@ -130,10 +117,22 @@ state manager 3 = zero mode
   /** Runs intake at feeding speed. */
   public void setFeedIntake() {
   stateManager = 2;
+  bManual = false;
+
   }
   /** Runs intake at ball intake speed. */
   public void setBallIntake() {
     stateManager = 4 ;
+    bManual = false;
+
+  }
+  public void setManFeed(){
+    stateManager = 2;
+    bManual = true;
+  }
+  public void setManReverse(){
+    stateManager = 4;
+    bManual = true;
   }
 
   /**

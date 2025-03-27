@@ -450,9 +450,9 @@ public class SwerveSubsystem extends SubsystemBase
      * @param angularRotationX Angular velocity of the robot to set. Cubed for smoother controls.
      * @return Drive command.
      */
-    public Command driveCommand(DoubleSupplier translationX, DoubleSupplier translationY, DoubleSupplier angularRotationX, BooleanSupplier flipRed)
+    public Command driveCommand(DoubleSupplier translationX, DoubleSupplier translationY, DoubleSupplier angularRotationX)
     {
-      double flipMultipler = flipRed.getAsBoolean() ? -1.0 : 1.0;
+      double flipMultipler = isRedAlliance() ? -1.0 : 1.0;
 
       return run(() -> {
         // Make the robot move
