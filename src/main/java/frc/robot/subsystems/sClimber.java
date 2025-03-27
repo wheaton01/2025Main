@@ -4,6 +4,10 @@
 
 package frc.robot.subsystems;
 
+import javax.sql.StatementEvent;
+
+import org.opencv.ml.StatModel;
+
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -37,6 +41,7 @@ public class sClimber extends SubsystemBase {
   SparkMax climberMotor;
   RelativeEncoder climberEncoder;
   boolean bHasExtended = false;
+  double stateManager = 0;
   public sClimber() {
     climberMotor = new SparkMax(climberConstants.kMotorID,MotorType.kBrushless);
     sClimb =       new Solenoid(1,PneumaticsModuleType.CTREPCM, Constants.robotConstants.climberConstants.kClimb2ID);  
@@ -50,6 +55,27 @@ public class sClimber extends SubsystemBase {
   public void periodic() {
     SmartDashboard.putBoolean(getName(), enableClimber);
     SmartDashboard.putNumber("Climb Encoder Value", climberEncoder.getPosition());
+    if (enableClimber && stateManager == 1) {
+      if (bHasExtended && climberEncoder.getPosition() > climberConstants.kClimbMax) {
+        climberMotor.set(climberConstants.kClimbSpeed);
+      }
+      if (climberEncoder.getPosition() <= climberConstants.kClimbMax && climberEncoder.getPosition() > climberConstants.kClimbSafety) {
+        climberMotor.set(climberConstants.kClimbSpeed*.5);
+      }
+    }
+      if (enableClimber && stateManager== -1) {
+        bHasExtended = true;
+        if (climberEncoder.getPosition() > climberConstants.kExtendedPose) {
+          climberMotor.set(-climberConstants.kClimbSpeed*.25);
+        }else{
+        climberMotor.set(-climberConstants.kClimbSpeed);
+        }
+      }
+      if (stateManager== 0) {
+        climberMotor.set(0);
+        
+      }
+   
    // SmartDashboard.putBoolean("Climber Deployed", sdeployClimb.get());
     // This method will be called once per scheduler run
   }
@@ -65,29 +91,15 @@ public class sClimber extends SubsystemBase {
     }
   }
   public void climb(){
-    if (enableClimber) {
-      if (bHasExtended && climberEncoder.getPosition() > climberConstants.kClimbMax) {
-        climberMotor.set(climberConstants.kClimbSpeed);
-      }
-      if (climberEncoder.getPosition() <= climberConstants.kClimbMax && climberEncoder.getPosition() > climberConstants.kClimbSafety) {
-        climberMotor.set(climberConstants.kClimbSpeed*.5);
-      }
-   }
+    stateManager =1;
   }  
   public void unClimb(){
-    if (enableClimber ) {
-
-      bHasExtended = true;
-      if (climberEncoder.getPosition() > climberConstants.kExtendedPose) {
-        climberMotor.set(-climberConstants.kClimbSpeed*.25);
-      }else{
-      climberMotor.set(-climberConstants.kClimbSpeed);
-      }
-    }
+ stateManager = -1;
     
   } 
   public void zeroClimb(){
     climberMotor.set(0);
+    stateManager = 0;
   }
   public void disableSafety(){
     enableClimber = true;

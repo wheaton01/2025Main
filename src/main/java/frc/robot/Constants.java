@@ -77,9 +77,9 @@ public final class Constants {
             public static final int kRamp1ID = 5;
             public static final int kMotorID = 18;    
             public static final double kClimbSpeed = -1.0;//Inverted 3/21
-            public static double kClimbMax= -1000;
-            public static double kClimbSafety= -500;
-            public static double kExtendedPose = 10000;
+            public static double kClimbMax= -15;
+            public static double kClimbSafety= -22;
+            public static double kExtendedPose = 379;
         }
 
         //==================================================================================

@@ -8,6 +8,7 @@ import frc.robot.Constants.robotConstants.elevatorConstants;
 import frc.robot.commands.SwerveCommands.aprilTagSwerve;
 import frc.robot.commands.VariableAutos.BranchSide;
 import frc.robot.commands.setCHaptics;
+import frc.robot.commands.setCHapticsAndHold;
 import frc.robot.commands.climberCommands.setClimber;
 import frc.robot.commands.elevatorCommands.setElevatorOffset;
 import frc.robot.commands.elevatorCommands.setElevatorPose;
@@ -195,10 +196,12 @@ public class RobotContainer {
             new SequentialCommandGroup(
                 new InstantCommand(sIntake::setFeedIntake),
             new WaitCommand(.5),
+            new setCHapticsAndHold(m_controllerHaptics,.8),
                 new InstantCommand(sIntake::setZero),
                 new InstantCommand(sSlider::setRetract), 
                 new InstantCommand(sIntake::hardResetIntake),
-            new WaitCommand(.5)
+            new WaitCommand(.5),
+            new setCHapticsAndHold(m_controllerHaptics,0)
             //TODO: discuss this with the team
             ).withTimeout(4.0));  
 
@@ -270,7 +273,9 @@ public class RobotContainer {
         m_operatorController.b().onTrue(setL3Pose.withTimeout(3.0));                                               
         m_operatorController.x().onTrue(setL2Pose.withTimeout(3.0));
         m_operatorController.a().onTrue(setCoralPose.withTimeout(3.0));
-        m_operatorController.start().onTrue(setHomePose.withTimeout(3.0));
+        m_operatorController.start().onTrue(new SequentialCommandGroup(
+            new setElevatorPose(sElevator, 1.0),
+            setHomePose.withTimeout(3.0)));
         
         // ----------------------- Climber Commands ----------------------- //
         new Trigger(() -> m_operatorController.rightStick().getAsBoolean() &&
@@ -298,10 +303,11 @@ public class RobotContainer {
         m_operatorController.leftBumper()
                 .onTrue(new ParallelCommandGroup(
                     new InstantCommand(sIntake::setBallIntake),
-                    new setCHaptics(m_controllerHaptics, 0.2),
+                    new setCHapticsAndHold(m_controllerHaptics, 0.2),
                     new InstantCommand(sSlider::setExtend)))
                 .onFalse(new ParallelCommandGroup(new InstantCommand(sSlider::setRetract),
-                                                  new InstantCommand(sIntake::setZero))); // No haptics here since motors are off
+                                                  new InstantCommand(sIntake::setZero),
+                                                  new setCHapticsAndHold(m_controllerHaptics,.0))); // No haptics here since motors are off
         m_operatorController.leftStick().onTrue(opeartorOffset);
 
         // **Left Trigger (≥ 0.2)**: Deploy & run **intake forward, place motor in reverse**
@@ -309,12 +315,14 @@ public class RobotContainer {
                 .whileTrue(new ParallelCommandGroup(
                         new InstantCommand(sIntake::setManReverse),
                         new setCHaptics(m_controllerHaptics, 0.2))
-                        ).onFalse(new InstantCommand(sIntake::setZero)); // Haptic feedback when motors are on
+                        )
+                        .onFalse(new InstantCommand(sIntake::setZero)); // Haptic feedback when motors are on
         m_operatorController.rightTrigger(0.2)
                         .whileTrue(new ParallelCommandGroup(
-                                new InstantCommand(sIntake::setFeedIntake),
+                                new InstantCommand(sIntake::setManFeed),
                                 new setCHaptics(m_controllerHaptics, 0.2))
-                                ).onFalse(new InstantCommand(sIntake::setZero)); // Haptic feedback when motors are on
+                                )
+                                .onFalse(new InstantCommand(sIntake::setZero)); // Haptic feedback when motors are on
         // m_operatorController.rightTrigger(0.2)
         //                 .whileTrue(new ParallelCommandGroup(
         //                         new InstantCommand(sEndAffector::setPlace),
@@ -393,7 +401,7 @@ public class RobotContainer {
     }
     private void registerNamedCommands() {
         NamedCommands.registerCommand("initAuto", new SequentialCommandGroup(
-            new setElevatorPose(sElevator, elevatorConstants.kProcessorhHeight).withTimeout(.1),
+            new setElevatorPose(sElevator, 1).withTimeout(.1),
             new setElevatorPose(sElevator,elevatorConstants.kHomePose).withTimeout(.5)
         ));
         NamedCommands.registerCommand("setHomePose", new SequentialCommandGroup(

@@ -49,8 +49,13 @@ state manager 3 = zero mode
     SmartDashboard.putBoolean("CORAL DETECTED", coralDetected);
     SmartDashboard.putNumber("Inake Sensor Val", aIntakeSensor.getValue());
     if (stateManager == 1) {
-      
+      if(bManual){
+        setMotorSpeed(intakeConstants.kIdleIntakeSpeed*.25);
+
+      }
+      if(!bManual){
       setMotorSpeed(intakeConstants.kIdleIntakeSpeed);
+      }
     } else if (stateManager == 2) {
       if (bManual) {
         setMotorSpeed(intakeConstants.kPlaceSpeed*.25);

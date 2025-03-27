@@ -130,7 +130,8 @@ public class SwerveSubsystem extends SubsystemBase
       swerveDrive.setModuleEncoderAutoSynchronize(false,
                                                   1); // Enable if you want to resynchronize your absolute encoders and motor encoders periodically when they are not moving.
   //    swerveDrive.pushOffsetsToEncoders(); // Set the absolute encoder to be used over the internal encoder and push the offsets onto it. Throws warning if not possible
-      if (visionDriveTest)
+        
+  if (visionDriveTest)
       {
         setupPhotonVision();
         // Stop the odometry thread if we are using vision that way we can synchronize updates better.
@@ -174,6 +175,7 @@ public class SwerveSubsystem extends SubsystemBase
     @Override
     public void periodic()
     {
+      SmartDashboard.putNumber("MATCH TIME",DriverStation.getMatchTime());
       // When vision is enabled we must manually update odometry in SwerveDrive
       if (visionDriveTest)
       {
