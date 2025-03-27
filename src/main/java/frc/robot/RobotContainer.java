@@ -309,7 +309,7 @@ public class RobotContainer {
                 .whileTrue(new ParallelCommandGroup(
                         new InstantCommand(sIntake::setManReverse),
                         new setCHaptics(m_controllerHaptics, 0.2))
-                        ).onFalse(new InstantCommand(sIntake::setManFeed)); // Haptic feedback when motors are on
+                        ).onFalse(new InstantCommand(sIntake::setZero)); // Haptic feedback when motors are on
         m_operatorController.rightTrigger(0.2)
                         .whileTrue(new ParallelCommandGroup(
                                 new InstantCommand(sIntake::setFeedIntake),

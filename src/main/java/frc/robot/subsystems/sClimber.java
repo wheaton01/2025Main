@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
@@ -33,17 +34,21 @@ public class sClimber extends SubsystemBase {
 
   boolean enableClimber = false;
   SparkMax climberMotor;
-
+  RelativeEncoder climberEncoder;
+  boolean bHasExtended = false;
   public sClimber() {
     climberMotor = new SparkMax(climberConstants.kMotorID,MotorType.kBrushless);
     sClimb =       new Solenoid(1,PneumaticsModuleType.CTREPCM, Constants.robotConstants.climberConstants.kClimb2ID);  
     sdeployClimb = new Solenoid(1,PneumaticsModuleType.CTREPCM, Constants.robotConstants.climberConstants.kClimb1ID);    
     sdropRamp =    new Solenoid(1,PneumaticsModuleType.CTREPCM, Constants.robotConstants.climberConstants.kRamp1ID);    
+    climberEncoder = climberMotor.getEncoder();
+    climberEncoder.setPosition(0);
   }
 
   @Override
   public void periodic() {
     SmartDashboard.putBoolean(getName(), enableClimber);
+    SmartDashboard.putNumber("Climb Encoder Value", climberEncoder.getPosition());
    // SmartDashboard.putBoolean("Climber Deployed", sdeployClimb.get());
     // This method will be called once per scheduler run
   }
@@ -60,11 +65,15 @@ public class sClimber extends SubsystemBase {
   }
   public void climb(){
     if (enableClimber) {
-      climberMotor.set(climberConstants.kClimbSpeed);
+      if (bHasExtended && climberEncoder.getPosition() > climberConstants.kClimbMax) {
+        climberMotor.set(climberConstants.kClimbSpeed);
+
+      }
    }
   }  
   public void unClimb(){
     if (enableClimber) {
+      bHasExtended = true;
       climberMotor.set(-climberConstants.kClimbSpeed);
     }
   } 
@@ -77,5 +86,6 @@ public class sClimber extends SubsystemBase {
   public void dropRamp(){
     sdropRamp.set(enableClimber);
   }
+  
 
 }
