@@ -33,6 +33,7 @@ public class sClimber extends SubsystemBase {
   Solenoid sClimb,sdeployClimb,sdropRamp;
 
   boolean enableClimber = false;
+  boolean bgoFurther = false;
   SparkMax climberMotor;
   RelativeEncoder climberEncoder;
   boolean bHasExtended = false;
@@ -67,15 +68,23 @@ public class sClimber extends SubsystemBase {
     if (enableClimber) {
       if (bHasExtended && climberEncoder.getPosition() > climberConstants.kClimbMax) {
         climberMotor.set(climberConstants.kClimbSpeed);
-
+      }
+      if (climberEncoder.getPosition() <= climberConstants.kClimbMax && climberEncoder.getPosition() > climberConstants.kClimbSafety) {
+        climberMotor.set(climberConstants.kClimbSpeed*.5);
       }
    }
   }  
   public void unClimb(){
-    if (enableClimber) {
+    if (enableClimber ) {
+
       bHasExtended = true;
+      if (climberEncoder.getPosition() > climberConstants.kExtendedPose) {
+        climberMotor.set(-climberConstants.kClimbSpeed*.25);
+      }else{
       climberMotor.set(-climberConstants.kClimbSpeed);
+      }
     }
+    
   } 
   public void zeroClimb(){
     climberMotor.set(0);
