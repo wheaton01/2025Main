@@ -9,7 +9,7 @@ public class ElementLocator {
     
     private final AprilTagFieldLayout fieldLayout;
 
-    private final double kDistanceFromTagToCoralMeters = .2;
+    private final double kDistanceFromTagToCoralMeters = 0;
 
     public ElementLocator() {
 

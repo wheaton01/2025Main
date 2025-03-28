@@ -222,6 +222,7 @@ public class RobotContainer {
        
             )
             );
+            m_driverController.back().onTrue(new InstantCommand(swerveSubsystem::flipDrive));
 
             m_driverController.leftBumper()
             .whileTrue(
@@ -406,9 +407,9 @@ public class RobotContainer {
         ));
         NamedCommands.registerCommand("setHomePose", new SequentialCommandGroup(
                 new InstantCommand(sSlider::setRetract),
-                new setElevatorPose(sElevator, elevatorConstants.kHomePose),
+                new setElevatorPose(sElevator, elevatorConstants.kCoralFeedPose).withTimeout(.5),
                 new InstantCommand(sIntake::hardResetIntake)
-        )); 
+        ).withTimeout(2.5)); 
         NamedCommands.registerCommand("placeL4", new SequentialCommandGroup(
                 //setting elevator to L4 height and extending the slider
                 new setElevatorPose(sElevator, elevatorConstants.kL4Height).withTimeout(2.0),
@@ -417,7 +418,7 @@ public class RobotContainer {
                 //actually feeding the intake
                 new InstantCommand(sIntake::setFeedIntake),
                 new WaitCommand(.125),
-                new setElevatorOffset(sElevator, ()->-0.5),
+                new setElevatorOffset(sElevator, ()->-0.5).withTimeout(0.0),
                 new WaitCommand(.75),
                 //going back down
                 new InstantCommand(sSlider::setRetract),

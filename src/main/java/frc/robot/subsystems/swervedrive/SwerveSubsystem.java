@@ -171,10 +171,15 @@ public class SwerveSubsystem extends SubsystemBase
     {
       vision = new Vision(swerveDrive::getPose, swerveDrive.field);
     }
-  
+    double flipMultipler;
+    boolean bflipped;
     @Override
     public void periodic()
     {
+      if(!bflipped){
+      flipMultipler = isRedAlliance() ? -1.0 : 1.0;
+      }
+
       SmartDashboard.putNumber("MATCH TIME",DriverStation.getMatchTime());
       // When vision is enabled we must manually update odometry in SwerveDrive
       if (visionDriveTest)
@@ -190,6 +195,10 @@ public class SwerveSubsystem extends SubsystemBase
     @Override
     public void simulationPeriodic()
     {
+    }
+    public void flipDrive(){
+      flipMultipler = flipMultipler*-1;
+      bflipped = true;
     }
   
     /**
@@ -454,7 +463,7 @@ public class SwerveSubsystem extends SubsystemBase
      */
     public Command driveCommand(DoubleSupplier translationX, DoubleSupplier translationY, DoubleSupplier angularRotationX)
     {
-      double flipMultipler = isRedAlliance() ? -1.0 : 1.0;
+      
 
       return run(() -> {
         // Make the robot move
