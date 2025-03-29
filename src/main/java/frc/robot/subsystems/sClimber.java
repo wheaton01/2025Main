@@ -55,7 +55,7 @@ public class sClimber extends SubsystemBase {
   public void periodic() {
     SmartDashboard.putBoolean(getName(), enableClimber);
     SmartDashboard.putNumber("Climb Encoder Value", climberEncoder.getPosition());
-    if (enableClimber && stateManager == 1) {
+    if (stateManager == 1) {
       if (bHasExtended && climberEncoder.getPosition() > climberConstants.kClimbMax) {
         climberMotor.set(climberConstants.kClimbSpeed);
       }
@@ -63,7 +63,7 @@ public class sClimber extends SubsystemBase {
         climberMotor.set(climberConstants.kClimbSpeed*.5);
       }
     }
-      if (enableClimber && stateManager== -1) {
+      if (stateManager== -1) {
         bHasExtended = true;
         if (climberEncoder.getPosition() > climberConstants.kExtendedPose) {
           climberMotor.set(-climberConstants.kClimbSpeed*.25);

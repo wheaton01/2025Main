@@ -292,12 +292,10 @@ public class RobotContainer {
         // ----------------------- Climber Commands ----------------------- //
         new Trigger(() -> m_operatorController.rightStick().getAsBoolean() &&
                           m_operatorController.leftStick().getAsBoolean())
-                                .onTrue(new SequentialCommandGroup(new ParallelCommandGroup(
-                                        new setCHaptics(m_controllerHaptics, 0.8).withTimeout(.75),
+                                .onTrue(new ParallelCommandGroup(
                                         new InstantCommand(sClimber::disableSafety),
-                                        new InstantCommand(sClimber::dropRamp)),
-                                        new InstantCommand(sClimber::deployClimber))                        
-                                        );
+                                        new setCHaptics(m_controllerHaptics, 0.8).withTimeout(.75)
+                                        ));
 
         m_operatorController.povDown().onTrue(new ParallelCommandGroup(new InstantCommand(sClimber::unClimb),
                                                                        new InstantCommand(sClimber::stowClimber)))
@@ -425,7 +423,7 @@ public class RobotContainer {
         new ParallelDeadlineGroup(new SequentialCommandGroup(
 
                 //setting elevator to L4 height and extending the slider
-                new setElevatorPose(sElevator, elevatorConstants.kL4Height,()->0).withTimeout(1.0),
+                new setElevatorPose(sElevator, elevatorConstants.kL4Height,()->0).withTimeout(1.25),
                 new InstantCommand(sSlider::setExtend),
                 new WaitCommand(1.25),
                 //actually feeding the intake
