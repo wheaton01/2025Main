@@ -24,19 +24,17 @@ import frc.robot.Constants.robotConstants.intakeConstants;
 ╚══════════════════════════════════════════════════════════════════════════════════════╝
 */
 public class sIntake extends SubsystemBase {
-  private final AnalogInput aIntakeSensor;
-  private final VictorSPX mIntake;
-  private final Timer intakeTimer = new Timer();
-  private boolean extraIntakeActive = false;
-  private boolean coralPlaceMode = false;
-  private boolean bHasCoral = false;
-  private boolean bManual;
-  private double stateManager =1;
+  private final        AnalogInput aIntakeSensor;
+  private final        VictorSPX mIntake;
+  private boolean      bHasCoral = false;
+  private boolean      bManual;
+  private double       stateManager = 1;
   /** Creates a new sIntake. */
   public sIntake() {
       mIntake = new VictorSPX(robotConstants.kintakeSparkID);
       aIntakeSensor = new AnalogInput(robotConstants.kIntakeSensorID);
   }
+  
 /*state manager 1 = intake mode
 state manager 2 = feed mode
 state manager 3 = zero mode 
@@ -74,14 +72,10 @@ state manager 3 = zero mode
         {
       stateManager = 3;
       bHasCoral = true;
-    }
+     }
     if(!bHasCoral && stateManager == 3){
       stateManager = 1;
     }
-  
-
-
-
     // Update coral detection for the next loop
   }
 

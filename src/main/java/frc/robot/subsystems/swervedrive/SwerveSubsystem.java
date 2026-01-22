@@ -50,7 +50,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants;
 import frc.robot.Constants.poseConstants;
 import frc.robot.Constants.swerveConstants;
-import frc.robot.subsystems.swervedrive.Vision.Cameras;
+//import frc.robot.subsystems.swervedrive.Vision.Cameras;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
@@ -60,8 +60,8 @@ import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import org.json.simple.parser.ParseException;
-import org.photonvision.targeting.PhotonPipelineResult;
-import org.photonvision.targeting.PhotonTrackedTarget;
+//import org.photonvision.targeting.PhotonPipelineResult;
+//import org.photonvision.targeting.PhotonTrackedTarget;
 
 import swervelib.SwerveController;
 import swervelib.SwerveDrive;
@@ -95,9 +95,9 @@ public class SwerveSubsystem extends SubsystemBase
   private final long VISION_TIMEOUT = 500;
     public static final TimeUnit Seconds = BaseUnits.TimeUnit;
 
-    private Vision vision;
-    PhotonTrackedTarget target;
-    public  PhotonPipelineResult result = new PhotonPipelineResult();
+   // private Vision vision;
+    //PhotonTrackedTarget target;
+    //public  PhotonPipelineResult result = new PhotonPipelineResult();
   
     private ApriltagRelativeRobotPose lSidePose, rSidePose, cPose;
   
@@ -168,7 +168,7 @@ public class SwerveSubsystem extends SubsystemBase
      */
     public void setupPhotonVision()
     {
-      vision = new Vision(swerveDrive::getPose, swerveDrive.field);
+      //vision = new Vision(swerveDrive::getPose, swerveDrive.field);
     }
   
     @Override
@@ -181,7 +181,7 @@ public class SwerveSubsystem extends SubsystemBase
         // if(vision.getNumberOfTargets()>1){
         //   vision.updatePoseEstimation(swerveDrive);
         //   }
-        vision.updatePoseEstimation(swerveDrive);
+        //vision.updatePoseEstimation(swerveDrive);
       }
     }
   
@@ -266,24 +266,24 @@ public class SwerveSubsystem extends SubsystemBase
      *
      * @return A {@link Command} which will run the alignment.
      */
-    public Command aimAtTarget(Cameras camera)
-    {
-  
-      return run(() -> {
-        Optional<PhotonPipelineResult> resultO = camera.getBestResult();
-        if (resultO.isPresent())
-        {
-          var result = resultO.get();
-          if (result.hasTargets())
-          {
-            drive(getTargetSpeeds(0,
-                                  0,
-                                  Rotation2d.fromDegrees(result.getBestTarget()
-                                                               .getYaw()))); // Not sure if this will work, more math may be required.
-          }
-        }
-      });
-    }
+    // public Command aimAtTarget(Cameras camera)
+    // {
+    //   return null;
+    //   // return run(() -> {
+    //   //   Optional<PhotonPipelineResult> resultO = camera.getBestResult();
+    //   //   if (resultO.isPresent())
+    //   //   {
+    //   //     var result = resultO.get();
+    //   //     if (result.hasTargets())
+    //   //     {
+    //   //       drive(getTargetSpeeds(0,
+    //   //                             0,
+    //   //                             Rotation2d.fromDegrees(result.getBestTarget()
+    //   //                                                          .getYaw()))); // Not sure if this will work, more math may be required.
+    //   //     }
+    //   //   }
+    //   // });
+    // }
   
     /**
      * Get the path follower with events.
@@ -920,41 +920,41 @@ public class SwerveSubsystem extends SubsystemBase
   
   private int targetID;
   public Optional<Pose3d> getAprilTagRobotRelativePose(int cameraID) {
-    if (cameraID == 0) {
-        result = vision.getLeftCamResult();
-        SmartDashboard.putString("AprilTag Detection", "LeftCam");
-    } else if (cameraID == 1) {
-        result = vision.getRightCamResult();
-        SmartDashboard.putString("AprilTag Detection", "RightCam");
-    } else if (cameraID == 2) {
-        result = vision.getCenterCamResult();
-        SmartDashboard.putString("AprilTag Detection", "CenterCam");
-    } else {
-        SmartDashboard.putString("AprilTag Detection", "NO Camera FOUND");
-        return Optional.empty();
-    }
-    //result = vision.getBestCameraResult();
+    // if (cameraID == 0) {
+    //     result = vision.getLeftCamResult();
+    //     SmartDashboard.putString("AprilTag Detection", "LeftCam");
+    // } else if (cameraID == 1) {
+    //     result = vision.getRightCamResult();
+    //     SmartDashboard.putString("AprilTag Detection", "RightCam");
+    // } else if (cameraID == 2) {
+    //     result = vision.getCenterCamResult();
+    //     SmartDashboard.putString("AprilTag Detection", "CenterCam");
+    // } else {
+    //     SmartDashboard.putString("AprilTag Detection", "NO Camera FOUND");
+    //     return Optional.empty();
+    // }
+    // //result = vision.getBestCameraResult();
     
   
   
-    if (result == null || !result.hasTargets()) {
-        SmartDashboard.putString("AprilTag Detection", "NO TAG FOUND");
-        return Optional.empty();
-    }
+    // if (result == null || !result.hasTargets()) {
+    //     SmartDashboard.putString("AprilTag Detection", "NO TAG FOUND");
+    //     return Optional.empty();
+    // }
   
-    PhotonTrackedTarget bestTarget = result.getBestTarget();
-    targetID = bestTarget.getFiducialId(); // Get the detected AprilTag ID
+    // PhotonTrackedTarget bestTarget = result.getBestTarget();
+    // targetID = bestTarget.getFiducialId(); // Get the detected AprilTag ID
   
-    Transform3d transform = bestTarget.getBestCameraToTarget();
-    Pose3d pose = new Pose3d(transform.getTranslation(), transform.getRotation());
-    Pose3d tagFieldPose3d = fieldLayout.getTagPose(targetID).orElse(new Pose3d());
-    SmartDashboard.putString("Tag Field Pose", tagFieldPose3d.toString());
+    // Transform3d transform = bestTarget.getBestCameraToTarget();
+    // Pose3d pose = new Pose3d(transform.getTranslation(), transform.getRotation());
+    // Pose3d tagFieldPose3d = fieldLayout.getTagPose(targetID).orElse(new Pose3d());
+    // SmartDashboard.putString("Tag Field Pose", tagFieldPose3d.toString());
   
-    // Store the last known pose and update timestamp
-    lastKnownTagPose = pose;
-    lastVisionTime = System.currentTimeMillis();
+    // // Store the last known pose and update timestamp
+    // lastKnownTagPose = pose;
+    // lastVisionTime = System.currentTimeMillis();
   
-    return Optional.of(pose);
+    return Optional.of(null);
   }
   
   public void setApriltagDrive(int cameraID, double xOffset, double yOffset) {
@@ -1037,8 +1037,8 @@ public class SwerveSubsystem extends SubsystemBase
   
   public double getDistanceToTarget() {
     // Calculate the difference in X and Y coordinates
-    double deltaX = target.getPitch() - currentPose.getTyaw();
-    double deltaY = target.getYaw() - currentPose.getTpitch();
+    double deltaX = currentPose.getTyaw();
+    double deltaY = currentPose.getTpitch();
   
     // Calculate the Euclidean distance (straight-line distance)
     return Math.sqrt(deltaX * deltaX + deltaY * deltaY);
