@@ -358,7 +358,7 @@
 //     field2d.getObject("tracked targets").setPoses(poses);
 //   }
 
-<<<<<<< HEAD
+
 //   /**
 //    * Camera Enum to select each camera
 //    */
