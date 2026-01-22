@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj.AnalogInput;
 
 import com.ctre.phoenix.motorcontrol.VictorSPXControlMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
-import com.ctre.phoenix6.CANBus;
+//import com.ctre.phoenix6.CANBus;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.robotConstants;
@@ -33,7 +33,7 @@ public class sEndAffector extends SubsystemBase {
   //
   AnalogInput aIntakeSensor; 
   AnalogInput aPlaceSensor;
-  CANBus rioBus;
+  //CANBus rioBus;
   public sEndAffector() {
     // mIntake = new SparkMax(Constants.robotConstants.kintakeSparkID, MotorType.kBrushed);
     // mPlace =  new SparkMax(Constants.robotConstants.kPlacesparkID , MotorType.kBrushed);
