@@ -130,7 +130,8 @@ public class SwerveSubsystem extends SubsystemBase
       swerveDrive.setModuleEncoderAutoSynchronize(false,
                                                   1); // Enable if you want to resynchronize your absolute encoders and motor encoders periodically when they are not moving.
   //    swerveDrive.pushOffsetsToEncoders(); // Set the absolute encoder to be used over the internal encoder and push the offsets onto it. Throws warning if not possible
-      if (visionDriveTest)
+        
+  if (visionDriveTest)
       {
         setupPhotonVision();
         // Stop the odometry thread if we are using vision that way we can synchronize updates better.
@@ -170,10 +171,16 @@ public class SwerveSubsystem extends SubsystemBase
     {
       //vision = new Vision(swerveDrive::getPose, swerveDrive.field);
     }
-  
+    double flipMultipler;
+    boolean bflipped;
     @Override
     public void periodic()
     {
+      if(!bflipped){
+      flipMultipler = isRedAlliance() ? -1.0 : 1.0;
+      }
+
+      SmartDashboard.putNumber("MATCH TIME",DriverStation.getMatchTime());
       // When vision is enabled we must manually update odometry in SwerveDrive
       if (visionDriveTest)
       {
@@ -188,6 +195,10 @@ public class SwerveSubsystem extends SubsystemBase
     @Override
     public void simulationPeriodic()
     {
+    }
+    public void flipDrive(){
+      flipMultipler = flipMultipler*-1;
+      bflipped = true;
     }
   
     /**
@@ -452,7 +463,7 @@ public class SwerveSubsystem extends SubsystemBase
      */
     public Command driveCommand(DoubleSupplier translationX, DoubleSupplier translationY, DoubleSupplier angularRotationX)
     {
-      double flipMultipler = isRedAlliance() ? -1.0 : 1.0;
+      
 
       return run(() -> {
         // Make the robot move

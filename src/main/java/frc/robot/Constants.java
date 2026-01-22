@@ -77,9 +77,9 @@ public final class Constants {
             public static final int kRamp1ID = 5;
             public static final int kMotorID = 18;    
             public static final double kClimbSpeed = -1.0;//Inverted 3/21
-            public static double kClimbMax= -1000;
-            public static double kClimbSafety= -500;
-            public static double kExtendedPose = 10000;
+            public static double kClimbMax= -15;
+            public static double kClimbSafety= -22;
+            public static double kExtendedPose = 379;
         }
 
         //==================================================================================
@@ -162,12 +162,12 @@ public final class Constants {
         // Tolerance Constants for Position and Rotation
         public static final double POSITION_TOLERANCE = 0.5;  // Tolerance for position accuracy
         public static final double ROTATION_TOLERANCE = 0.5;  // Tolerance for rotation accuracy
-        public static final PIDController SWERVEX_CONTROLLER = new PIDController(1.0, 0.0, 0.0);
-        public static final PIDController SWERVEY_CONTROLLER = new PIDController(1.0, 0.0, 0.0);
+        public static final PIDController SWERVEX_CONTROLLER = new PIDController(1.2, 0.0, 0.0);
+        public static final PIDController SWERVEY_CONTROLLER = new PIDController(1.2, 0.0, 0.0);
         public static final PIDController SWERVETHETA_CONTROLLER = new PIDController(0.03, 0.0, 0.0);
-        public static final PIDConstants X_CONTROLLER = new     PIDConstants(2.2, 0.0, 0.1);
-        public static final PIDConstants Y_CONTROLLER = new     PIDConstants(2.2, 0.0, 0.1);
-        public static final PIDConstants THETA_CONTROLLER = new PIDConstants(0.35, 0.0, 0.0);
+        public static final PIDConstants X_CONTROLLER = new     PIDConstants(1.2, 0.01, 0.2);
+        public static final PIDConstants Y_CONTROLLER = new     PIDConstants(1.2, 0.01, 0.2);
+        public static final PIDConstants THETA_CONTROLLER = new PIDConstants(0.5, 0.0, 0.0);
         public static final PPHolonomicDriveController kAutoAlignPIDController = new PPHolonomicDriveController(
             X_CONTROLLER, THETA_CONTROLLER);
         public static final double xOffsetReef = .3 ;

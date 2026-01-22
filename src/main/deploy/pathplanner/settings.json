@@ -1,6 +1,6 @@
 {
-  "robotWidth": 0.84,
-  "robotLength": 0.84,
+  "robotWidth": 0.8,
+  "robotLength": 0.8,
   "holonomicMode": true,
   "pathFolders": [
     "CenterStart",
@@ -17,11 +17,11 @@
   "robotMass": 52.163,
   "robotMOI": 4.08,
   "robotTrackwidth": 0.546,
-  "driveWheelRadius": 0.051,
+  "driveWheelRadius": 0.05,
   "driveGearing": 8.14,
   "maxDriveSpeed": 4.602,
-  "driveMotorType": "NEO",
-  "driveCurrentLimit": 45.0,
+  "driveMotorType": "falcon500",
+  "driveCurrentLimit": 52.0,
   "wheelCOF": 1.2,
   "flModuleX": 0.294,
   "flModuleY": 0.294,

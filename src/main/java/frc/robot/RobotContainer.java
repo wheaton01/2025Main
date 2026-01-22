@@ -8,6 +8,7 @@ import frc.robot.Constants.robotConstants.elevatorConstants;
 import frc.robot.commands.SwerveCommands.aprilTagSwerve;
 import frc.robot.commands.VariableAutos.BranchSide;
 import frc.robot.commands.setCHaptics;
+import frc.robot.commands.setCHapticsAndHold;
 import frc.robot.commands.climberCommands.setClimber;
 import frc.robot.commands.elevatorCommands.setElevatorOffset;
 import frc.robot.commands.elevatorCommands.setElevatorPose;
@@ -43,6 +44,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -105,15 +108,13 @@ public class RobotContainer {
         sElevator = new sElevator();
         m_controllerHaptics = new sControllerHaptics(m_driverController, m_operatorController);
         sIntake = new sIntake();
-        registerNamedCommands();
-
-
 
         swerveSubsystem = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
                 "neo"));
-
         setupCommands();
         configureBindings();
+        registerNamedCommands();
+
         autoChooser = AutoBuilder.buildAutoChooser("LsideStart");
 
         SmartDashboard.putData("Auto Chooser", autoChooser);
@@ -139,13 +140,13 @@ public class RobotContainer {
         //intakeBall = new setIntake(false, true, 0.0, -1.0, sEndAffector);
 
         // Elevator Commands
-        setL4Pose = new setElevatorPose(sElevator, elevatorConstants.kL4Height);
-        setL3Pose = new setElevatorPose(sElevator, elevatorConstants.kL3Height);
-        setL2Pose = new setElevatorPose(sElevator, elevatorConstants.kL2Height);
-        setL1Pose = new setElevatorPose(sElevator, elevatorConstants.kL1Height);
-        setHomePose = new setElevatorPose(sElevator, elevatorConstants.kHomePose);
-        setProcessorPose = new setElevatorPose(sElevator, elevatorConstants.kProcessorhHeight);
-        setCoralPose = new setElevatorPose(sElevator, elevatorConstants.kCoralFeedPose);
+        setL4Pose = new setElevatorPose(sElevator, elevatorConstants.kL4Height, ()-> m_operatorController.getLeftY());
+        setL3Pose = new setElevatorPose(sElevator, elevatorConstants.kL3Height, ()-> m_operatorController.getLeftY());
+        setL2Pose = new setElevatorPose(sElevator, elevatorConstants.kL2Height, ()-> m_operatorController.getLeftY());
+        setL1Pose = new setElevatorPose(sElevator, elevatorConstants.kL1Height, ()-> m_operatorController.getLeftY());
+        setHomePose = new setElevatorPose(sElevator, elevatorConstants.kHomePose, ()-> m_operatorController.getLeftY());
+        setProcessorPose = new setElevatorPose(sElevator, elevatorConstants.kProcessorhHeight, ()-> m_operatorController.getLeftY());
+        setCoralPose = new setElevatorPose(sElevator, elevatorConstants.kCoralFeedPose, ()-> m_operatorController.getLeftY());
 
         //setElevatorOffset = new setElevatorOffset(sElevator, () -> MathUtil.applyDeadband(m_operatorController.getLeftY(), .1));
 
@@ -195,10 +196,12 @@ public class RobotContainer {
             new SequentialCommandGroup(
                 new InstantCommand(sIntake::setFeedIntake),
             new WaitCommand(.5),
+            new setCHapticsAndHold(m_controllerHaptics,.8),
                 new InstantCommand(sIntake::setZero),
                 new InstantCommand(sSlider::setRetract), 
                 new InstantCommand(sIntake::hardResetIntake),
-            new WaitCommand(.5)
+            new WaitCommand(.5),
+            new setCHapticsAndHold(m_controllerHaptics,0)
             //TODO: discuss this with the team
             ).withTimeout(4.0));  
 
@@ -219,6 +222,7 @@ public class RobotContainer {
        
             )
             );
+            m_driverController.back().onTrue(new InstantCommand(swerveSubsystem::flipDrive));
 
             m_driverController.leftBumper()
             .whileTrue(
@@ -243,14 +247,25 @@ public class RobotContainer {
     }
     public void newVisionControls(){
         m_driverController.leftTrigger(.2).whileTrue(
-            alignmentCommandFactory.generateCommand(FieldBranchSide.LEFT)//.finallyDo((boolean interrupted) -> {
+            alignmentCommandFactory.generateCommand(FieldBranchSide.LEFT).andThen(
+                swerveSubsystem.driveRobotCentCommand(
+            () -> MathUtil.applyDeadband(-m_driverController.getLeftY(), 0.1)*.10+.05,
+            () -> MathUtil.applyDeadband(-m_driverController.getLeftX(), 0.1)*.10,
+            () -> MathUtil.applyDeadband(-m_driverController.getRightX(), 0.1)*.350
+            )
+            )//.finallyDo((boolean interrupted) -> {
             //     dynamics.gotoLastInputtedScore().onlyIf(() -> !interrupted);
             // })
             .withName("Align Left Branch")
         );
 
         m_driverController.rightTrigger(.2).whileTrue(
-            alignmentCommandFactory.generateCommand(FieldBranchSide.RIGHT)//.finallyDo((boolean interrupted) -> {
+            alignmentCommandFactory.generateCommand(FieldBranchSide.RIGHT)
+            .andThen(swerveSubsystem.driveRobotCentCommand(
+                () -> MathUtil.applyDeadband(-m_driverController.getLeftY(), 0.1)*.10+.05,
+                () -> MathUtil.applyDeadband(-m_driverController.getLeftX(), 0.1)*.10,
+                () -> MathUtil.applyDeadband(-m_driverController.getRightX(), 0.1)*.350
+                ))//.finallyDo((boolean interrupted) -> {
             //     dynamics.gotoLastInputtedScore().onlyIf(() -> !interrupted);
             // })
             .withName("Align Right Branch")
@@ -270,17 +285,17 @@ public class RobotContainer {
         m_operatorController.b().onTrue(setL3Pose.withTimeout(3.0));                                               
         m_operatorController.x().onTrue(setL2Pose.withTimeout(3.0));
         m_operatorController.a().onTrue(setCoralPose.withTimeout(3.0));
-        m_operatorController.start().onTrue(setHomePose.withTimeout(3.0));
+        m_operatorController.start().onTrue(new SequentialCommandGroup(
+            new setElevatorPose(sElevator, 1.0,()->0),
+            setHomePose.withTimeout(3.0)));
         
         // ----------------------- Climber Commands ----------------------- //
         new Trigger(() -> m_operatorController.rightStick().getAsBoolean() &&
                           m_operatorController.leftStick().getAsBoolean())
-                                .onTrue(new SequentialCommandGroup(new ParallelCommandGroup(
-                                        new setCHaptics(m_controllerHaptics, 0.8).withTimeout(.75),
+                                .onTrue(new ParallelCommandGroup(
                                         new InstantCommand(sClimber::disableSafety),
-                                        new InstantCommand(sClimber::dropRamp)),
-                                        new InstantCommand(sClimber::deployClimber))                        
-                                        );
+                                        new setCHaptics(m_controllerHaptics, 0.8).withTimeout(.75)
+                                        ));
 
         m_operatorController.povDown().onTrue(new ParallelCommandGroup(new InstantCommand(sClimber::unClimb),
                                                                        new InstantCommand(sClimber::stowClimber)))
@@ -298,10 +313,11 @@ public class RobotContainer {
         m_operatorController.leftBumper()
                 .onTrue(new ParallelCommandGroup(
                     new InstantCommand(sIntake::setBallIntake),
-                    new setCHaptics(m_controllerHaptics, 0.2),
+                    new setCHapticsAndHold(m_controllerHaptics, 0.2),
                     new InstantCommand(sSlider::setExtend)))
                 .onFalse(new ParallelCommandGroup(new InstantCommand(sSlider::setRetract),
-                                                  new InstantCommand(sIntake::setZero))); // No haptics here since motors are off
+                                                  new InstantCommand(sIntake::setZero),
+                                                  new setCHapticsAndHold(m_controllerHaptics,.0))); // No haptics here since motors are off
         m_operatorController.leftStick().onTrue(opeartorOffset);
 
         // **Left Trigger (≥ 0.2)**: Deploy & run **intake forward, place motor in reverse**
@@ -309,12 +325,14 @@ public class RobotContainer {
                 .whileTrue(new ParallelCommandGroup(
                         new InstantCommand(sIntake::setManReverse),
                         new setCHaptics(m_controllerHaptics, 0.2))
-                        ).onFalse(new InstantCommand(sIntake::setZero)); // Haptic feedback when motors are on
+                        )
+                        .onFalse(new InstantCommand(sIntake::setZero)); // Haptic feedback when motors are on
         m_operatorController.rightTrigger(0.2)
                         .whileTrue(new ParallelCommandGroup(
-                                new InstantCommand(sIntake::setFeedIntake),
+                                new InstantCommand(sIntake::setManFeed),
                                 new setCHaptics(m_controllerHaptics, 0.2))
-                                ).onFalse(new InstantCommand(sIntake::setZero)); // Haptic feedback when motors are on
+                                )
+                                .onFalse(new InstantCommand(sIntake::setZero)); // Haptic feedback when motors are on
         // m_operatorController.rightTrigger(0.2)
         //                 .whileTrue(new ParallelCommandGroup(
         //                         new InstantCommand(sEndAffector::setPlace),
@@ -393,28 +411,30 @@ public class RobotContainer {
     }
     private void registerNamedCommands() {
         NamedCommands.registerCommand("initAuto", new SequentialCommandGroup(
-            new setElevatorPose(sElevator, elevatorConstants.kProcessorhHeight).withTimeout(.1),
-            new setElevatorPose(sElevator,elevatorConstants.kHomePose).withTimeout(.5)
+            new setElevatorPose(sElevator, 1,()->0).withTimeout(.1),
+            new setElevatorPose(sElevator,elevatorConstants.kHomePose,()->0).withTimeout(.5)
         ));
         NamedCommands.registerCommand("setHomePose", new SequentialCommandGroup(
                 new InstantCommand(sSlider::setRetract),
-                new setElevatorPose(sElevator, elevatorConstants.kHomePose),
+                new setElevatorPose(sElevator, elevatorConstants.kCoralFeedPose,()->0).withTimeout(.5),
                 new InstantCommand(sIntake::hardResetIntake)
-        )); 
-        NamedCommands.registerCommand("placeL4", new SequentialCommandGroup(
+        ).withTimeout(2.5)); 
+        NamedCommands.registerCommand("placeL4", 
+        new ParallelDeadlineGroup(new SequentialCommandGroup(
+
                 //setting elevator to L4 height and extending the slider
-                new setElevatorPose(sElevator, elevatorConstants.kL4Height).withTimeout(2.0),
+                new setElevatorPose(sElevator, elevatorConstants.kL4Height,()->0).withTimeout(1.25),
                 new InstantCommand(sSlider::setExtend),
                 new WaitCommand(1.25),
                 //actually feeding the intake
                 new InstantCommand(sIntake::setFeedIntake),
                 new WaitCommand(.125),
-                new setElevatorOffset(sElevator, ()->-0.5),
+                new setElevatorOffset(sElevator, ()->-0.5).withTimeout(0.0),
                 new WaitCommand(.75),
                 //going back down
                 new InstantCommand(sSlider::setRetract),
                 new WaitCommand(.5)
-        ));
+        ), swerveSubsystem.driveRobotCentCommand(()->.2, ()->0,()->0).withTimeout(1.5)));
     }
     public static AprilTagFieldLayout getFieldlayout(){
         return fieldLayout;

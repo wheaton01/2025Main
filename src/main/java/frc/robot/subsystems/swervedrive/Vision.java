@@ -358,6 +358,7 @@
 //     field2d.getObject("tracked targets").setPoses(poses);
 //   }
 
+<<<<<<< HEAD
 //   /**
 //    * Camera Enum to select each camera
 //    */
@@ -384,6 +385,34 @@
 //                                .290,
 //                                .180),
 //              VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1));
+=======
+  /**
+   * Camera Enum to select each camera
+   */
+//   enum Cameras
+//   {
+//     /**
+//      * Left Camera
+//      */
+//     LIMELIGHT("limelight",
+//              new Rotation3d(0, Math.toRadians(-17), Math.toRadians(0)),
+//              new Translation3d(Units.inchesToMeters(0.0),
+//                                Units.inchesToMeters(0.0),
+//                                .820),
+//              VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
+//     rightCam("rightCam",
+//              new Rotation3d(0, Math.toRadians(17.0), Math.toRadians(0)),
+//              new Translation3d(0.070,
+//                                -0.290,
+//                                0.180),
+//              VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
+//     leftCam("leftCam",
+//              new Rotation3d(0, Math.toRadians(17.0), Math.toRadians(0)),
+//              new Translation3d(.070,
+//                                .290,
+//                                .180),
+//              VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1));
+// >>>>>>> 4824da113ae4dacebbca9b592923e08e8c2c984d
 
 //     /**
 //      * Latency alert to use when high latency is detected.

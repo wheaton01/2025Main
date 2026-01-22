@@ -4,6 +4,8 @@
 
 package frc.robot.commands.elevatorCommands;
 
+import java.util.function.DoubleSupplier;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.sElevator;
 
@@ -11,8 +13,10 @@ import frc.robot.subsystems.sElevator;
 public class setElevatorPose extends Command {
   sElevator mElevator;
   double deisredPose;
+  DoubleSupplier elevatorOffset;
   /** Creates a new setElevatorPose. */
-  public setElevatorPose(sElevator mElevator,double deisredPose) {
+  public setElevatorPose(sElevator mElevator,double deisredPose, DoubleSupplier elevatorOffset) {
+    this.elevatorOffset = elevatorOffset;
     this.mElevator = mElevator;
     this.deisredPose = deisredPose;
     addRequirements(mElevator);
@@ -27,7 +31,9 @@ public class setElevatorPose extends Command {
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {}
+  public void execute() {
+    mElevator.setoperatorOffset(elevatorOffset.getAsDouble());
+  }
 
   // Called once the command ends or is interrupted.
   @Override
